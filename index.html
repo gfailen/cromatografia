@@ -80,41 +80,51 @@
 
     /* ── Hero ────────────────────────────────────── */
     .hero {
-      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #0ea5e9 100%);
-      color: #fff;
+      position: relative;
       overflow: hidden;
-    }
-    .hero-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 4rem 2rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
+      min-height: 480px;
+      display: flex;
       align-items: center;
     }
-    @media (max-width: 768px) {
-      .hero-inner { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
-      .hero-image { display: none; }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(10,22,54,.88) 0%, rgba(10,22,54,.7) 45%, rgba(10,22,54,.1) 100%);
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      width: 100%;
+    }
+    .hero-text { max-width: 520px; color: #fff; }
     .hero-text h1 {
-      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
+      line-height: 1.1;
       margin-bottom: 1rem;
     }
     .hero-text p {
-      font-size: 1rem;
+      font-size: 1.05rem;
       color: #bfdbfe;
       line-height: 1.6;
       margin-bottom: 2rem;
-      max-width: 440px;
     }
     .hero-cta {
       display: inline-block;
       background: #fff;
-      color: var(--primary);
+      color: #0d1b35;
       font-weight: 700;
       font-size: 0.875rem;
       padding: .65rem 1.5rem;
@@ -123,12 +133,6 @@
       transition: opacity .15s;
     }
     .hero-cta:hover { opacity: .9; }
-    .hero-image {
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,.3);
-    }
-    .hero-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* ── Main ────────────────────────────────────── */
     main { flex: 1; padding: 3rem 2rem; }
@@ -274,14 +278,13 @@
   </header>
 
   <section class="hero">
+    <img class="hero-bg" src="/Hero para cromatografia_com_ar.jpg" alt="Equipos de cromatografía en laboratorio" />
+    <div class="hero-overlay"></div>
     <div class="hero-inner">
       <div class="hero-text">
-        <h1>Cromatografía,<br>por cromatografistas.</h1>
+        <h1>Cromatografía<br>por cromatografistas.</h1>
         <p>Herramientas analíticas online para el laboratorio. Sin registro, sin instalación.</p>
         <a class="hero-cta" href="/usp467/">Ver solventes USP &lt;467&gt; →</a>
-      </div>
-      <div class="hero-image">
-        <img src="/Hero para cromatografia_com_ar.jpg" alt="Equipos de cromatografía en laboratorio" />
       </div>
     </div>
   </section>
