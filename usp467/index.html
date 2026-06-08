@@ -109,6 +109,61 @@
       margin-bottom: .75rem;
     }
 
+    /* step 1 CTA */
+    .step-cta {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 1.1rem 1.4rem 1.25rem;
+      margin-bottom: 1.25rem;
+      max-width: 560px;
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      background: var(--primary);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      margin-bottom: .6rem;
+    }
+    .step-cta h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .3rem;
+    }
+    .step-cta p {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: .85rem;
+    }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #0f172a;
+      color: #fff;
+      font-size: .85rem;
+      font-weight: 600;
+      padding: .65rem 1.4rem;
+      border-radius: 999px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.2);
+      z-index: 999;
+      transition: transform .25s ease, opacity .25s ease;
+      opacity: 0;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
     /* autocomplete */
     .autocomplete-wrap {
       position: relative;
@@ -125,19 +180,19 @@
     }
     #solvent-input {
       width: 100%;
-      padding: .55rem .75rem .55rem 2.25rem;
-      border: 1.5px solid var(--border);
+      padding: .65rem .75rem .65rem 2.25rem;
+      border: 2px solid #93c5fd;
       border-radius: 8px;
-      font-size: 0.9rem;
-      background: var(--bg);
+      font-size: 0.95rem;
+      background: #fff;
       color: var(--text);
       outline: none;
       transition: border-color .15s, box-shadow .15s;
+      box-shadow: 0 1px 4px rgba(29,78,216,.08);
     }
     #solvent-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(29,78,216,.1);
-      background: #fff;
+      box-shadow: 0 0 0 3px rgba(29,78,216,.15);
     }
     .autocomplete-dropdown {
       display: none;
@@ -536,6 +591,30 @@
 
     mark { background: #fef9c3; color: inherit; border-radius: 2px; padding: 0 .1em; }
 
+    /* ── Paso 2 / Finalizar ──────────────────────── */
+    .step-finalize {
+      margin-top: 1.5rem;
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      border-radius: 12px;
+      padding: 1.1rem 1.4rem 1.25rem;
+      max-width: 560px;
+    }
+    .step-finalize h2 { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+    .step-finalize p  { font-size: .8rem; color: var(--muted); margin-bottom: .85rem; }
+    .finalize-btns { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .btn-finalize {
+      display: inline-flex; align-items: center; gap: .45rem;
+      font-size: .82rem; font-weight: 700;
+      padding: .6rem 1.1rem; border-radius: 8px; border: none;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .btn-finalize:hover { opacity: .85; }
+    .btn-print  { background: #0d1b35; color: #fff; }
+    .btn-wa     { background: #25d366; color: #fff; }
+    .btn-email  { background: #e2e8f0; color: #0f172a; }
+
+
     @media (max-width: 640px) {
       /* header */
       header { padding: 0 1rem; }
@@ -589,6 +668,8 @@
 </head>
 <body>
 
+  <div class="toast" id="toast"></div>
+
   <header>
     <div class="header-inner">
       <a class="logo" href="/">Cromatograf<span class="logo-ia">IA</span><span>.com.ar</span></a>
@@ -609,24 +690,49 @@
 
   <div class="selector-panel">
     <div class="selector-inner">
-      <div class="selector-label">Seleccioná los solventes de tu formulación</div>
-      <p style="font-size:.82rem;color:var(--muted);margin-bottom:.75rem;">Buscá cada solvente utilizado en tu proceso de fabricación y agregalo a la lista. La herramienta identifica automáticamente la clase de riesgo y el límite regulatorio aplicable según USP &lt;467&gt;.</p>
-
-      <div class="autocomplete-wrap">
+      <div class="step-cta">
+        <div class="step-badge">Paso 1</div>
+        <h2>¿Qué solventes usás en tu proceso?</h2>
+        <p>Escribí el nombre (o número CAS) y seleccioná de la lista. Podés agregar todos los que quieras.</p>
+        <div class="autocomplete-wrap" style="margin-bottom:0">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input type="text" id="solvent-input" placeholder="Escribí el nombre o CAS y presioná Enter…" autocomplete="off" />
         <div class="autocomplete-dropdown" id="ac-dropdown"></div>
-      </div>
+        </div><!-- end autocomplete-wrap -->
+      </div><!-- end step-cta -->
 
       <div class="selected-list" id="selected-chips">
         <span class="selected-empty" id="chips-empty">Ningún solvente seleccionado todavía.</span>
       </div>
 
+      <!-- Paso 2 — aparece al agregar el primer solvente -->
+      <div class="step-finalize" id="step-finalize" style="display:none;margin-top:1rem;">
+        <div class="step-badge" style="background:#0369a1;">Paso 2</div>
+        <h2>Guardá o compartí tu análisis</h2>
+        <p>Exportá un PDF con el resumen, los límites regulatorios y el disclaimer, o compartilo por WhatsApp o email.</p>
+        <div class="finalize-btns">
+          <button class="btn-finalize btn-print" id="btn-print">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Imprimir / Guardar PDF
+          </button>
+          <button class="btn-finalize btn-wa" id="btn-whatsapp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.858L.057 23.885l6.196-1.448A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.794 9.794 0 0 1-5.064-1.413l-.361-.214-3.681.861.925-3.572-.235-.373A9.77 9.77 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+            Compartir por WhatsApp
+          </button>
+          <button class="btn-finalize btn-email" id="btn-email">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Enviar por email
+          </button>
+        </div>
+      </div>
+
+      <a href="/" id="btn-volver" style="display:none;margin-top:1rem;text-align:center;padding:.85rem;background:#0d1b35;color:#fff;font-weight:700;font-size:.95rem;border-radius:10px;text-decoration:none;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">← Volver a cromatografia.com.ar</a>
+
       <div class="dose-wrap" id="dose-wrap" style="display:none;margin-top:1rem;">
         <label style="font-size:.8rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.4rem;">
-          Dosis diaria del producto <span style="font-weight:400;font-style:italic">(opcional — si no la ingresás se usan los 50 g/día del ICH)</span>
+          Dosis diaria del producto <span style="font-weight:400;font-style:italic">(opcional — si no la ingresás se usa 10 g/día, referencia ICH Q3C)</span>
         </label>
         <div style="display:flex;align-items:center;gap:.5rem;">
           <input type="number" id="daily-dose" min="0.01" step="0.1" placeholder="ej. 1.5"
@@ -658,6 +764,7 @@
           <tbody id="summary-body"></tbody>
         </table>
       </div>
+
     </div>
   </div>
 
@@ -860,6 +967,15 @@
       dropdown.classList.add("open");
     }
 
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
     function addSolvent(name) {
       if (isSelected(name)) return;
       selected.push(name);
@@ -870,6 +986,15 @@
       input.value = "";
       dropdown.classList.remove("open");
       input.focus();
+      const s = SOLVENTS.find(x => x.name === name);
+      showToast(`${name} agregado — Clase ${s.cls}`);
+      renderFinalize();
+      // scroll to results on mobile
+      if (window.innerWidth <= 640) {
+        setTimeout(() => {
+          document.getElementById("selected-chips").scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
     }
 
     function removeSolvent(name) {
@@ -878,6 +1003,7 @@
       renderConclusion();
       renderSummary();
       renderTable();
+      renderFinalize();
     }
 
     input.addEventListener("input", e => renderDropdown(e.target.value.trim()));
@@ -995,6 +1121,214 @@
       renderConclusion();
       renderSummary();
       renderTable();
+      renderFinalize();
+    });
+
+    // ── Finalize / share ──────────────────────────────────────────────────
+    function buildSummaryText() {
+      const solvents = selected.map(n => SOLVENTS.find(s => s.name === n)).sort((a,b) => a.cls-b.cls || a.name.localeCompare(b.name));
+      const c1 = solvents.filter(s => s.cls===1);
+      const doseLabel = dailyDose ? `${dailyDose} g/día` : "10 g/día (referencia ICH Q3C)";
+      let lines = [];
+      lines.push("ANÁLISIS DE SOLVENTES RESIDUALES — USP <467> / ICH Q3C (R8)");
+      lines.push(`Generado en cromatografia.com.ar/usp467  |  Dosis: ${doseLabel}`);
+      lines.push("");
+      lines.push("SOLVENTES SELECCIONADOS:");
+      solvents.forEach(s => {
+        const ref = getRefLimit(s);
+        const prod = (dailyDose && dailyDose > 0) ? `  |  Producto: ${getLimit(s)} ppm` : "";
+        lines.push(`  • ${s.name} — Clase ${s.cls} — Ref. ICH/USP: ${ref} ppm${prod}`);
+      });
+      lines.push("");
+      if (c1.length) {
+        lines.push(`⚠️ CLASE 1 DETECTADA: ${c1.map(s=>s.name).join(", ")} — uso debe estar justificado.`);
+      }
+      const mostR = [...solvents].sort((a,b) => getRefLimit(a)-getRefLimit(b))[0];
+      lines.push(`Límite más restrictivo: ${getRefLimit(mostR)} ppm (${mostR.name})`);
+      lines.push("");
+      lines.push("NOTA: Esta herramienta es de referencia. Los datos pueden contener errores. Verificar contra fuentes regulatorias oficiales. AGS ANALÍTICA S.A. no asume responsabilidad alguna por el uso de la información.");
+      lines.push("");
+      lines.push("AGS Analítica S.A. | agsanalitica.com | cromatografia.com.ar/usp467/");
+      return lines.join("\n");
+    }
+
+    function buildPrintArea() {
+      const solvents = selected.map(n => SOLVENTS.find(s => s.name === n)).sort((a,b) => a.cls-b.cls || a.name.localeCompare(b.name));
+      const c1 = solvents.filter(s => s.cls===1);
+      const c2 = solvents.filter(s => s.cls===2);
+      const c3 = solvents.filter(s => s.cls===3);
+      const mostR = [...solvents].sort((a,b) => getRefLimit(a)-getRefLimit(b))[0];
+      const doseLabel = dailyDose ? `${dailyDose} g/día` : "10 g/día (referencia ICH Q3C / USP Option 1)";
+      const showDose = dailyDose && dailyDose > 0;
+      const now = new Date().toLocaleDateString("es-AR", {day:"2-digit",month:"long",year:"numeric"});
+
+      let alertText = c1.length
+        ? `⚠️ Clase 1 detectada: ${c1.map(s=>s.name).join(", ")} — uso debe estar justificado y documentado.`
+        : c2.length
+          ? `Solventes Clase 2 presentes: deben controlarse por debajo de los límites indicados.`
+          : `Solo solventes Clase 3 — bajo potencial tóxico según USP <467>.`;
+
+      const rows = solvents.map(s => `
+        <tr>
+          <td><strong>${esc(s.name)}</strong><br><span style="font-size:8pt;color:#64748b">${esc(s.alias.split(",")[0])}</span></td>
+          <td>Clase ${s.cls}</td>
+          <td>${getRefLimit(s).toLocaleString("es-AR")} ppm</td>
+          ${showDose ? `<td>${getLimit(s).toLocaleString("es-AR")} ppm</td>` : ""}
+          <td>${s.pde !== null ? s.pde.toFixed(1) : "—"}</td>
+        </tr>`).join("");
+
+      document.getElementById("print-area").innerHTML = `
+        <div class="print-header">
+          <h1>Análisis de Solventes Residuales — USP &lt;467&gt; / ICH Q3C (R8)</h1>
+          <p>Generado el ${now} en <strong>cromatografia.com.ar/usp467/</strong> | Dosis de referencia: ${doseLabel}</p>
+        </div>
+
+        <div class="print-section-title">Resumen del análisis</div>
+        <div class="print-conclusion-box">
+          ${alertText}<br>
+          <strong>Límite más restrictivo: ${getRefLimit(mostR).toLocaleString("es-AR")} ppm (${esc(mostR.name)})</strong> — el método analítico debe cubrir este nivel.<br>
+          Clase 1: ${c1.length ? c1.map(s=>esc(s.name)).join(", ") : "ninguno"} &nbsp;|&nbsp;
+          Clase 2: ${c2.length ? c2.map(s=>esc(s.name)).join(", ") : "ninguno"} &nbsp;|&nbsp;
+          Clase 3: ${c3.length ? c3.map(s=>esc(s.name)).join(", ") : "ninguno"}
+        </div>
+
+        <div class="print-section-title">Solventes seleccionados</div>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th>Solvente</th>
+              <th>Clase</th>
+              <th>Ref. ICH/USP Op.1 (10 g/día)</th>
+              ${showDose ? `<th>Tu producto (${dailyDose} g/día)</th>` : ""}
+              <th>PDE oral (mg/día)</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <div class="print-disclaimer">
+          <strong>Nota sobre las limitaciones de esta herramienta:</strong> Los datos son de carácter informativo y de referencia, tomados de ICH Q3C (R8) y USP &lt;467&gt;. Esta herramienta puede contener errores o no reflejar la versión más reciente de las guías regulatorias. Los resultados deben ser verificados por el usuario contra las fuentes regulatorias oficiales vigentes antes de ser utilizados en decisiones técnicas, analíticas o regulatorias. AGS ANALÍTICA S.A. no asume responsabilidad alguna por el uso de la información.
+        </div>
+
+        <div class="print-footer">
+          <div>
+            <strong>AGS Analítica S.A.</strong><br>
+            agsanalitica.com &nbsp;|&nbsp; cromatografia.com.ar/usp467/
+          </div>
+          <div style="text-align:right;font-size:7.5pt;">
+            Fuente: ICH Q3C (R8) / USP &lt;467&gt;<br>
+            ${now}
+          </div>
+        </div>`;
+    }
+
+    function renderFinalize() {
+      const show = selected.length > 0;
+      document.getElementById("step-finalize").style.display = show ? "block" : "none";
+      document.getElementById("btn-volver").style.display = show ? "block" : "none";
+    }
+
+    document.getElementById("btn-whatsapp").addEventListener("click", () => {
+      const text = buildSummaryText();
+      window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+    });
+
+    document.getElementById("btn-email").addEventListener("click", () => {
+      const text = buildSummaryText();
+      const subject = "Análisis de solventes residuales USP <467> / ICH Q3C";
+      window.location.href = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(text);
+    });
+
+    document.getElementById("btn-print").addEventListener("click", () => {
+      const solvents = selected.map(n => SOLVENTS.find(s => s.name === n)).sort((a,b) => a.cls-b.cls || a.name.localeCompare(b.name));
+      const c1 = solvents.filter(s => s.cls===1);
+      const c2 = solvents.filter(s => s.cls===2);
+      const c3 = solvents.filter(s => s.cls===3);
+      const mostR = [...solvents].sort((a,b) => getRefLimit(a)-getRefLimit(b))[0];
+      const doseLabel = dailyDose ? `${dailyDose} g/día` : "10 g/día (ref. ICH Q3C / USP Option 1)";
+      const showDose = dailyDose && dailyDose > 0;
+      const now = new Date().toLocaleDateString("es-AR", {day:"2-digit",month:"long",year:"numeric"});
+
+      const alertText = c1.length
+        ? `⚠️ Clase 1 detectada: ${c1.map(s=>esc(s.name)).join(", ")} — uso debe estar justificado y documentado.`
+        : c2.length
+          ? `Solventes Clase 2 presentes: deben controlarse por debajo de los límites indicados.`
+          : `Solo solventes Clase 3 — bajo potencial tóxico según USP &lt;467&gt;.`;
+
+      const rows = solvents.map(s => `
+        <tr>
+          <td><strong>${esc(s.name)}</strong><br><span style="font-size:8pt;color:#64748b">${esc(s.alias.split(",")[0])}</span></td>
+          <td style="text-align:center">Clase ${s.cls}</td>
+          <td style="text-align:center;font-weight:700;color:${s.cls===1?"#dc2626":s.cls===2?"#d97706":"#16a34a"}">${getRefLimit(s).toLocaleString("es-AR")}</td>
+          ${showDose ? `<td style="text-align:center;font-weight:700">${getLimit(s).toLocaleString("es-AR")}</td>` : ""}
+          <td style="text-align:center">${s.pde !== null ? s.pde.toFixed(1) : "—"}</td>
+        </tr>`).join("");
+
+      const html = `<!DOCTYPE html><html lang="es"><head>
+        <meta charset="UTF-8">
+        <title>Análisis Solventes Residuales — cromatografia.com.ar</title>
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 10pt; color: #0f172a; padding: 1.8cm 2cm; }
+          h1 { font-size: 13pt; font-weight: 800; margin-bottom: .2rem; }
+          .subtitle { font-size: 8.5pt; color: #64748b; margin-bottom: .9rem; }
+          .header { border-bottom: 2.5px solid #0d1b35; padding-bottom: .6rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: flex-end; }
+          .header-right { font-size: 8pt; color: #64748b; text-align: right; }
+          .section-title { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #64748b; margin: .9rem 0 .35rem; }
+          .alert-box { border-left: 4px solid #0d1b35; padding: .45rem .7rem; background: #f8fafc; font-size: 9pt; margin-bottom: .4rem; }
+          .classes-row { font-size: 8.5pt; color: #475569; margin-bottom: .2rem; }
+          table { width: 100%; border-collapse: collapse; font-size: 9pt; margin-top: .3rem; }
+          th { background: #f1f5f9; padding: .3rem .5rem; text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1.5px solid #cbd5e1; }
+          td { padding: .3rem .5rem; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+          .disclaimer { margin-top: 1rem; padding: .5rem .7rem; border: 1px solid #fcd34d; background: #fffbeb; font-size: 7.5pt; color: #78350f; line-height: 1.5; }
+          .footer { margin-top: 1rem; padding-top: .6rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 7.5pt; color: #64748b; }
+          @page { margin: 0; }
+        </style>
+      </head><body>
+        <div class="header">
+          <div>
+            <h1>Análisis de Solventes Residuales</h1>
+            <div class="subtitle">USP &lt;467&gt; / ICH Q3C (R8) &nbsp;·&nbsp; Dosis de referencia: ${doseLabel}</div>
+          </div>
+          <div class="header-right">cromatografia.com.ar/usp467/<br>${now}</div>
+        </div>
+
+        <div class="section-title">Resumen del análisis</div>
+        <div class="alert-box">${alertText}<br>
+          <strong>Límite más restrictivo: ${getRefLimit(mostR).toLocaleString("es-AR")} ppm (${esc(mostR.name)})</strong> — el método analítico debe cubrir este nivel.
+        </div>
+        <div class="classes-row">
+          Clase 1: ${c1.length ? c1.map(s=>esc(s.name)).join(", ") : "ninguno"} &nbsp;|&nbsp;
+          Clase 2: ${c2.length ? c2.map(s=>esc(s.name)).join(", ") : "ninguno"} &nbsp;|&nbsp;
+          Clase 3: ${c3.length ? c3.map(s=>esc(s.name)).join(", ") : "ninguno"}
+        </div>
+
+        <div class="section-title">Solventes seleccionados</div>
+        <table>
+          <thead><tr>
+            <th>Solvente</th><th style="text-align:center">Clase</th>
+            <th style="text-align:center">Ref. ICH/USP Op.1 (10 g/día)</th>
+            ${showDose ? `<th style="text-align:center">Tu producto (${dailyDose} g/día)</th>` : ""}
+            <th style="text-align:center">PDE oral (mg/día)</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <div class="disclaimer">
+          <strong>Nota sobre las limitaciones de esta herramienta:</strong> Los datos son de carácter informativo y de referencia, tomados de ICH Q3C (R8) y USP &lt;467&gt;. Esta herramienta puede contener errores o no reflejar la versión más reciente de las guías regulatorias. Los resultados deben ser verificados por el usuario contra las fuentes regulatorias oficiales vigentes antes de ser utilizados en decisiones técnicas, analíticas o regulatorias. AGS ANALÍTICA S.A. no asume responsabilidad alguna por el uso de la información.
+        </div>
+
+        <div class="footer">
+          <div><strong>AGS Analítica S.A.</strong> &nbsp;·&nbsp; agsanalitica.com &nbsp;·&nbsp; cromatografia.com.ar/usp467/</div>
+          <div>Fuente: ICH Q3C (R8) / USP &lt;467&gt;</div>
+        </div>
+      </body></html>`;
+
+      const w = window.open("", "_blank");
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(() => { w.print(); }, 400);
     });
 
     // ── Table ─────────────────────────────────────────────────────────────
