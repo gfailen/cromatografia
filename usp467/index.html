@@ -28,6 +28,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
     /* ── Header ─────────────────────────────────── */
@@ -52,7 +53,7 @@
       white-space: nowrap;
     }
     .logo span { color: #fff; }
-    .logo-ia { color: #38bdf8; font-style: italic; }
+    .logo span.logo-ia { color: #38bdf8; font-style: italic; }
     .breadcrumb {
       font-size: 0.8rem;
       color: #93c5fd;
@@ -487,23 +488,102 @@
 
     /* ── Footer ──────────────────────────────────── */
     footer {
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      padding: 1.25rem 2rem;
-      text-align: center;
-      font-size: .8rem;
-      color: var(--muted);
+      background: #0d1b35;
+      color: #94a3b8;
+      padding: 2rem 2rem 2.5rem;
+      font-size: 0.8rem;
     }
-    footer a { color: var(--primary); text-decoration: none; }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      text-align: center;
+    }
+    .footer-back {
+      display: inline-block;
+      background: #fff;
+      color: #0d1b35;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: .85rem 2.5rem;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .footer-back:hover { opacity: .88; }
+    .footer-ags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.5rem;
+      justify-content: center;
+      align-items: center;
+      font-size: .8rem;
+    }
+    .footer-ags a { color: #93c5fd; text-decoration: none; }
+    .footer-ags a:hover { color: #fff; }
+    .footer-sep { color: #334155; }
+    .footer-copy {
+      color: #475569;
+      font-size: 0.72rem;
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding-top: 1rem;
+      width: 100%;
+      text-align: center;
+    }
 
     mark { background: #fef9c3; color: inherit; border-radius: 2px; padding: 0 .1em; }
 
     @media (max-width: 640px) {
-      .page-header h1 { font-size: 1.2rem; }
+      /* header */
+      header { padding: 0 1rem; }
+      .breadcrumb { display: none; }
+
+      /* page header */
+      .page-header { padding: 1rem 1rem; }
+      .page-header h1 { font-size: 1.15rem; }
+
+      /* selector */
+      .selector-panel { padding: 1rem 1rem; }
+
+      /* controls */
       .controls-bar { padding: .75rem 1rem; }
+      .search-wrap { max-width: 100%; }
+
+      /* main */
       main { padding: 1rem 1rem 2rem; }
-      th, td { padding: .6rem .75rem; }
+
+      /* legend compact */
+      .legend { flex-direction: column; gap: .4rem; }
+      .legend-item { padding: .35rem .75rem; font-size: .75rem; }
+
+      /* table: hide CAS, PDE, Observaciones */
+      th, td { padding: .55rem .6rem; }
+      #solvent-table th:nth-child(3),
+      #solvent-table td:nth-child(3),
+      #solvent-table th:nth-child(6),
+      #solvent-table td:nth-child(6),
+      #solvent-table th:nth-child(7),
+      #solvent-table td:nth-child(7) { display: none; }
+
       .concern-text { display: none; }
+      .solvent-alias { display: none; }
+      .col-full { display: none; }
+      .col-short { display: inline; }
+    }
+    @media (min-width: 641px) {
+      .col-short { display: none; }
+    }
+
+    @media (max-width: 390px) {
+      #solvent-table { font-size: .78rem; }
+      #solvent-table th, #solvent-table td { padding: .45rem .4rem; }
+      .btn-add { font-size: .68rem; padding: .15rem .4rem; }
+      .class-badge { font-size: .62rem; padding: .15rem .35rem; }
+      .filter-btn { font-size: .72rem; padding: .3rem .6rem; }
+      #search, #solvent-input { font-size: .82rem; }
     }
   </style>
 </head>
@@ -614,7 +694,7 @@
               <th data-col="name">Solvente <span class="sort-icon">↕</span></th>
               <th data-col="cas">CAS <span class="sort-icon">↕</span></th>
               <th data-col="class">Clase <span class="sort-icon">↕</span></th>
-              <th data-col="limit">Límite (ppm) <span class="sort-icon">↕</span></th>
+              <th data-col="limit"><span class="col-full">Límite (ppm)</span><span class="col-short">ppm</span> <span class="sort-icon">↕</span></th>
               <th data-col="pde">PDE oral (mg/día) <span class="sort-icon">↕</span></th>
               <th data-col="concern">Observaciones</th>
             </tr>
@@ -631,7 +711,23 @@
   </main>
 
   <footer>
-    <p>cromatografia.com.ar &mdash; <a href="/">Volver al inicio</a> &mdash; Fuente: ICH Q3C (R8) / USP &lt;467&gt;</p>
+    <div class="footer-inner">
+
+      <a class="footer-back" href="/">← Volver a cromatografia.com.ar</a>
+
+      <div class="footer-ags">
+        <strong style="color:#e2e8f0;">AGS Analítica S.A.</strong>
+        <span class="footer-sep">|</span>
+        <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">agsanalitica.com</a>
+        <span class="footer-sep">|</span>
+        <a href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Soporte técnico</a>
+      </div>
+
+      <div class="footer-copy">
+        Fuente: ICH Q3C (R8) / USP &lt;467&gt; &mdash; &copy; 2025 AGS ANALÍTICA S.A.
+      </div>
+
+    </div>
   </footer>
 
   <script>
