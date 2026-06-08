@@ -602,7 +602,7 @@
   <div class="page-header">
     <div class="page-header-inner">
       <h1>Solventes Residuales — USP &lt;467&gt; / ICH Q3C (R8)</h1>
-      <p>Límites de concentración (ppm), PDE por vía oral y clasificación de toxicidad. Dosis diaria de referencia: 50 g/día (Opción 1, vía oral).</p>
+      <p>Clases y límites según ICH Q3C (R8) / USP &lt;467&gt;. Los límites de referencia (Clase 2) se calculan como PDE oral ÷ 10 g/día — dosis estándar de ICH Q3C Procedure 1 y USP Option 1. Clase 3: 5000 ppm. Ingresá la dosis de tu producto para ver los límites específicos.</p>
       <span class="page-note">Esta herramienta es de referencia. <a href="#disclaimer">Ver nota al pie sobre las limitaciones de esta herramienta.</a></span>
     </div>
   </div>
@@ -648,7 +648,8 @@
             <tr>
               <th>Solvente</th>
               <th>Clase</th>
-              <th>Límite (ppm)</th>
+              <th>Ref. ICH/USP Op.1<br><span style="font-weight:400;font-size:.68rem;text-transform:none">(10 g/día)</span></th>
+              <th id="summary-dose-header" style="display:none">Tu producto<br><span style="font-weight:400;font-size:.68rem;text-transform:none" id="summary-dose-label"></span></th>
               <th>PDE oral (mg/día)</th>
               <th>Observaciones</th>
               <th></th>
@@ -694,7 +695,7 @@
               <th data-col="name">Solvente <span class="sort-icon">↕</span></th>
               <th data-col="cas">CAS <span class="sort-icon">↕</span></th>
               <th data-col="class">Clase <span class="sort-icon">↕</span></th>
-              <th data-col="limit"><span class="col-full">Límite (ppm)</span><span class="col-short">ppm</span> <span class="sort-icon">↕</span></th>
+              <th data-col="limit"><span class="col-full">Límite ref. (ppm)</span><span class="col-short">ppm</span> <span class="sort-icon">↕</span></th>
               <th data-col="pde">PDE oral (mg/día) <span class="sort-icon">↕</span></th>
               <th data-col="concern">Observaciones</th>
             </tr>
@@ -800,10 +801,16 @@
     let acIndex = -1;
     let dailyDose = null; // null = use ICH default (50 g/day)
 
+    // Reference limit: ICH Q3C / USP <467> Option 1 — always 10 g/day
+    function getRefLimit(s) {
+      if (s.pde === null) return 5000;
+      return Math.round((s.pde / 10) * 1000 * 10) / 10;
+    }
+    // Product limit: uses user-entered dose, falls back to 10 g/day (same as reference)
     function getLimit(s) {
-      if (s.pde === null) return s.limit; // Class 3 — fixed 5000 ppm
-      const dose = dailyDose && dailyDose > 0 ? dailyDose : 50;
-      return Math.round((s.pde / dose) * 1000 * 10) / 10; // one decimal
+      if (s.pde === null) return 5000;
+      const dose = dailyDose && dailyDose > 0 ? dailyDose : 10;
+      return Math.round((s.pde / dose) * 1000 * 10) / 10;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
@@ -920,13 +927,20 @@
       const tbody = document.getElementById("summary-body");
       if (!selected.length) { panel.classList.remove("visible"); return; }
       panel.classList.add("visible");
-      // sort by class then name
+
+      const doseHeader = document.getElementById("summary-dose-header");
+      const doseLabel = document.getElementById("summary-dose-label");
+      const showDoseCol = dailyDose && dailyDose > 0;
+      doseHeader.style.display = showDoseCol ? "" : "none";
+      if (showDoseCol) doseLabel.textContent = `(${dailyDose} g/día)`;
+
       const sorted = [...selected].map(n => SOLVENTS.find(s => s.name === n)).sort((a,b) => a.cls-b.cls || a.name.localeCompare(b.name));
       tbody.innerHTML = sorted.map(s => `
         <tr>
           <td><div class="s-name">${esc(s.name)}</div><div class="s-alias">${esc(s.alias.split(",")[0])}</div></td>
           <td>${classBadge(s.cls)}</td>
-          <td><span class="s-limit ${limClass(s.cls)}">${getLimit(s).toLocaleString("es-AR")}</span></td>
+          <td><span class="s-limit ${limClass(s.cls)}">${getRefLimit(s).toLocaleString("es-AR")}</span></td>
+          ${showDoseCol ? `<td><span class="s-limit ${limClass(s.cls)}">${getLimit(s).toLocaleString("es-AR")}</span></td>` : ""}
           <td>${s.pde !== null ? s.pde.toFixed(1) : "—"}</td>
           <td style="font-size:.8rem;color:var(--muted)">${s.concern ? esc(s.concern) : "—"}</td>
           <td><button class="s-remove" data-name="${esc(s.name)}" title="Quitar">×</button></td>
@@ -1015,7 +1029,7 @@
           <td><div class="solvent-name">${highlight(s.name,q)}</div>${s.alias?`<div class="solvent-alias">${highlight(s.alias,q)}</div>`:""}</td>
           <td><span class="cas-num">${highlight(s.cas,q)}</span></td>
           <td>${classBadge(s.cls)}</td>
-          <td><span class="limit-val ${limClass(s.cls)}">${s.limit.toLocaleString("es-AR")}</span></td>
+          <td><span class="limit-val ${limClass(s.cls)}">${getRefLimit(s).toLocaleString("es-AR")}</span></td>
           <td>${s.pde!==null?s.pde.toFixed(1):"—"}</td>
           <td><span class="concern-text">${s.concern?esc(s.concern):"—"}</span></td>
         </tr>`;
