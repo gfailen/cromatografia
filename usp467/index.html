@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Solventes Residuales USP &lt;467&gt; — cromatografia.com.ar</title>
   <meta name="description" content="Lookup completo de solventes residuales USP &lt;467&gt; / ICH Q3C (R8). Clases 1, 2 y 3 con PDE, límites en ppm y número CAS." />
+  <link rel="icon" href="/favicon.ico" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -31,7 +32,7 @@
 
     /* ── Header ─────────────────────────────────── */
     header {
-      background: var(--primary);
+      background: #0d1b35;
       color: #fff;
       padding: 0 2rem;
     }
@@ -50,7 +51,8 @@
       color: #fff;
       white-space: nowrap;
     }
-    .logo span { color: #93c5fd; }
+    .logo span { color: #fff; }
+    .logo-ia { color: #38bdf8; font-style: italic; }
     .breadcrumb {
       font-size: 0.8rem;
       color: #93c5fd;
@@ -67,10 +69,7 @@
       border-bottom: 1px solid var(--border);
       padding: 1.5rem 2rem;
     }
-    .page-header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .page-header-inner { max-width: 1200px; margin: 0 auto; }
     .page-header h1 {
       font-size: 1.5rem;
       font-weight: 800;
@@ -80,7 +79,249 @@
     .page-header p {
       font-size: 0.875rem;
       color: var(--muted);
+      margin-bottom: .6rem;
     }
+    .page-note {
+      font-size: 0.78rem;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 6px;
+      padding: .4rem .75rem;
+      display: inline-block;
+    }
+    .page-note a { color: #92400e; font-weight: 600; }
+
+    /* ── Selector panel ──────────────────────────── */
+    .selector-panel {
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      padding: 1.25rem 2rem;
+    }
+    .selector-inner { max-width: 1200px; margin: 0 auto; }
+    .selector-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin-bottom: .75rem;
+    }
+
+    /* autocomplete */
+    .autocomplete-wrap {
+      position: relative;
+      max-width: 480px;
+      margin-bottom: 1rem;
+    }
+    .autocomplete-wrap svg {
+      position: absolute;
+      left: .75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    #solvent-input {
+      width: 100%;
+      padding: .55rem .75rem .55rem 2.25rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    #solvent-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29,78,216,.1);
+      background: #fff;
+    }
+    .autocomplete-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+      z-index: 100;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .autocomplete-dropdown.open { display: block; }
+    .ac-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .6rem 1rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background .1s;
+    }
+    .ac-item:hover, .ac-item.active { background: #f1f5f9; }
+    .ac-item .ac-name { flex: 1; font-weight: 500; }
+    .ac-item .ac-alias { font-size: .75rem; color: var(--muted); }
+    .ac-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: .15rem .4rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .ac-c1 { background: var(--c1-bg); color: var(--c1-text); border: 1px solid var(--c1-border); }
+    .ac-c2 { background: var(--c2-bg); color: var(--c2-text); border: 1px solid var(--c2-border); }
+    .ac-c3 { background: var(--c3-bg); color: var(--c3-text); border: 1px solid var(--c3-border); }
+    .ac-empty { padding: .75rem 1rem; font-size: .85rem; color: var(--muted); }
+
+    /* selected solvents */
+    .selected-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-top: .25rem;
+    }
+    .selected-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .3rem .65rem .3rem .75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: default;
+      border: 1.5px solid;
+    }
+    .chip-c1 { background: var(--c1-bg); color: var(--c1-text); border-color: var(--c1-border); }
+    .chip-c2 { background: var(--c2-bg); color: var(--c2-text); border-color: var(--c2-border); }
+    .chip-c3 { background: var(--c3-bg); color: var(--c3-text); border-color: var(--c3-border); }
+    .chip-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: .9rem;
+      line-height: 1;
+      opacity: .6;
+      padding: 0;
+      color: inherit;
+    }
+    .chip-remove:hover { opacity: 1; }
+    .selected-empty {
+      font-size: .8rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Conclusion block ────────────────────────── */
+    .conclusion {
+      display: none;
+      margin-top: 1.25rem;
+      background: #f0f9ff;
+      border: 1.5px solid #bae6fd;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      font-size: .875rem;
+    }
+    .conclusion.visible { display: block; }
+    .conclusion h3 {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #0369a1;
+      margin-bottom: .75rem;
+    }
+    .conclusion-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.5rem;
+      margin-bottom: .75rem;
+    }
+    .conclusion-item { font-size: .85rem; color: var(--text); }
+    .conclusion-item span { font-weight: 700; }
+    .conclusion-alert {
+      background: #fff;
+      border-radius: 8px;
+      padding: .6rem 1rem;
+      font-size: .85rem;
+      border-left: 4px solid;
+      margin-top: .5rem;
+    }
+    .alert-red   { border-color: #dc2626; background: #fef2f2; color: #991b1b; }
+    .alert-amber { border-color: #d97706; background: #fffbeb; color: #92400e; }
+    .alert-green { border-color: #16a34a; background: #f0fdf4; color: #14532d; }
+    .conclusion-most-restrictive {
+      margin-top: .75rem;
+      font-size: .85rem;
+      color: var(--text);
+    }
+    .conclusion-most-restrictive strong { color: #0c4a6e; }
+
+    /* selected summary table */
+    .selected-summary {
+      display: none;
+      margin-top: 1.25rem;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .selected-summary.visible { display: block; }
+    .summary-header {
+      padding: .6rem 1rem;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-clear {
+      font-size: .72rem;
+      font-weight: 600;
+      color: #dc2626;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: .2rem .5rem;
+      border-radius: 4px;
+      transition: background .1s;
+    }
+    .btn-clear:hover { background: #fef2f2; }
+    .summary-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    .summary-table th {
+      padding: .5rem 1rem;
+      text-align: left;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-table td {
+      padding: .6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr:hover td { background: #f8fafc; }
+    .s-name { font-weight: 600; }
+    .s-alias { font-size: .72rem; color: var(--muted); }
+    .s-limit { font-weight: 700; }
+    .lim-c1 { color: #dc2626; }
+    .lim-c2 { color: #d97706; }
+    .lim-c3 { color: #16a34a; }
+    .s-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: 0 .25rem; }
+    .s-remove:hover { color: #dc2626; }
 
     /* ── Controls ────────────────────────────────── */
     .controls-bar {
@@ -104,7 +345,7 @@
       position: relative;
       flex: 1;
       min-width: 200px;
-      max-width: 360px;
+      max-width: 320px;
     }
     .search-wrap svg {
       position: absolute;
@@ -116,31 +357,24 @@
     }
     #search {
       width: 100%;
-      padding: .5rem .75rem .5rem 2.25rem;
+      padding: .45rem .75rem .45rem 2.25rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 0.875rem;
       background: var(--bg);
       color: var(--text);
       outline: none;
-      transition: border-color .15s, box-shadow .15s;
+      transition: border-color .15s;
     }
-    #search:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(29,78,216,.1);
-    }
+    #search:focus { border-color: var(--primary); }
 
-    .filter-group {
-      display: flex;
-      gap: .4rem;
-      flex-wrap: wrap;
-    }
+    .filter-group { display: flex; gap: .4rem; flex-wrap: wrap; }
     .filter-btn {
-      padding: .4rem .9rem;
+      padding: .35rem .85rem;
       border-radius: 999px;
       border: 1.5px solid var(--border);
       background: var(--surface);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
       transition: all .15s;
@@ -151,43 +385,20 @@
     .filter-btn.c1.active { background: #dc2626; border-color: #dc2626; }
     .filter-btn.c2.active { background: #d97706; border-color: #d97706; }
     .filter-btn.c3.active { background: #16a34a; border-color: #16a34a; }
-
-    .result-count {
-      margin-left: auto;
-      font-size: 0.8rem;
-      color: var(--muted);
-      white-space: nowrap;
-    }
+    .result-count { margin-left: auto; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
 
     /* ── Main ────────────────────────────────────── */
-    main {
-      flex: 1;
-      padding: 1.5rem 2rem 3rem;
-    }
+    main { flex: 1; padding: 1.5rem 2rem 3rem; }
     .container { max-width: 1200px; margin: 0 auto; }
 
     /* ── Legend ──────────────────────────────────── */
-    .legend {
-      display: flex;
-      gap: .75rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.25rem;
-    }
+    .legend { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
     .legend-item {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      font-size: 0.8rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .5rem .875rem;
+      display: flex; align-items: center; gap: .5rem;
+      font-size: 0.8rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 8px; padding: .5rem .875rem;
     }
-    .legend-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .dot-c1 { background: #dc2626; }
     .dot-c2 { background: #d97706; }
     .dot-c3 { background: #16a34a; }
@@ -200,19 +411,12 @@
       overflow: hidden;
       overflow-x: auto;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-    thead {
-      background: #f8fafc;
-      border-bottom: 2px solid var(--border);
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead { background: #f8fafc; border-bottom: 2px solid var(--border); }
     th {
       padding: .75rem 1rem;
       text-align: left;
-      font-size: 0.75rem;
+      font-size: .75rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: .04em;
@@ -224,18 +428,30 @@
     th:hover { color: var(--text); }
     th .sort-icon { margin-left: .3rem; opacity: .4; }
     th.sorted .sort-icon { opacity: 1; color: var(--primary); }
-
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background .1s;
-    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #f8fafc; }
     td { padding: .75rem 1rem; vertical-align: middle; }
 
+    /* add button in table */
+    .btn-add {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: .2rem .55rem;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .btn-add:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+    .btn-add.added { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+
     .class-badge {
       display: inline-block;
-      font-size: 0.7rem;
+      font-size: .7rem;
       font-weight: 700;
       padding: .2rem .55rem;
       border-radius: 5px;
@@ -246,26 +462,15 @@
     .badge-c3 { background: var(--c3-bg); color: var(--c3-text); border: 1px solid var(--c3-border); }
 
     .solvent-name { font-weight: 600; color: var(--text); }
-    .solvent-alias { font-size: 0.75rem; color: var(--muted); margin-top: .1rem; }
-    .cas-num { font-family: "SF Mono", "Fira Code", monospace; font-size: 0.8rem; color: var(--muted); }
-
+    .solvent-alias { font-size: .75rem; color: var(--muted); margin-top: .1rem; }
+    .cas-num { font-family: "SF Mono","Fira Code",monospace; font-size: .8rem; color: var(--muted); }
     .limit-val { font-weight: 700; font-size: .95rem; }
     .limit-c1 { color: #dc2626; }
     .limit-c2 { color: #d97706; }
     .limit-c3 { color: #16a34a; }
+    .concern-text { font-size: .8rem; color: var(--muted); max-width: 220px; }
 
-    .pde-val { color: var(--text); }
-
-    .concern-text { font-size: 0.8rem; color: var(--muted); max-width: 220px; }
-
-    /* ── No results ──────────────────────────────── */
-    #no-results {
-      display: none;
-      padding: 3rem;
-      text-align: center;
-      color: var(--muted);
-    }
-    #no-results p { font-size: 0.9rem; }
+    #no-results { display: none; padding: 3rem; text-align: center; color: var(--muted); }
 
     /* ── Disclaimer ──────────────────────────────── */
     .disclaimer {
@@ -274,9 +479,9 @@
       background: #fffbeb;
       border: 1px solid #fcd34d;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #78350f;
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .disclaimer strong { font-weight: 700; }
 
@@ -286,12 +491,11 @@
       background: var(--surface);
       padding: 1.25rem 2rem;
       text-align: center;
-      font-size: 0.8rem;
+      font-size: .8rem;
       color: var(--muted);
     }
     footer a { color: var(--primary); text-decoration: none; }
 
-    /* ── Highlight ────────────────────────────────── */
     mark { background: #fef9c3; color: inherit; border-radius: 2px; padding: 0 .1em; }
 
     @media (max-width: 640px) {
@@ -307,7 +511,7 @@
 
   <header>
     <div class="header-inner">
-      <a class="logo" href="/">cromatografia<span>.com.ar</span></a>
+      <a class="logo" href="/">Cromatograf<span class="logo-ia">IA</span><span>.com.ar</span></a>
       <div class="breadcrumb">
         <span class="sep">/</span>
         <span class="current">Solventes Residuales USP &lt;467&gt;</span>
@@ -319,6 +523,60 @@
     <div class="page-header-inner">
       <h1>Solventes Residuales — USP &lt;467&gt; / ICH Q3C (R8)</h1>
       <p>Límites de concentración (ppm), PDE por vía oral y clasificación de toxicidad. Dosis diaria de referencia: 50 g/día (Opción 1, vía oral).</p>
+      <span class="page-note">Esta herramienta es de referencia. <a href="#disclaimer">Ver nota al pie sobre las limitaciones de esta herramienta.</a></span>
+    </div>
+  </div>
+
+  <div class="selector-panel">
+    <div class="selector-inner">
+      <div class="selector-label">Seleccioná los solventes de tu formulación</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:.75rem;">Buscá cada solvente utilizado en tu proceso de fabricación y agregalo a la lista. La herramienta identifica automáticamente la clase de riesgo y el límite regulatorio aplicable según USP &lt;467&gt;.</p>
+
+      <div class="autocomplete-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" id="solvent-input" placeholder="Escribí el nombre o CAS y presioná Enter…" autocomplete="off" />
+        <div class="autocomplete-dropdown" id="ac-dropdown"></div>
+      </div>
+
+      <div class="selected-list" id="selected-chips">
+        <span class="selected-empty" id="chips-empty">Ningún solvente seleccionado todavía.</span>
+      </div>
+
+      <div class="dose-wrap" id="dose-wrap" style="display:none;margin-top:1rem;">
+        <label style="font-size:.8rem;font-weight:600;color:var(--muted);display:block;margin-bottom:.4rem;">
+          Dosis diaria del producto <span style="font-weight:400;font-style:italic">(opcional — si no la ingresás se usan los 50 g/día del ICH)</span>
+        </label>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <input type="number" id="daily-dose" min="0.01" step="0.1" placeholder="ej. 1.5"
+            style="width:120px;padding:.4rem .6rem;border:1.5px solid var(--border);border-radius:7px;font-size:.9rem;outline:none;" />
+          <span style="font-size:.85rem;color:var(--muted);">g/día</span>
+          <button id="btn-clear-dose" style="font-size:.75rem;color:#dc2626;background:none;border:none;cursor:pointer;padding:.2rem .4rem;">× Usar default ICH</button>
+        </div>
+      </div>
+
+      <div class="conclusion" id="conclusion"></div>
+
+      <div class="selected-summary" id="selected-summary">
+        <div class="summary-header">
+          <span>Solventes seleccionados</span>
+          <button class="btn-clear" id="btn-clear-all">Limpiar todo</button>
+        </div>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Solvente</th>
+              <th>Clase</th>
+              <th>Límite (ppm)</th>
+              <th>PDE oral (mg/día)</th>
+              <th>Observaciones</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="summary-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -328,23 +586,20 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="search" id="search" placeholder="Buscar solvente o CAS…" autocomplete="off" />
+        <input type="search" id="search" placeholder="Filtrar tabla…" autocomplete="off" />
       </div>
-
       <div class="filter-group">
         <button class="filter-btn active" data-class="all">Todos</button>
-        <button class="filter-btn c1"     data-class="1">Clase 1</button>
-        <button class="filter-btn c2"     data-class="2">Clase 2</button>
-        <button class="filter-btn c3"     data-class="3">Clase 3</button>
+        <button class="filter-btn c1" data-class="1">Clase 1</button>
+        <button class="filter-btn c2" data-class="2">Clase 2</button>
+        <button class="filter-btn c3" data-class="3">Clase 3</button>
       </div>
-
       <span class="result-count" id="result-count"></span>
     </div>
   </div>
 
   <main>
     <div class="container">
-
       <div class="legend">
         <div class="legend-item"><span class="legend-dot dot-c1"></span><strong>Clase 1</strong> — Evitar (cancerígenos, peligrosos para el medio ambiente)</div>
         <div class="legend-item"><span class="legend-dot dot-c2"></span><strong>Clase 2</strong> — Limitar (toxicidad no genotóxica)</div>
@@ -355,6 +610,7 @@
         <table id="solvent-table">
           <thead>
             <tr>
+              <th></th>
               <th data-col="name">Solvente <span class="sort-icon">↕</span></th>
               <th data-col="cas">CAS <span class="sort-icon">↕</span></th>
               <th data-col="class">Clase <span class="sort-icon">↕</span></th>
@@ -365,15 +621,12 @@
           </thead>
           <tbody id="table-body"></tbody>
         </table>
-        <div id="no-results">
-          <p>No se encontraron solventes que coincidan con la búsqueda.</p>
-        </div>
+        <div id="no-results"><p>No se encontraron solventes.</p></div>
       </div>
 
-      <div class="disclaimer">
-        <strong>Aviso regulatorio:</strong> Esta herramienta es de referencia. Los valores corresponden a ICH Q3C (R8) y USP &lt;467&gt; vigentes al momento de la publicación. Verificá siempre contra la edición oficial de la farmacopea y la guía ICH aplicable antes de tomar decisiones analíticas o regulatorias. Los límites pueden variar según la vía de administración del producto final (oral, parenteral, inhalación).
+      <div class="disclaimer" id="disclaimer">
+        <strong>Nota sobre las limitaciones de esta herramienta:</strong> Los datos son de carácter informativo y de referencia, tomados de ICH Q3C (R8) y USP &lt;467&gt;. Esta herramienta puede contener errores o no reflejar la versión más reciente de las guías regulatorias. Los resultados deben ser verificados por el usuario contra las fuentes regulatorias oficiales vigentes antes de ser utilizados en decisiones técnicas, analíticas o regulatorias. AGS ANALÍTICA S.A. no asume responsabilidad alguna por el uso de la información.
       </div>
-
     </div>
   </main>
 
@@ -383,184 +636,341 @@
 
   <script>
     const SOLVENTS = [
-      // ── Class 1 ──────────────────────────────────────────────────────────
-      { name: "Benzene",              alias: "Benceno",                      cas: "71-43-2",    cls: 1, pde: 0.1,  limit: 2,    concern: "Carcinógeno humano (Grupo 1, IARC)" },
-      { name: "Carbon tetrachloride", alias: "Tetracloruro de carbono",       cas: "56-23-5",    cls: 1, pde: 0.2,  limit: 4,    concern: "Tóxico, peligroso para el medio ambiente" },
-      { name: "1,2-Dichloroethane",   alias: "1,2-Dicloroetano",             cas: "107-06-2",   cls: 1, pde: 0.25, limit: 5,    concern: "Tóxico" },
-      { name: "1,1-Dichloroethene",   alias: "1,1-Dicloroetileno",           cas: "75-35-4",    cls: 1, pde: 0.4,  limit: 8,    concern: "Tóxico" },
-      { name: "1,1,1-Trichloroethane",alias: "Metilcloroformo",              cas: "71-55-6",    cls: 1, pde: 75,   limit: 1500, concern: "Peligroso para el medio ambiente (destructor de ozono)" },
-
-      // ── Class 2 ──────────────────────────────────────────────────────────
-      { name: "Acetonitrile",         alias: "Acetonitrilo",                 cas: "75-05-8",    cls: 2, pde: 4.1,  limit: 82,   concern: "" },
-      { name: "Chlorobenzene",        alias: "Clorobenceno",                 cas: "108-90-7",   cls: 2, pde: 3.6,  limit: 72,   concern: "" },
-      { name: "Chloroform",           alias: "Cloroformo, triclorometano",   cas: "67-66-3",    cls: 2, pde: 0.6,  limit: 12,   concern: "Posible carcinógeno" },
-      { name: "Cyclohexane",          alias: "Ciclohexano",                  cas: "110-82-7",   cls: 2, pde: 38.8, limit: 776,  concern: "" },
-      { name: "1,2-Dichloroethene",   alias: "1,2-Dicloroetileno (suma de isómeros)", cas: "540-59-0", cls: 2, pde: 18.7, limit: 374, concern: "" },
-      { name: "Dichloromethane",      alias: "Diclorometano, DCM",           cas: "75-09-2",    cls: 2, pde: 6.0,  limit: 120,  concern: "" },
-      { name: "1,2-Dimethoxyethane",  alias: "Dimetoxietano, DME, glima",   cas: "110-71-4",   cls: 2, pde: 1.0,  limit: 20,   concern: "" },
-      { name: "N,N-Dimethylacetamide",alias: "DMAc",                        cas: "127-19-5",   cls: 2, pde: 10.9, limit: 218,  concern: "Teratogénico" },
-      { name: "N,N-Dimethylformamide",alias: "DMF",                         cas: "68-12-2",    cls: 2, pde: 8.8,  limit: 176,  concern: "Teratogénico" },
-      { name: "1,4-Dioxane",          alias: "1,4-Dioxano",                 cas: "123-91-1",   cls: 2, pde: 3.8,  limit: 76,   concern: "Posible carcinógeno" },
-      { name: "2-Ethoxyethanol",      alias: "Éter monoetílico del etilenglicol", cas: "110-80-5", cls: 2, pde: 1.6, limit: 32, concern: "Teratogénico" },
-      { name: "Ethylene glycol",      alias: "Etilenglicol, 1,2-etanodiol", cas: "107-21-1",   cls: 2, pde: 6.2,  limit: 124,  concern: "" },
-      { name: "Formamide",            alias: "Formamida",                   cas: "75-12-7",    cls: 2, pde: 2.2,  limit: 44,   concern: "Teratogénico" },
-      { name: "Hexane",               alias: "Hexano (n-hexano)",            cas: "110-54-3",   cls: 2, pde: 2.9,  limit: 58,   concern: "Neurotóxico" },
-      { name: "Methanol",             alias: "Metanol, alcohol metílico",    cas: "67-56-1",    cls: 2, pde: 30.0, limit: 600,  concern: "Tóxico para el sistema nervioso y ocular" },
-      { name: "2-Methoxyethanol",     alias: "Éter monometílico del etilenglicol", cas: "109-86-4", cls: 2, pde: 0.5, limit: 10, concern: "Teratogénico" },
-      { name: "Methylbutyl ketone",   alias: "2-Hexanona, MBK",             cas: "591-78-6",   cls: 2, pde: 0.5,  limit: 10,   concern: "Neurotóxico" },
-      { name: "Methylcyclohexane",    alias: "Metilciclohexano",            cas: "108-87-2",   cls: 2, pde: 11.8, limit: 236,  concern: "" },
-      { name: "N-Methylpyrrolidone",  alias: "NMP, N-metil-2-pirrolidona",  cas: "872-50-4",   cls: 2, pde: 5.3,  limit: 106,  concern: "Reproductivo" },
-      { name: "Nitromethane",         alias: "Nitrometano",                 cas: "75-52-5",    cls: 2, pde: 0.5,  limit: 10,   concern: "Posible carcinógeno" },
-      { name: "Pyridine",             alias: "Piridina",                    cas: "110-86-1",   cls: 2, pde: 2.0,  limit: 40,   concern: "" },
-      { name: "Sulfolane",            alias: "Sulfolano, tetrahidrotiofeno-1,1-dióxido", cas: "126-33-0", cls: 2, pde: 1.6, limit: 32, concern: "" },
-      { name: "Tetrahydrofuran",      alias: "THF, tetrahidrofurano",       cas: "109-99-9",   cls: 2, pde: 7.2,  limit: 144,  concern: "" },
-      { name: "Tetralin",             alias: "Tetralina, 1,2,3,4-tetrahidronaftaleno", cas: "119-64-2", cls: 2, pde: 1.0, limit: 20, concern: "" },
-      { name: "Toluene",              alias: "Tolueno, metilbenceno",       cas: "108-88-3",   cls: 2, pde: 8.9,  limit: 178,  concern: "" },
-      { name: "Trichloroethylene",    alias: "Tricloroetileno, TCE",        cas: "79-01-6",    cls: 2, pde: 0.8,  limit: 16,   concern: "Posible carcinógeno" },
-      { name: "Xylene",               alias: "Xileno (suma de isómeros)",   cas: "1330-20-7",  cls: 2, pde: 21.7, limit: 434,  concern: "" },
-
-      // ── Class 3 ──────────────────────────────────────────────────────────
-      { name: "Acetic acid",          alias: "Ácido acético, ácido etanoico", cas: "64-19-7",  cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Acetone",              alias: "Acetona, 2-propanona",        cas: "67-64-1",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Anisole",              alias: "Anisol, metoxibenceno",       cas: "100-66-3",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "1-Butanol",            alias: "n-Butanol, alcohol n-butílico", cas: "71-36-3",  cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "2-Butanol",            alias: "sec-Butanol",                 cas: "78-92-2",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Butyl acetate",        alias: "Acetato de n-butilo",         cas: "123-86-4",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "tert-Butylmethyl ether", alias: "MTBE",                     cas: "1634-04-4",  cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Cumene",               alias: "Cumeno, isopropilbenceno",    cas: "98-82-8",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Dimethyl sulfoxide",   alias: "DMSO",                        cas: "67-68-5",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Ethanol",              alias: "Etanol, alcohol etílico",     cas: "64-17-5",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Ethyl acetate",        alias: "Acetato de etilo",            cas: "141-78-6",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Ethyl ether",          alias: "Éter dietílico, éter etílico", cas: "60-29-7",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Ethyl formate",        alias: "Formiato de etilo",           cas: "109-94-4",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Formic acid",          alias: "Ácido fórmico, ácido metanoico", cas: "64-18-6", cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Heptane",              alias: "Heptano (n-heptano)",         cas: "142-82-5",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Isobutyl acetate",     alias: "Acetato de isobutilo",        cas: "110-19-0",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Isopropyl acetate",    alias: "Acetato de isopropilo",       cas: "108-21-4",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Methyl acetate",       alias: "Acetato de metilo",           cas: "79-20-9",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "3-Methyl-1-butanol",   alias: "Alcohol isoamílico",          cas: "123-51-3",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Methylethyl ketone",   alias: "MEK, 2-butanona",             cas: "78-93-3",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Methylisobutyl ketone",alias: "MIBK, 4-metil-2-pentanona",  cas: "108-10-1",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "2-Methyl-1-propanol",  alias: "Isobutanol",                  cas: "78-83-1",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Pentane",              alias: "Pentano (n-pentano)",         cas: "109-66-0",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "1-Pentanol",           alias: "Alcohol amílico, n-pentanol", cas: "71-41-0",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "1-Propanol",           alias: "n-Propanol, alcohol propílico", cas: "71-23-8",  cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "2-Propanol",           alias: "IPA, isopropanol",            cas: "67-63-0",    cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Propyl acetate",       alias: "Acetato de n-propilo",        cas: "109-60-4",   cls: 3, pde: null, limit: 5000, concern: "" },
-      { name: "Triethylamine",        alias: "Trietilamina, TEA",           cas: "121-44-8",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Benzene",               alias: "Benceno",                            cas: "71-43-2",    cls: 1, pde: 0.1,  limit: 2,    concern: "Carcinógeno humano (Grupo 1, IARC)" },
+      { name: "Carbon tetrachloride",  alias: "Tetracloruro de carbono",            cas: "56-23-5",    cls: 1, pde: 0.2,  limit: 4,    concern: "Tóxico, peligroso para el medio ambiente" },
+      { name: "1,2-Dichloroethane",    alias: "1,2-Dicloroetano",                  cas: "107-06-2",   cls: 1, pde: 0.25, limit: 5,    concern: "Tóxico" },
+      { name: "1,1-Dichloroethene",    alias: "1,1-Dicloroetileno",                cas: "75-35-4",    cls: 1, pde: 0.4,  limit: 8,    concern: "Tóxico" },
+      { name: "1,1,1-Trichloroethane", alias: "Metilcloroformo",                   cas: "71-55-6",    cls: 1, pde: 75,   limit: 1500, concern: "Peligroso para el medio ambiente" },
+      { name: "Acetonitrile",          alias: "Acetonitrilo",                       cas: "75-05-8",    cls: 2, pde: 4.1,  limit: 82,   concern: "" },
+      { name: "Chlorobenzene",         alias: "Clorobenceno",                       cas: "108-90-7",   cls: 2, pde: 3.6,  limit: 72,   concern: "" },
+      { name: "Chloroform",            alias: "Cloroformo, triclorometano",         cas: "67-66-3",    cls: 2, pde: 0.6,  limit: 12,   concern: "Posible carcinógeno" },
+      { name: "Cyclohexane",           alias: "Ciclohexano",                        cas: "110-82-7",   cls: 2, pde: 38.8, limit: 776,  concern: "" },
+      { name: "1,2-Dichloroethene",    alias: "1,2-Dicloroetileno (suma isómeros)", cas: "540-59-0",   cls: 2, pde: 18.7, limit: 374,  concern: "" },
+      { name: "Dichloromethane",       alias: "Diclorometano, DCM",                 cas: "75-09-2",    cls: 2, pde: 6.0,  limit: 120,  concern: "" },
+      { name: "1,2-Dimethoxyethane",   alias: "Dimetoxietano, DME",                cas: "110-71-4",   cls: 2, pde: 1.0,  limit: 20,   concern: "" },
+      { name: "N,N-Dimethylacetamide", alias: "DMAc",                               cas: "127-19-5",   cls: 2, pde: 10.9, limit: 218,  concern: "Teratogénico" },
+      { name: "N,N-Dimethylformamide", alias: "DMF",                                cas: "68-12-2",    cls: 2, pde: 8.8,  limit: 176,  concern: "Teratogénico" },
+      { name: "1,4-Dioxane",           alias: "1,4-Dioxano",                        cas: "123-91-1",   cls: 2, pde: 3.8,  limit: 76,   concern: "Posible carcinógeno" },
+      { name: "2-Ethoxyethanol",       alias: "Éter monoetílico del etilenglicol",  cas: "110-80-5",   cls: 2, pde: 1.6,  limit: 32,   concern: "Teratogénico" },
+      { name: "Ethylene glycol",       alias: "Etilenglicol, 1,2-etanodiol",        cas: "107-21-1",   cls: 2, pde: 6.2,  limit: 124,  concern: "" },
+      { name: "Formamide",             alias: "Formamida",                          cas: "75-12-7",    cls: 2, pde: 2.2,  limit: 44,   concern: "Teratogénico" },
+      { name: "Hexane",                alias: "Hexano (n-hexano)",                  cas: "110-54-3",   cls: 2, pde: 2.9,  limit: 58,   concern: "Neurotóxico" },
+      { name: "Methanol",              alias: "Metanol, alcohol metílico",          cas: "67-56-1",    cls: 2, pde: 30.0, limit: 600,  concern: "Tóxico para sistema nervioso y ocular" },
+      { name: "2-Methoxyethanol",      alias: "Éter monometílico del etilenglicol", cas: "109-86-4",   cls: 2, pde: 0.5,  limit: 10,   concern: "Teratogénico" },
+      { name: "Methylbutyl ketone",    alias: "2-Hexanona, MBK",                   cas: "591-78-6",   cls: 2, pde: 0.5,  limit: 10,   concern: "Neurotóxico" },
+      { name: "Methylcyclohexane",     alias: "Metilciclohexano",                  cas: "108-87-2",   cls: 2, pde: 11.8, limit: 236,  concern: "" },
+      { name: "N-Methylpyrrolidone",   alias: "NMP, N-metil-2-pirrolidona",        cas: "872-50-4",   cls: 2, pde: 5.3,  limit: 106,  concern: "Reproductivo" },
+      { name: "Nitromethane",          alias: "Nitrometano",                        cas: "75-52-5",    cls: 2, pde: 0.5,  limit: 10,   concern: "Posible carcinógeno" },
+      { name: "Pyridine",              alias: "Piridina",                           cas: "110-86-1",   cls: 2, pde: 2.0,  limit: 40,   concern: "" },
+      { name: "Sulfolane",             alias: "Sulfolano",                          cas: "126-33-0",   cls: 2, pde: 1.6,  limit: 32,   concern: "" },
+      { name: "Tetrahydrofuran",       alias: "THF, tetrahidrofurano",             cas: "109-99-9",   cls: 2, pde: 7.2,  limit: 144,  concern: "" },
+      { name: "Tetralin",              alias: "Tetralina, 1,2,3,4-tetrahidronaftaleno", cas: "119-64-2", cls: 2, pde: 1.0, limit: 20, concern: "" },
+      { name: "Toluene",               alias: "Tolueno, metilbenceno",             cas: "108-88-3",   cls: 2, pde: 8.9,  limit: 178,  concern: "" },
+      { name: "Trichloroethylene",     alias: "Tricloroetileno, TCE",              cas: "79-01-6",    cls: 2, pde: 0.8,  limit: 16,   concern: "Posible carcinógeno" },
+      { name: "Xylene",                alias: "Xileno (suma de isómeros)",         cas: "1330-20-7",  cls: 2, pde: 21.7, limit: 434,  concern: "" },
+      { name: "Acetic acid",           alias: "Ácido acético",                     cas: "64-19-7",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Acetone",               alias: "Acetona",                           cas: "67-64-1",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Anisole",               alias: "Anisol, metoxibenceno",             cas: "100-66-3",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "1-Butanol",             alias: "n-Butanol",                         cas: "71-36-3",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "2-Butanol",             alias: "sec-Butanol",                       cas: "78-92-2",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Butyl acetate",         alias: "Acetato de n-butilo",               cas: "123-86-4",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "tert-Butylmethyl ether",alias: "MTBE",                              cas: "1634-04-4",  cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Cumene",                alias: "Cumeno, isopropilbenceno",          cas: "98-82-8",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Dimethyl sulfoxide",    alias: "DMSO",                              cas: "67-68-5",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Ethanol",               alias: "Etanol, alcohol etílico",           cas: "64-17-5",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Ethyl acetate",         alias: "Acetato de etilo",                  cas: "141-78-6",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Ethyl ether",           alias: "Éter dietílico",                    cas: "60-29-7",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Ethyl formate",         alias: "Formiato de etilo",                 cas: "109-94-4",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Formic acid",           alias: "Ácido fórmico",                     cas: "64-18-6",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Heptane",               alias: "Heptano",                           cas: "142-82-5",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Isobutyl acetate",      alias: "Acetato de isobutilo",              cas: "110-19-0",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Isopropyl acetate",     alias: "Acetato de isopropilo",             cas: "108-21-4",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Methyl acetate",        alias: "Acetato de metilo",                 cas: "79-20-9",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "3-Methyl-1-butanol",    alias: "Alcohol isoamílico",                cas: "123-51-3",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Methylethyl ketone",    alias: "MEK, 2-butanona",                   cas: "78-93-3",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Methylisobutyl ketone", alias: "MIBK, 4-metil-2-pentanona",        cas: "108-10-1",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "2-Methyl-1-propanol",   alias: "Isobutanol",                        cas: "78-83-1",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Pentane",               alias: "Pentano",                           cas: "109-66-0",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "1-Pentanol",            alias: "Alcohol amílico",                   cas: "71-41-0",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "1-Propanol",            alias: "n-Propanol",                        cas: "71-23-8",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "2-Propanol",            alias: "IPA, isopropanol",                  cas: "67-63-0",    cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Propyl acetate",        alias: "Acetato de n-propilo",              cas: "109-60-4",   cls: 3, pde: null, limit: 5000, concern: "" },
+      { name: "Triethylamine",         alias: "Trietilamina, TEA",                 cas: "121-44-8",   cls: 3, pde: null, limit: 5000, concern: "" },
     ];
 
-    // ── State ────────────────────────────────────────────────────────────
-    let query = "";
-    let filterClass = "all";
-    let sortCol = "cls";
-    let sortAsc = true;
+    // ── State ─────────────────────────────────────────────────────────────
+    let query = "", filterClass = "all", sortCol = "cls", sortAsc = true;
+    let selected = [];
+    let acIndex = -1;
+    let dailyDose = null; // null = use ICH default (50 g/day)
 
-    // ── Helpers ──────────────────────────────────────────────────────────
-    function esc(s) {
-      return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    function getLimit(s) {
+      if (s.pde === null) return s.limit; // Class 3 — fixed 5000 ppm
+      const dose = dailyDose && dailyDose > 0 ? dailyDose : 50;
+      return Math.round((s.pde / dose) * 1000 * 10) / 10; // one decimal
     }
 
+    // ── Helpers ───────────────────────────────────────────────────────────
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
     function highlight(text, q) {
       if (!q) return esc(text);
       const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
       return esc(text).replace(re, "<mark>$1</mark>");
     }
+    function classBadge(cls) {
+      const map = {1:["badge-c1","Clase 1"],2:["badge-c2","Clase 2"],3:["badge-c3","Clase 3"]};
+      const [k,l] = map[cls];
+      return `<span class="class-badge ${k}">${l}</span>`;
+    }
+    function limClass(cls) { return cls===1?"limit-c1":cls===2?"limit-c2":"limit-c3"; }
+    function chipClass(cls) { return cls===1?"chip-c1":cls===2?"chip-c2":"chip-c3"; }
+    function acBadgeClass(cls) { return cls===1?"ac-c1":cls===2?"ac-c2":"ac-c3"; }
+    function isSelected(name) { return selected.includes(name); }
 
-    function classLabel(cls) {
-      const map = { 1: ["badge-c1","Clase 1"], 2: ["badge-c2","Clase 2"], 3: ["badge-c3","Clase 3"] };
-      const [klass, label] = map[cls];
-      return `<span class="class-badge ${klass}">${label}</span>`;
+    // ── Autocomplete ──────────────────────────────────────────────────────
+    const input = document.getElementById("solvent-input");
+    const dropdown = document.getElementById("ac-dropdown");
+
+    function getAcItems(q) {
+      if (!q) return [];
+      const ql = q.toLowerCase();
+      return SOLVENTS.filter(s =>
+        s.name.toLowerCase().includes(ql) ||
+        s.alias.toLowerCase().includes(ql) ||
+        s.cas.includes(ql)
+      ).slice(0, 8);
     }
 
-    function limitClass(cls) {
-      return cls === 1 ? "limit-c1" : cls === 2 ? "limit-c2" : "limit-c3";
+    function renderDropdown(q) {
+      const items = getAcItems(q);
+      if (!items.length || !q) { dropdown.classList.remove("open"); return; }
+      acIndex = -1;
+      dropdown.innerHTML = items.map((s, i) => `
+        <div class="ac-item" data-name="${esc(s.name)}" data-i="${i}">
+          <span class="ac-badge ${acBadgeClass(s.cls)}">C${s.cls}</span>
+          <span class="ac-name">${highlight(s.name, q)}</span>
+          <span class="ac-alias">${esc(s.alias.split(",")[0])}</span>
+          ${isSelected(s.name) ? '<span style="font-size:.7rem;color:#16a34a">✓ agregado</span>' : ""}
+        </div>`).join("") || `<div class="ac-empty">Sin resultados</div>`;
+      dropdown.classList.add("open");
     }
 
-    // ── Render ───────────────────────────────────────────────────────────
-    function render() {
-      const q = query.toLowerCase().trim();
+    function addSolvent(name) {
+      if (isSelected(name)) return;
+      selected.push(name);
+      renderChips();
+      renderConclusion();
+      renderSummary();
+      renderTable();
+      input.value = "";
+      dropdown.classList.remove("open");
+      input.focus();
+    }
 
-      let data = SOLVENTS.filter(s => {
-        const matchClass = filterClass === "all" || String(s.cls) === filterClass;
-        const matchQ = !q ||
-          s.name.toLowerCase().includes(q) ||
-          (s.alias && s.alias.toLowerCase().includes(q)) ||
-          s.cas.includes(q);
-        return matchClass && matchQ;
-      });
+    function removeSolvent(name) {
+      selected = selected.filter(n => n !== name);
+      renderChips();
+      renderConclusion();
+      renderSummary();
+      renderTable();
+    }
 
-      data.sort((a, b) => {
-        let va, vb;
-        if (sortCol === "name")  { va = a.name.toLowerCase(); vb = b.name.toLowerCase(); }
-        else if (sortCol === "cas")   { va = a.cas; vb = b.cas; }
-        else if (sortCol === "class") { va = a.cls; vb = b.cls; }
-        else if (sortCol === "limit") { va = a.limit; vb = b.limit; }
-        else if (sortCol === "pde")   { va = a.pde ?? 999; vb = b.pde ?? 999; }
-        else { va = a.cls; vb = b.cls; }
-        if (va < vb) return sortAsc ? -1 : 1;
-        if (va > vb) return sortAsc ? 1 : -1;
-        return a.name.localeCompare(b.name);
-      });
+    input.addEventListener("input", e => renderDropdown(e.target.value.trim()));
+    input.addEventListener("keydown", e => {
+      const items = dropdown.querySelectorAll(".ac-item");
+      if (e.key === "ArrowDown") { acIndex = Math.min(acIndex+1, items.length-1); items.forEach((el,i) => el.classList.toggle("active", i===acIndex)); e.preventDefault(); }
+      else if (e.key === "ArrowUp") { acIndex = Math.max(acIndex-1, 0); items.forEach((el,i) => el.classList.toggle("active", i===acIndex)); e.preventDefault(); }
+      else if (e.key === "Enter") {
+        if (acIndex >= 0 && items[acIndex]) { addSolvent(items[acIndex].dataset.name); }
+        else if (items.length === 1) { addSolvent(items[0].dataset.name); }
+        e.preventDefault();
+      }
+      else if (e.key === "Escape") { dropdown.classList.remove("open"); }
+    });
+    dropdown.addEventListener("click", e => {
+      const item = e.target.closest(".ac-item");
+      if (item) addSolvent(item.dataset.name);
+    });
+    document.addEventListener("click", e => { if (!e.target.closest(".autocomplete-wrap")) dropdown.classList.remove("open"); });
 
-      const tbody = document.getElementById("table-body");
-      const noRes = document.getElementById("no-results");
-      const countEl = document.getElementById("result-count");
-
-      countEl.textContent = `${data.length} solvente${data.length !== 1 ? "s" : ""}`;
-
-      if (data.length === 0) {
-        tbody.innerHTML = "";
-        noRes.style.display = "block";
+    // ── Chips ─────────────────────────────────────────────────────────────
+    function renderChips() {
+      const container = document.getElementById("selected-chips");
+      const empty = document.getElementById("chips-empty");
+      if (!selected.length) {
+        container.innerHTML = "";
+        container.appendChild(empty);
+        empty.style.display = "";
         return;
       }
-      noRes.style.display = "none";
-
-      tbody.innerHTML = data.map(s => `
-        <tr>
-          <td>
-            <div class="solvent-name">${highlight(s.name, q)}</div>
-            ${s.alias ? `<div class="solvent-alias">${highlight(s.alias, q)}</div>` : ""}
-          </td>
-          <td><span class="cas-num">${highlight(s.cas, q)}</span></td>
-          <td>${classLabel(s.cls)}</td>
-          <td><span class="limit-val ${limitClass(s.cls)}">${s.limit.toLocaleString("es-AR")}</span></td>
-          <td class="pde-val">${s.pde !== null ? s.pde.toFixed(1) : "—"}</td>
-          <td><span class="concern-text">${s.concern ? esc(s.concern) : "—"}</span></td>
-        </tr>`).join("");
+      empty.style.display = "none";
+      const existing = [...container.querySelectorAll(".selected-chip")];
+      existing.forEach(el => el.remove());
+      selected.forEach(name => {
+        const s = SOLVENTS.find(x => x.name === name);
+        const chip = document.createElement("span");
+        chip.className = `selected-chip ${chipClass(s.cls)}`;
+        chip.innerHTML = `${esc(s.name)} <button class="chip-remove" title="Quitar">×</button>`;
+        chip.querySelector(".chip-remove").addEventListener("click", () => removeSolvent(name));
+        container.appendChild(chip);
+      });
     }
 
-    // ── Sort headers ─────────────────────────────────────────────────────
+    // ── Summary table ─────────────────────────────────────────────────────
+    function renderSummary() {
+      const panel = document.getElementById("selected-summary");
+      const tbody = document.getElementById("summary-body");
+      if (!selected.length) { panel.classList.remove("visible"); return; }
+      panel.classList.add("visible");
+      // sort by class then name
+      const sorted = [...selected].map(n => SOLVENTS.find(s => s.name === n)).sort((a,b) => a.cls-b.cls || a.name.localeCompare(b.name));
+      tbody.innerHTML = sorted.map(s => `
+        <tr>
+          <td><div class="s-name">${esc(s.name)}</div><div class="s-alias">${esc(s.alias.split(",")[0])}</div></td>
+          <td>${classBadge(s.cls)}</td>
+          <td><span class="s-limit ${limClass(s.cls)}">${getLimit(s).toLocaleString("es-AR")}</span></td>
+          <td>${s.pde !== null ? s.pde.toFixed(1) : "—"}</td>
+          <td style="font-size:.8rem;color:var(--muted)">${s.concern ? esc(s.concern) : "—"}</td>
+          <td><button class="s-remove" data-name="${esc(s.name)}" title="Quitar">×</button></td>
+        </tr>`).join("");
+      tbody.querySelectorAll(".s-remove").forEach(btn => btn.addEventListener("click", () => removeSolvent(btn.dataset.name)));
+    }
+
+    // ── Conclusion ────────────────────────────────────────────────────────
+    function renderConclusion() {
+      const el = document.getElementById("conclusion");
+      const doseWrap = document.getElementById("dose-wrap");
+      if (!selected.length) {
+        el.classList.remove("visible");
+        doseWrap.style.display = "none";
+        return;
+      }
+      doseWrap.style.display = "block";
+      el.classList.add("visible");
+
+      const solvents = selected.map(n => SOLVENTS.find(s => s.name === n));
+      const c1 = solvents.filter(s => s.cls === 1);
+      const c2 = solvents.filter(s => s.cls === 2);
+      const c3 = solvents.filter(s => s.cls === 3);
+      const mostRestrictive = [...solvents].sort((a,b) => getLimit(a) - getLimit(b))[0];
+      const doseLabel = dailyDose ? `${dailyDose} g/día (producto)` : "50 g/día (ICH default)";
+
+      let alertHtml = "";
+      if (c1.length) {
+        alertHtml = `<div class="conclusion-alert alert-red">⚠️ <strong>Clase 1 detectada:</strong> ${c1.map(s=>esc(s.name)).join(", ")} — uso debe estar justificado y documentado. Límites muy estrictos.</div>`;
+      } else if (c2.length) {
+        alertHtml = `<div class="conclusion-alert alert-amber">⚠️ <strong>Solventes Clase 2:</strong> deben controlarse. Verificar que los niveles estén por debajo de los límites indicados.</div>`;
+      } else {
+        alertHtml = `<div class="conclusion-alert alert-green">✓ Solo solventes Clase 3 — bajo potencial tóxico. Sin restricciones especiales según USP &lt;467&gt;.</div>`;
+      }
+
+      el.innerHTML = `
+        <h3>Análisis de tu selección <span style="font-weight:400;font-size:.7rem;color:#0369a1;text-transform:none;letter-spacing:0">— dosis: ${doseLabel}</span></h3>
+        <div class="conclusion-grid">
+          <div class="conclusion-item">Clase 1: <span style="color:${c1.length?"#dc2626":"#16a34a"}">${c1.length ? c1.map(s=>esc(s.name)).join(", ") : "ninguno ✓"}</span></div>
+          <div class="conclusion-item">Clase 2: <span style="color:${c2.length?"#d97706":"#16a34a"}">${c2.length ? c2.map(s=>esc(s.name)).join(", ") : "ninguno ✓"}</span></div>
+          <div class="conclusion-item">Clase 3: <span style="color:#16a34a">${c3.length ? c3.map(s=>esc(s.name)).join(", ") : "ninguno"}</span></div>
+        </div>
+        ${alertHtml}
+        <div class="conclusion-most-restrictive">
+          🎯 <strong>Límite más restrictivo: ${getLimit(mostRestrictive).toLocaleString("es-AR")} ppm (${esc(mostRestrictive.name)})</strong> — el método analítico debe tener capacidad de detección al menos hasta este nivel.
+        </div>`;
+    }
+
+    document.getElementById("btn-clear-all").addEventListener("click", () => {
+      selected = [];
+      renderChips();
+      renderConclusion();
+      renderSummary();
+      renderTable();
+    });
+
+    // ── Table ─────────────────────────────────────────────────────────────
+    function renderTable() {
+      const q = query.toLowerCase().trim();
+      let data = SOLVENTS.filter(s => {
+        const matchClass = filterClass === "all" || String(s.cls) === filterClass;
+        const matchQ = !q || s.name.toLowerCase().includes(q) || s.alias.toLowerCase().includes(q) || s.cas.includes(q);
+        return matchClass && matchQ;
+      });
+      data.sort((a,b) => {
+        let va, vb;
+        if (sortCol==="name") { va=a.name.toLowerCase(); vb=b.name.toLowerCase(); }
+        else if (sortCol==="cas") { va=a.cas; vb=b.cas; }
+        else if (sortCol==="class") { va=a.cls; vb=b.cls; }
+        else if (sortCol==="limit") { va=a.limit; vb=b.limit; }
+        else if (sortCol==="pde") { va=a.pde??999; vb=b.pde??999; }
+        else { va=a.cls; vb=b.cls; }
+        if (va<vb) return sortAsc?-1:1;
+        if (va>vb) return sortAsc?1:-1;
+        return a.name.localeCompare(b.name);
+      });
+      const tbody = document.getElementById("table-body");
+      const noRes = document.getElementById("no-results");
+      document.getElementById("result-count").textContent = `${data.length} solvente${data.length!==1?"s":""}`;
+      if (!data.length) { tbody.innerHTML=""; noRes.style.display="block"; return; }
+      noRes.style.display="none";
+      tbody.innerHTML = data.map(s => {
+        const sel = isSelected(s.name);
+        return `<tr>
+          <td><button class="btn-add${sel?" added":""}" data-name="${esc(s.name)}">${sel?"✓ Agregado":"+ Agregar"}</button></td>
+          <td><div class="solvent-name">${highlight(s.name,q)}</div>${s.alias?`<div class="solvent-alias">${highlight(s.alias,q)}</div>`:""}</td>
+          <td><span class="cas-num">${highlight(s.cas,q)}</span></td>
+          <td>${classBadge(s.cls)}</td>
+          <td><span class="limit-val ${limClass(s.cls)}">${s.limit.toLocaleString("es-AR")}</span></td>
+          <td>${s.pde!==null?s.pde.toFixed(1):"—"}</td>
+          <td><span class="concern-text">${s.concern?esc(s.concern):"—"}</span></td>
+        </tr>`;
+      }).join("");
+      tbody.querySelectorAll(".btn-add").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (isSelected(btn.dataset.name)) removeSolvent(btn.dataset.name);
+          else addSolvent(btn.dataset.name);
+        });
+      });
+    }
+
     document.querySelectorAll("th[data-col]").forEach(th => {
       th.addEventListener("click", () => {
         const col = th.dataset.col;
-        if (sortCol === col) sortAsc = !sortAsc;
-        else { sortCol = col; sortAsc = true; }
+        if (sortCol===col) sortAsc=!sortAsc; else { sortCol=col; sortAsc=true; }
         document.querySelectorAll("th[data-col]").forEach(t => t.classList.remove("sorted"));
         th.classList.add("sorted");
-        th.querySelector(".sort-icon").textContent = sortAsc ? " ↑" : " ↓";
-        render();
+        th.querySelector(".sort-icon").textContent = sortAsc?" ↑":" ↓";
+        renderTable();
       });
     });
 
-    // ── Search ───────────────────────────────────────────────────────────
-    document.getElementById("search").addEventListener("input", e => {
-      query = e.target.value;
-      render();
-    });
-
-    // ── Filter buttons ────────────────────────────────────────────────────
+    document.getElementById("search").addEventListener("input", e => { query=e.target.value; renderTable(); });
     document.querySelectorAll(".filter-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         filterClass = btn.dataset.class;
-        render();
+        renderTable();
       });
     });
 
-    // ── Init ─────────────────────────────────────────────────────────────
-    render();
+    // ── Daily dose field ──────────────────────────────────────────────────
+    document.getElementById("daily-dose").addEventListener("input", e => {
+      const v = parseFloat(e.target.value);
+      dailyDose = (!isNaN(v) && v > 0) ? v : null;
+      renderConclusion();
+      renderSummary();
+    });
+    document.getElementById("btn-clear-dose").addEventListener("click", () => {
+      document.getElementById("daily-dose").value = "";
+      dailyDose = null;
+      renderConclusion();
+      renderSummary();
+    });
+
+    renderChips();
+    renderConclusion();
+    renderSummary();
+    renderTable();
   </script>
 
 </body>
