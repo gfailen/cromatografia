@@ -353,7 +353,9 @@
       <div class="cards-grid">
 
         <a class="card" href="/usp467/">
-          <div class="card-icon">⚗️</div>
+          <div class="card-icon" style="background:#E05C35;border-radius:6px;display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;">
+          <span style="font-size:9px;font-weight:800;color:#fff;text-align:center;line-height:1.2;letter-spacing:.03em;">USP<br>&lt;467&gt;</span>
+          </div>
           <span class="card-tag tag-live">Disponible</span>
           <div class="card-title">Solventes Residuales USP &lt;467&gt;</div>
           <div class="card-desc">60 solventes con clase, PDE, límite en ppm y CAS. Buscá por nombre o filtrá por clase.</div>
@@ -442,6 +444,15 @@
 
     </div>
   </footer>
-
+<div id="usp-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:999;background:#E05C35;color:#fff;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:center;gap:1rem;font-size:.875rem;font-weight:500;">
+  <span>Nueva herramienta disponible:</span>
+  <a href="/usp467/" style="color:#fff;font-weight:700;text-decoration:underline;">Solventes Residuales USP &lt;467&gt; →</a>
+  <button onclick="document.getElementById('usp-bar').style.display='none'" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;padding:0 .25rem;margin-left:.5rem;opacity:.8;">×</button>
+</div>
+<script>
+  setTimeout(function(){
+    document.getElementById('usp-bar').style.display='flex';
+  }, 5000);
+</script>
 </body>
 </html>
