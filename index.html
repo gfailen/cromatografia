@@ -454,5 +454,17 @@
     document.getElementById('usp-bar').style.display='flex';
   }, 5000);
 </script>
+  <style>
+  #usp-bar { bottom: -80px; transition: bottom 0.4s ease; }
+  #usp-bar.visible { bottom: 0; }
+</style>
+<div id="usp-bar" style="display:flex;position:fixed;bottom:-80px;left:0;right:0;z-index:999;background:#E05C35;color:#fff;padding:.75rem 1.5rem;align-items:center;justify-content:center;gap:1rem;font-size:.875rem;font-weight:500;">
+  <span>Nueva herramienta disponible:</span>
+  <a href="/usp467/" style="color:#fff;font-weight:700;text-decoration:underline;">Solventes Residuales USP &lt;467&gt; →</a>
+  <button onclick="document.getElementById('usp-bar').classList.remove('visible');document.getElementById('usp-bar').style.bottom='-80px';" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;padding:0 .25rem;margin-left:.5rem;opacity:.8;">×</button>
+</div>
+<script>
+  setTimeout(function(){ document.getElementById('usp-bar').classList.add('visible'); }, 5000);
+</script>
 </body>
 </html>
