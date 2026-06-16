@@ -40,37 +40,55 @@
     }
 
     /* ── Header ─────────────────────────────────── */
+       /* ── Header ─────────────────────────────────── */
     header {
       background: #0d1b35;
       color: #fff;
-      padding: 0 2rem;
+      padding: 0 1.25rem;
     }
     .header-inner {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
       display: flex;
       align-items: center;
-      height: 56px;
+      justify-content: space-between;
+      height: 64px;
       gap: 1rem;
     }
     .logo {
-      font-size: 1.1rem;
+      font-size: 1.25rem;
       font-weight: 700;
+      letter-spacing: -0.02em;
       text-decoration: none;
       color: #fff;
       white-space: nowrap;
     }
     .logo span { color: #fff; }
     .logo span.logo-ia { color: #38bdf8; font-style: italic; }
-    .breadcrumb {
-      font-size: 0.8rem;
+    .header-tagline {
+      font-size: 0.75rem;
       color: #93c5fd;
+      white-space: nowrap;
+    }
+    .header-tagline a { color: #93c5fd; text-decoration: none; }
+    .header-tagline a:hover { color: #fff; }
+    nav {
       display: flex;
       align-items: center;
-      gap: .4rem;
+      gap: .15rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
-    .breadcrumb .sep { color: #3b82f6; }
-    .breadcrumb .current { color: #bfdbfe; font-weight: 500; }
+    nav a {
+      color: #bfdbfe;
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: .3rem .6rem;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+      white-space: nowrap;
+    }
+    nav a:hover { color: #fff; background: rgba(255,255,255,.1); }
 
     /* ── Page header ─────────────────────────────── */
     .page-header {
@@ -681,10 +699,12 @@
   <header>
     <div class="header-inner">
       <a class="logo" href="/">Cromatograf<span class="logo-ia">IA</span><span>.com.ar</span></a>
-      <div class="breadcrumb">
-        <span class="sep">/</span>
-        <span class="current">Solventes Residuales USP &lt;467&gt;</span>
-      </div>
+      <span class="header-tagline">Un proyecto de <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a></span>
+      <nav>
+        <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a>
+        <a href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Soporte técnico</a>
+        <a href="https://www.viales.com.ar" target="_blank" rel="noopener">viales.com.ar</a>
+      </nav>
     </div>
   </header>
 
