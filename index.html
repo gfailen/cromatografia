@@ -340,7 +340,21 @@
       });
     }
   </script>
-
+    .chroma { padding: 2.75rem 0 1.5rem; }
+    .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .chroma-base { stroke: #cbd5e1; stroke-width: 1; vector-effect: non-scaling-stroke; }
+    #chroma-line {
+      stroke: #1d4ed8; stroke-width: 1.6;
+      stroke-linejoin: round; stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+    #chroma-pen { fill: #0ea5e9; opacity: 0; transition: opacity .25s; }
+    .chroma-axis { display: flex; justify-content: space-between; margin-top: .45rem; }
+    .chroma-axis span {
+      font-family: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+      font-size: .62rem; letter-spacing: .08em; color: #94a3b8;
+      font-variant-numeric: tabular-nums;
+    }
   <style>
 .anim-on .card {
   opacity: 0;
@@ -384,7 +398,28 @@
 
   <main>
     <div class="container">
-
+      <div class="chroma" aria-hidden="true">
+        <svg class="chroma-svg" viewBox="0 0 1000 120" role="presentation">
+          <defs>
+            <clipPath id="chroma-clip">
+              <rect id="chroma-wipe" x="0" y="0" width="0" height="120"></rect>
+            </clipPath>
+            <linearGradient id="chroma-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0ea5e9" stop-opacity=".18"></stop>
+              <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <line class="chroma-base" x1="0" y1="104.5" x2="1000" y2="104.5"></line>
+          <g clip-path="url(#chroma-clip)">
+            <path id="chroma-area" fill="url(#chroma-fill)"></path>
+            <path id="chroma-line" fill="none"></path>
+          </g>
+          <circle id="chroma-pen" r="3.2" cx="0" cy="104.5"></circle>
+        </svg>
+        <div class="chroma-axis">
+          <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10 min</span>
+        </div>
+      </div>
       <p class="section-title">Explorar</p>
       <div class="cards-grid">
 
@@ -496,5 +531,65 @@
     to   { transform: translateY(0); }
   }
 </style>
+  <script>
+(function () {
+  var wrap = document.querySelector('.chroma');
+  if (!wrap) return;
+  var line = document.getElementById('chroma-line');
+  var area = document.getElementById('chroma-area');
+  var wipe = document.getElementById('chroma-wipe');
+  var pen  = document.getElementById('chroma-pen');
+
+  var BASE = 104.5;
+  var peaks = [
+    { c:  28, w: 5.0, h: 26 }, { c: 150, w: 6.0, h: 44 },
+    { c: 196, w: 5.5, h: 68 }, { c: 300, w: 6.5, h: 88 },
+    { c: 352, w: 5.0, h: 30 }, { c: 470, w: 7.0, h: 54 },
+    { c: 560, w: 6.0, h: 96 }, { c: 612, w: 5.5, h: 38 },
+    { c: 730, w: 7.5, h: 46 }, { c: 800, w: 6.0, h: 24 },
+    { c: 880, w: 8.0, h: 62 }
+  ];
+
+  function yAt(x) {
+    var s = 0;
+    for (var i = 0; i < peaks.length; i++) {
+      var p = peaks[i], d = x - p.c;
+      s += p.h * Math.exp(-(d * d) / (2 * p.w * p.w));
+    }
+    return BASE - s - Math.sin(x / 6.3) * 0.3;
+  }
+
+  var pts = [];
+  for (var x = 0; x <= 1000; x++) pts.push(x + ',' + yAt(x).toFixed(2));
+  var d = 'M' + pts.join('L');
+  line.setAttribute('d', d);
+  area.setAttribute('d', d + 'L1000,' + BASE + 'L0,' + BASE + 'Z');
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    wipe.setAttribute('width', 1000);
+    return;
+  }
+
+  var ticking = false;
+  function draw() {
+    ticking = false;
+    var r = wrap.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var p = (vh * 0.92 - r.top) / (vh * 0.55);
+    p = p < 0 ? 0 : (p > 1 ? 1 : p);
+    var px = p * 1000;
+    wipe.setAttribute('width', px.toFixed(1));
+    pen.setAttribute('cx', px.toFixed(1));
+    pen.setAttribute('cy', yAt(px).toFixed(2));
+    pen.style.opacity = (p > 0.002 && p < 0.998) ? 1 : 0;
+  }
+  function onScroll() {
+    if (!ticking) { ticking = true; requestAnimationFrame(draw); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  draw();
+})();
+</script>
 </body>
 </html>
