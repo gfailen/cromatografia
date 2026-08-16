@@ -320,20 +320,13 @@
       padding-top: 1rem;
     }
   </style>
-    <style>
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to   { transform: translateY(0); }
-    }
-  </style>
-
     <script>
     if ('IntersectionObserver' in window) {
       document.documentElement.classList.add('anim-on');
       document.addEventListener('DOMContentLoaded', function () {
         var targets = document.querySelectorAll('.card');
         targets.forEach(function (el, i) {
-          el.style.transitionDelay = (i % 3) * 90 + 'ms';
+          el.style.transitionDelay = (i % 3) * 200 + 'ms';
         });
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
@@ -349,12 +342,12 @@
   </script>
 
   <style>
-    .anim-on .card {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity .55s cubic-bezier(.22,.61,.36,1),
-                  transform .55s cubic-bezier(.22,.61,.36,1);
-    }
+.anim-on .card {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1s cubic-bezier(.22,.61,.36,1),
+              transform 1s cubic-bezier(.22,.61,.36,1);
+}
     .anim-on .card.is-visible { opacity: 1; transform: none; }
 
     @media (prefers-reduced-motion: reduce) {
@@ -496,27 +489,12 @@
 
     </div>
   </footer>
-
-<script>
-  setTimeout(function(){
-    document.getElementById('usp-bar').style.display='flex';
-  }, 5000);
-</script>
   <style>
-  #usp-bar { bottom: -80px; transition: bottom 0.4s ease; }
-  #usp-bar.visible { bottom: 0; }
 <style>
   @keyframes slideUp {
     from { transform: translateY(100%); }
     to   { transform: translateY(0); }
   }
 </style>
-<script>
-  setTimeout(function(){
-    var el = document.getElementById('usp-bar');
-    el.style.display = 'flex';
-    el.style.animation = 'slideUp 0.4s ease';
-  }, 5000);
-</script>
 </body>
 </html>
