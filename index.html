@@ -327,9 +327,8 @@
     }
   </style>
 
-  <script>
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        && 'IntersectionObserver' in window) {
+    <script>
+    if ('IntersectionObserver' in window) {
       document.documentElement.classList.add('anim-on');
       document.addEventListener('DOMContentLoaded', function () {
         var targets = document.querySelectorAll('.card');
@@ -357,6 +356,11 @@
                   transform .55s cubic-bezier(.22,.61,.36,1);
     }
     .anim-on .card.is-visible { opacity: 1; transform: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .anim-on .card { transform: none; transition: opacity .3s linear; }
+      .anim-on .card.is-visible { transform: none; }
+    }
   </style>
 </head>
 </head>
