@@ -112,7 +112,7 @@
       min-height: 420px;    /* piso en pantallas bajas */
       max-height: 720px;    /* techo en monitores altos */
     }
-    .hero-bg {
+      .hero-bg, .hero-lit {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -383,6 +383,15 @@
     @media (max-width: 600px) {
       .hero-media { top: 0; height: 100%; transform: none !important; }
     }
+        .hero-lit {
+      mix-blend-mode: screen;
+      animation: litPulse 4.5s ease-in-out infinite;
+      will-change: opacity;
+    }
+    @keyframes litPulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-lit { animation: none; opacity: .85; }
+    }
   </style>
     <script>
     if ('IntersectionObserver' in window) {
@@ -436,7 +445,8 @@
 
   <section class="hero">
       <div class="hero-media">
-            <img class="hero-bg" src="/hero-seleccionado-base.jpg" alt="Equipos de cromatografía en laboratorio">
+        <img class="hero-bg"  src="/hero-apagado.jpg" alt="Equipos de cromatografía en laboratorio">
+        <img class="hero-lit" src="/hero-luces.png" alt="" aria-hidden="true">
       </div>
     <div class="hero-overlay"></div>
     <div class="hero-inner">
