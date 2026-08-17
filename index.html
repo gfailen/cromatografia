@@ -355,6 +355,54 @@
       });
     }
   </script>
+      /* ── Hero: parallax, asentamiento y deriva de luz ── */
+    .hero-media {
+      position: absolute;
+      left: 0; right: 0;
+      top: -11%;
+      height: 122%;
+      will-change: transform;
+    }
+
+    .anim-on .hero-bg {
+      transform: scale(1.045);
+      transition: transform 1.4s cubic-bezier(.22,.61,.36,1);
+    }
+    .anim-on.hero-in .hero-bg { transform: scale(1); }
+
+    .anim-on .hero-text {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .9s cubic-bezier(.22,.61,.36,1) .25s,
+                  transform .9s cubic-bezier(.22,.61,.36,1) .25s;
+    }
+    .anim-on.hero-in .hero-text { opacity: 1; transform: none; }
+
+    .hero-overlay::after {
+      content: '';
+      position: absolute;
+      inset: -20%;
+      background: linear-gradient(115deg,
+        rgba(255,255,255,0) 36%,
+        rgba(198,228,255,.15) 50%,
+        rgba(255,255,255,0) 64%);
+      animation: heroLuz 52s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes heroLuz {
+      0%, 100% { transform: translate3d(-12%, -6%, 0); }
+      50%      { transform: translate3d(12%, 6%, 0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .anim-on .hero-bg { transform: none; }
+      .anim-on .hero-text { opacity: 1; transform: none; }
+      .hero-overlay::after { animation: none; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-media { top: 0; height: 100%; transform: none !important; }
+    }
   <style>
 .anim-on .card {
   opacity: 0;
@@ -386,7 +434,9 @@
   </header>
 
   <section class="hero">
-    <img class="hero-bg" src="/Hero para cromatografia_com_ar.jpg" alt="Equipos de cromatografía en laboratorio" />
+      <div class="hero-media">
+      <img class="hero-bg" src="/Hero para cromatografia_com_ar.jpg" alt="Equipos de cromatografía en laboratorio" />
+      </div>
     <div class="hero-overlay"></div>
     <div class="hero-inner">
       <div class="hero-text">
@@ -586,6 +636,43 @@
     pen.setAttribute('cx', px.toFixed(1));
     pen.setAttribute('cy', yAt(px).toFixed(1));
     pen.style.opacity = (p > 0.002 && p < 0.998) ? 1 : 0;
+  }
+  function onScroll() {
+    if (!ticking) { ticking = true; requestAnimationFrame(draw); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  draw();
+})();
+</script>
+  <script>
+(function () {
+  var hero  = document.querySelector('.hero');
+  var media = document.querySelector('.hero-media');
+  if (!hero || !media) return;
+
+  // Asentamiento: dos rAF para que el navegador registre el estado inicial
+  // antes de cambiarlo, si no la transición no corre.
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.documentElement.classList.add('hero-in');
+    });
+  });
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia('(max-width: 600px)').matches) return;
+
+  var RANGO = 0.11;   // tiene que coincidir con el top:-11% del CSS
+  var ticking = false;
+
+  function draw() {
+    ticking = false;
+    var h = hero.offsetHeight;
+    var y = window.scrollY || window.pageYOffset;
+    var p = y / h;
+    p = p < 0 ? 0 : (p > 1 ? 1 : p);
+    var desp = (p - 0.5) * 2 * (RANGO * h);
+    media.style.transform = 'translate3d(0,' + desp.toFixed(1) + 'px,0)';
   }
   function onScroll() {
     if (!ticking) { ticking = true; requestAnimationFrame(draw); }
