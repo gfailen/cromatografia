@@ -344,18 +344,20 @@
     }
 
     .anim-on .hero-bg {
-      transform: scale(1.045);
-      transition: transform 1.4s cubic-bezier(.22,.61,.36,1);
+      animation: heroFoto 1.4s cubic-bezier(.22,.61,.36,1) both;
     }
-    .anim-on.hero-in .hero-bg { transform: scale(1); }
+    @keyframes heroFoto {
+      from { transform: scale(1.045); }
+      to   { transform: scale(1); }
+    }
 
     .anim-on .hero-text {
-      opacity: 0;
-      transform: translateY(14px);
-      transition: opacity .9s cubic-bezier(.22,.61,.36,1) .25s,
-                  transform .9s cubic-bezier(.22,.61,.36,1) .25s;
+      animation: heroPanel .9s cubic-bezier(.22,.61,.36,1) .25s both;
     }
-    .anim-on.hero-in .hero-text { opacity: 1; transform: none; }
+    @keyframes heroPanel {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: none; }
+    }
 
     .hero-overlay::after {
       content: '';
@@ -374,8 +376,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .anim-on .hero-bg { transform: none; }
-      .anim-on .hero-text { opacity: 1; transform: none; }
+      .anim-on .hero-bg, .anim-on .hero-text { animation: none; }
       .hero-overlay::after { animation: none; }
     }
 
@@ -645,24 +646,16 @@
   draw();
 })();
 </script>
-  <script>
+<script>
 (function () {
   var hero  = document.querySelector('.hero');
   var media = document.querySelector('.hero-media');
   if (!hero || !media) return;
 
-  // Asentamiento: dos rAF para que el navegador registre el estado inicial
-  // antes de cambiarlo, si no la transición no corre.
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
-      document.documentElement.classList.add('hero-in');
-    });
-  });
-
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (window.matchMedia('(max-width: 600px)').matches) return;
 
-  var RANGO = 0.11;   // tiene que coincidir con el top:-11% del CSS
+  var RANGO = 0.11;
   var ticking = false;
 
   function draw() {
