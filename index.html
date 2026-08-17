@@ -319,6 +319,21 @@
       border-top: 1px solid rgba(255,255,255,.06);
       padding-top: 1rem;
     }
+        .chroma { padding: 2.75rem 0 1.5rem; }
+    .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .chroma-base { stroke: #cbd5e1; stroke-width: 1; vector-effect: non-scaling-stroke; }
+    #chroma-line {
+      stroke: #1d4ed8; stroke-width: 1.6;
+      stroke-linejoin: round; stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+    #chroma-pen { fill: #0ea5e9; opacity: 0; transition: opacity .25s; }
+    .chroma-axis { display: flex; justify-content: space-between; margin-top: .45rem; }
+    .chroma-axis span {
+      font-family: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+      font-size: .62rem; letter-spacing: .08em; color: #94a3b8;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
     <script>
     if ('IntersectionObserver' in window) {
@@ -340,21 +355,6 @@
       });
     }
   </script>
-    .chroma { padding: 2.75rem 0 1.5rem; }
-    .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
-    .chroma-base { stroke: #cbd5e1; stroke-width: 1; vector-effect: non-scaling-stroke; }
-    #chroma-line {
-      stroke: #1d4ed8; stroke-width: 1.6;
-      stroke-linejoin: round; stroke-linecap: round;
-      vector-effect: non-scaling-stroke;
-    }
-    #chroma-pen { fill: #0ea5e9; opacity: 0; transition: opacity .25s; }
-    .chroma-axis { display: flex; justify-content: space-between; margin-top: .45rem; }
-    .chroma-axis span {
-      font-family: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
-      font-size: .62rem; letter-spacing: .08em; color: #94a3b8;
-      font-variant-numeric: tabular-nums;
-    }
   <style>
 .anim-on .card {
   opacity: 0;
