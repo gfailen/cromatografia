@@ -325,6 +325,7 @@
     #chroma-base { stroke: #ea2f9a; stroke-width: 1; vector-effect: non-scaling-stroke; }
     #chroma-pen { fill: #1f4ed8; opacity: 0; transition: opacity .2s; }
     .chroma-mark { opacity: 0; transition: opacity .25s ease-out; }
+    #chroma-axes { opacity: 0; transition: opacity .3s ease-out; }
     #chroma-line {
       stroke: #1d4ed8; stroke-width: 1.6;
       stroke-linejoin: round; stroke-linecap: round;
@@ -661,6 +662,7 @@
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     wipe.setAttribute('width', W);
+    axesG.style.opacity = 1;
     markEls.forEach(function (mk) { mk.el.style.opacity = 1; });
     return;
   }
@@ -672,6 +674,7 @@
     var vh = window.innerHeight || document.documentElement.clientHeight;
     var p = (vh * START - r.top) / (vh * (START - END));
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
+        axesG.style.opacity = (p > 0) ? 1 : 0;
     var px = p * W;
     wipe.setAttribute('width', px.toFixed(1));
     if (px > L && px < R) {
