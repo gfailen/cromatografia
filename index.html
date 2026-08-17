@@ -477,7 +477,6 @@
           <g id="chroma-marks"></g>
         </svg>
       </div>
-      </div>
       <p class="section-title">Explorar</p>
       <div class="cards-grid">
 
@@ -650,7 +649,7 @@
 
   function tick(x) { return el('line', { x1: x, y1: by - 2, x2: x, y2: by + 6, stroke: mag, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }); }
   var markEls = [];
-  var gs = el('g', { 'class': 'chroma-mark' }); gs.appendChild(tick(xAt(SA))); gs.appendChild(tick(xAt(SB))); marksG.appendChild(gs); markEls.push({ el: gs, x: xAt(SB) });
+ 
   peaks.forEach(function (p) {
     var g = el('g', { 'class': 'chroma-mark' });
     g.appendChild(tick(xAt(p.rt - 2.6 * p.w))); g.appendChild(tick(xAt(p.rt + 2.6 * p.w)));
@@ -666,7 +665,7 @@
     return;
   }
 
-  var START = 0.76, END = 0.04, ticking = false;
+  var START = 0.66, END = 0.04, ticking = false;
   function draw() {
     ticking = false;
     var r = wrap.getBoundingClientRect();
