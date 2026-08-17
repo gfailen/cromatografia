@@ -383,15 +383,16 @@
     @media (max-width: 600px) {
       .hero-media { top: 0; height: 100%; transform: none !important; }
     }
-        .hero-lit {
-      mix-blend-mode: screen;
-      animation: litPulse 4.5s ease-in-out infinite;
-      will-change: opacity;
-    }
-    @keyframes litPulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
-    @media (prefers-reduced-motion: reduce) {
-      .hero-lit { animation: none; opacity: .85; }
-    }
+      .hero-lit {
+        opacity: 0;                        /* apagado al cargar */
+        transition: opacity .28s ease-out; /* encendido rapido, no parpadeo */
+        mix-blend-mode: screen;
+        will-change: opacity;
+      }
+      .hero-lit.is-on { opacity: 1; }
+      @media (prefers-reduced-motion: reduce) {
+        .hero-lit { opacity: .9; transition: none; }  /* accesibilidad: quedan encendidas fijas */
+      }
   </style>
     <script>
     if ('IntersectionObserver' in window) {
@@ -686,6 +687,20 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   draw();
+})();
+</script>
+  <script>
+(function () {
+  var lit = document.querySelector('.hero-lit');
+  if (!lit) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // ya quedan encendidas por CSS
+  function encender() {
+    if ((window.scrollY || window.pageYOffset) > 8) {
+      lit.classList.add('is-on');
+      window.removeEventListener('scroll', encender);  // se prenden una vez y quedan
+    }
+  }
+  window.addEventListener('scroll', encender, { passive: true });
 })();
 </script>
 </body>
