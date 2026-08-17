@@ -384,14 +384,14 @@
       .hero-media { top: 0; height: 100%; transform: none !important; }
     }
       .hero-lit {
-        opacity: 0;                        /* apagado al cargar */
-        transition: opacity .28s ease-out; /* encendido rapido, no parpadeo */
+        opacity: 0;                                /* apagado durante el zoom */
+        animation: litOn .28s ease-out 1.5s both;  /* enciende al terminar el zoom */
         mix-blend-mode: screen;
         will-change: opacity;
       }
-      .hero-lit.is-on { opacity: 1; }
+      @keyframes litOn { from { opacity: 0; } to { opacity: 1; } }
       @media (prefers-reduced-motion: reduce) {
-        .hero-lit { opacity: .9; transition: none; }  /* accesibilidad: quedan encendidas fijas */
+        .hero-lit { opacity: .9; animation: none; }  /* accesibilidad: encendidas fijas */
       }
   </style>
     <script>
@@ -687,20 +687,6 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   draw();
-})();
-</script>
-  <script>
-(function () {
-  var lit = document.querySelector('.hero-lit');
-  if (!lit) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // ya quedan encendidas por CSS
-  function encender() {
-    if ((window.scrollY || window.pageYOffset) > 8) {
-      lit.classList.add('is-on');
-      window.removeEventListener('scroll', encender);  // se prenden una vez y quedan
-    }
-  }
-  window.addEventListener('scroll', encender, { passive: true });
 })();
 </script>
 </body>
