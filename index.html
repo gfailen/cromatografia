@@ -108,9 +108,9 @@
     .hero {
       position: relative; overflow: hidden;
       display: flex; align-items: stretch;
-      aspect-ratio: 16 / 9;
-      min-height: 460px;
-      max-height: 88vh;
+      height: 62vh;         /* ~2/3 de pantalla, deja asomar la sección de abajo */
+      min-height: 420px;    /* piso en pantallas bajas */
+      max-height: 720px;    /* techo en monitores altos */
     }
     .hero-bg {
       position: absolute;
@@ -118,7 +118,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: center 50%;
+      object-position: 50% 42%;
     }
     .hero-overlay {
       position: absolute;
