@@ -321,7 +321,10 @@
     }
     .chroma { padding: .5rem 0 1.5rem; }
     .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
-    .chroma-base { stroke: #cbd5e1; stroke-width: 1; vector-effect: non-scaling-stroke; }
+    #chroma-line { stroke: #1f4ed8; stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+    #chroma-base { stroke: #ea2f9a; stroke-width: 1; vector-effect: non-scaling-stroke; }
+    #chroma-pen { fill: #1f4ed8; opacity: 0; transition: opacity .2s; }
+    .chroma-mark { opacity: 0; transition: opacity .25s ease-out; }
     #chroma-line {
       stroke: #1d4ed8; stroke-width: 1.6;
       stroke-linejoin: round; stroke-linecap: round;
@@ -460,27 +463,20 @@
 
   <main>
     <div class="container">
-      <div class="chroma" aria-hidden="true">
-        <svg class="chroma-svg" viewBox="0 0 1000 120" role="presentation">
+            <div class="chroma" aria-hidden="true">
+        <svg class="chroma-svg" viewBox="0 0 1000 245" role="presentation">
           <defs>
-            <clipPath id="chroma-clip">
-              <rect id="chroma-wipe" x="0" y="0" width="0" height="120"></rect>
-            </clipPath>
-            <linearGradient id="chroma-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#0ea5e9" stop-opacity=".18"></stop>
-              <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"></stop>
-            </linearGradient>
+            <clipPath id="chroma-clip"><rect id="chroma-wipe" x="0" y="0" width="0" height="245"></rect></clipPath>
           </defs>
-          <line class="chroma-base" x1="0" y1="104.5" x2="1000" y2="104.5"></line>
+          <g id="chroma-axes"></g>
           <g clip-path="url(#chroma-clip)">
-            <path id="chroma-area" fill="url(#chroma-fill)"></path>
+            <line id="chroma-base"></line>
             <path id="chroma-line" fill="none"></path>
           </g>
-          <circle id="chroma-pen" r="3.2" cx="0" cy="104.5"></circle>
+          <circle id="chroma-pen" r="3.5" cx="0" cy="0"></circle>
+          <g id="chroma-marks"></g>
         </svg>
-        <div class="chroma-axis">
-          <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10 min</span>
-        </div>
+      </div>
       </div>
       <p class="section-title">Explorar</p>
       <div class="cards-grid">
@@ -597,61 +593,96 @@
 (function () {
   var wrap = document.querySelector('.chroma');
   if (!wrap) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(t, a) { var e = document.createElementNS(NS, t); for (var k in a) e.setAttribute(k, a[k]); return e; }
+
+  var axesG = document.getElementById('chroma-axes');
+  var marksG = document.getElementById('chroma-marks');
   var line = document.getElementById('chroma-line');
-  var area = document.getElementById('chroma-area');
+  var base = document.getElementById('chroma-base');
   var wipe = document.getElementById('chroma-wipe');
   var pen  = document.getElementById('chroma-pen');
 
-  // Ventana de scroll: el trazo arranca cuando el bloque llega al 76% del alto
-  // de pantalla y termina al 4%. Subí START o bajá END para que tarde más.
-  var START = 0.76, END = 0.04;
+  var W = 1000, L = 60, R = 980, T = 46, B = 212, maxPA = 175;
+  var ff = 'Arial, Helvetica, sans-serif', ax = '#8a8a8a', axt = '#444', mag = '#ea2f9a';
+  function xAt(t) { return L + (t / 10) * (R - L); }
+  function yAt(pa) { return B - pa / maxPA * (B - T); }
 
-  var BASE = 104.5;
   var peaks = [
-    { c:  28, w: 2.50, h: 26 }, { c: 150, w: 3.00, h: 44 },
-    { c: 196, w: 2.75, h: 68 }, { c: 300, w: 3.25, h: 88 },
-    { c: 352, w: 2.50, h: 30 }, { c: 470, w: 3.50, h: 54 },
-    { c: 560, w: 3.00, h: 96 }, { c: 612, w: 2.75, h: 38 },
-    { c: 730, w: 3.75, h: 46 }, { c: 800, w: 3.00, h: 24 },
-    { c: 880, w: 4.00, h: 62 }
+    { rt: 4.985, h: 96, w: .060 },
+    { rt: 6.718, h: 64, w: .055 },
+    { rt: 8.406, h: 54, w: .060 }
   ];
-
-  function yAt(x) {
-    var s = 0;
-    for (var i = 0; i < peaks.length; i++) {
-      var p = peaks[i], d = x - p.c;
-      s += p.h * Math.exp(-(d * d) / (2 * p.w * p.w));
-    }
-    return BASE - s - Math.sin(x / 6.3) * 0.22;
+  var SA = 1.4, SB = 2.1, SPLAT = 168, SRAMP = .03;
+  function solvent(t) {
+    if (t < SA || t > SB) return 0;
+    if (t < SA + SRAMP) return SPLAT * (t - SA) / SRAMP;
+    if (t > SB - SRAMP) return SPLAT * (SB - t) / SRAMP;
+    return SPLAT;
+  }
+  function sig(t) {
+    var s = solvent(t);
+    for (var i = 0; i < peaks.length; i++) { var p = peaks[i], d = t - p.rt; s += p.h * Math.exp(-(d * d) / (2 * p.w * p.w)); }
+    return s;
   }
 
-  var pts = [];
-  for (var x = 0; x <= 1000; x += 0.5) pts.push(x.toFixed(1) + ',' + yAt(x).toFixed(1));
-  var d = 'M' + pts.join('L');
+  var t1 = el('text', { x: 14, y: 18, fill: '#1a3fd0', 'font-family': ff, 'font-size': 13 }); t1.textContent = 'FID1 A, (AGS\\DEMO0007.D)'; axesG.appendChild(t1);
+  axesG.appendChild(el('line', { x1: L, y1: T, x2: L, y2: B, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
+  axesG.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
+  for (var pa = 0; pa <= 175; pa += 25) {
+    var y = yAt(pa);
+    axesG.appendChild(el('line', { x1: L - 5, y1: y, x2: L, y2: y, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
+    var tk = el('text', { x: L - 9, y: y + 4, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); tk.textContent = pa; axesG.appendChild(tk);
+  }
+  var pal = el('text', { x: 14, y: T - 6, fill: axt, 'font-family': ff, 'font-size': 13 }); pal.textContent = 'pA'; axesG.appendChild(pal);
+  for (var m = 0; m <= 10; m++) {
+    var x = xAt(m);
+    axesG.appendChild(el('line', { x1: x, y1: B, x2: x, y2: B + 5, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
+    if (m % 2 === 0) { var tx = el('text', { x: x, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'middle' }); tx.textContent = m; axesG.appendChild(tx); }
+  }
+  var ml = el('text', { x: R + 14, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); ml.textContent = 'min'; axesG.appendChild(ml);
+
+  var by = yAt(0);
+  base.setAttribute('x1', L); base.setAttribute('y1', by); base.setAttribute('x2', R); base.setAttribute('y2', by);
+  var d = '', N = 1400;
+  for (var i = 0; i <= N; i++) { var t = 10 * i / N, xx = xAt(t), yy = yAt(sig(t)); d += (i ? 'L' : 'M') + xx.toFixed(1) + ',' + yy.toFixed(1); }
   line.setAttribute('d', d);
-  area.setAttribute('d', d + 'L1000,' + BASE + 'L0,' + BASE + 'Z');
+
+  function tick(x) { return el('line', { x1: x, y1: by - 2, x2: x, y2: by + 6, stroke: mag, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }); }
+  var markEls = [];
+  var gs = el('g', { 'class': 'chroma-mark' }); gs.appendChild(tick(xAt(SA))); gs.appendChild(tick(xAt(SB))); marksG.appendChild(gs); markEls.push({ el: gs, x: xAt(SB) });
+  peaks.forEach(function (p) {
+    var g = el('g', { 'class': 'chroma-mark' });
+    g.appendChild(tick(xAt(p.rt - 2.6 * p.w))); g.appendChild(tick(xAt(p.rt + 2.6 * p.w)));
+    var axp = xAt(p.rt), ayp = yAt(sig(p.rt));
+    var lb = el('text', { x: axp, y: ayp - 12, fill: '#222', 'font-family': ff, 'font-size': 13, 'text-anchor': 'start', transform: 'rotate(-90 ' + axp + ' ' + (ayp - 12) + ')' });
+    lb.textContent = p.rt.toFixed(3); g.appendChild(lb);
+    marksG.appendChild(g); markEls.push({ el: g, x: xAt(p.rt + 2.6 * p.w) });
+  });
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    wipe.setAttribute('width', 1000);
+    wipe.setAttribute('width', W);
+    markEls.forEach(function (mk) { mk.el.style.opacity = 1; });
     return;
   }
 
-  var ticking = false;
+  var START = 0.76, END = 0.04, ticking = false;
   function draw() {
     ticking = false;
     var r = wrap.getBoundingClientRect();
     var vh = window.innerHeight || document.documentElement.clientHeight;
     var p = (vh * START - r.top) / (vh * (START - END));
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
-    var px = p * 1000;
+    var px = p * W;
     wipe.setAttribute('width', px.toFixed(1));
-    pen.setAttribute('cx', px.toFixed(1));
-    pen.setAttribute('cy', yAt(px).toFixed(1));
-    pen.style.opacity = (p > 0.002 && p < 0.998) ? 1 : 0;
+    if (px > L && px < R) {
+      var t = (px - L) / (R - L) * 10;
+      pen.setAttribute('cx', px.toFixed(1)); pen.setAttribute('cy', yAt(sig(t)).toFixed(1));
+      pen.style.opacity = (p > 0.002 && p < 0.998) ? 1 : 0;
+    } else { pen.style.opacity = 0; }
+    markEls.forEach(function (mk) { mk.el.style.opacity = (px >= mk.x) ? 1 : 0; });
   }
-  function onScroll() {
-    if (!ticking) { ticking = true; requestAnimationFrame(draw); }
-  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(draw); } }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   draw();
