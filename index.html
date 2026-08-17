@@ -319,7 +319,7 @@
       border-top: 1px solid rgba(255,255,255,.06);
       padding-top: 1rem;
     }
-        .chroma { padding: 2.75rem 0 1.5rem; }
+    .chroma { padding: .5rem 0 1.5rem; }
     .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
     .chroma-base { stroke: #cbd5e1; stroke-width: 1; vector-effect: non-scaling-stroke; }
     #chroma-line {
@@ -531,7 +531,7 @@
     to   { transform: translateY(0); }
   }
 </style>
-  <script>
+<script>
 (function () {
   var wrap = document.querySelector('.chroma');
   if (!wrap) return;
@@ -540,14 +540,18 @@
   var wipe = document.getElementById('chroma-wipe');
   var pen  = document.getElementById('chroma-pen');
 
+  // Ventana de scroll: el trazo arranca cuando el bloque llega al 76% del alto
+  // de pantalla y termina al 4%. Subí START o bajá END para que tarde más.
+  var START = 0.76, END = 0.04;
+
   var BASE = 104.5;
   var peaks = [
-    { c:  28, w: 5.0, h: 26 }, { c: 150, w: 6.0, h: 44 },
-    { c: 196, w: 5.5, h: 68 }, { c: 300, w: 6.5, h: 88 },
-    { c: 352, w: 5.0, h: 30 }, { c: 470, w: 7.0, h: 54 },
-    { c: 560, w: 6.0, h: 96 }, { c: 612, w: 5.5, h: 38 },
-    { c: 730, w: 7.5, h: 46 }, { c: 800, w: 6.0, h: 24 },
-    { c: 880, w: 8.0, h: 62 }
+    { c:  28, w: 2.50, h: 26 }, { c: 150, w: 3.00, h: 44 },
+    { c: 196, w: 2.75, h: 68 }, { c: 300, w: 3.25, h: 88 },
+    { c: 352, w: 2.50, h: 30 }, { c: 470, w: 3.50, h: 54 },
+    { c: 560, w: 3.00, h: 96 }, { c: 612, w: 2.75, h: 38 },
+    { c: 730, w: 3.75, h: 46 }, { c: 800, w: 3.00, h: 24 },
+    { c: 880, w: 4.00, h: 62 }
   ];
 
   function yAt(x) {
@@ -556,11 +560,11 @@
       var p = peaks[i], d = x - p.c;
       s += p.h * Math.exp(-(d * d) / (2 * p.w * p.w));
     }
-    return BASE - s - Math.sin(x / 6.3) * 0.3;
+    return BASE - s - Math.sin(x / 6.3) * 0.22;
   }
 
   var pts = [];
-  for (var x = 0; x <= 1000; x++) pts.push(x + ',' + yAt(x).toFixed(2));
+  for (var x = 0; x <= 1000; x += 0.5) pts.push(x.toFixed(1) + ',' + yAt(x).toFixed(1));
   var d = 'M' + pts.join('L');
   line.setAttribute('d', d);
   area.setAttribute('d', d + 'L1000,' + BASE + 'L0,' + BASE + 'Z');
@@ -575,12 +579,12 @@
     ticking = false;
     var r = wrap.getBoundingClientRect();
     var vh = window.innerHeight || document.documentElement.clientHeight;
-    var p = (vh * 0.92 - r.top) / (vh * 0.55);
+    var p = (vh * START - r.top) / (vh * (START - END));
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
     var px = p * 1000;
     wipe.setAttribute('width', px.toFixed(1));
     pen.setAttribute('cx', px.toFixed(1));
-    pen.setAttribute('cy', yAt(px).toFixed(2));
+    pen.setAttribute('cy', yAt(px).toFixed(1));
     pen.style.opacity = (p > 0.002 && p < 0.998) ? 1 : 0;
   }
   function onScroll() {
