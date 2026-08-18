@@ -669,7 +669,7 @@
     if (m % 2 === 0) { var tx = el('text', { x: x, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'middle' }); tx.textContent = m; axesG.appendChild(tx); }
   }
   var ml = el('text', { x: R + 14, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); ml.textContent = 'min'; axesG.appendChild(ml);
-
+  axesG.style.opacity = 1;
   var by = yAt(0);
   base.setAttribute('x1', L); base.setAttribute('y1', by); base.setAttribute('x2', R); base.setAttribute('y2', by);
   var d = '', N = 1400;
@@ -702,7 +702,6 @@
     var vh = window.innerHeight || document.documentElement.clientHeight;
     var p = (vh * START - r.top) / (vh * (START - END));
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
-        axesG.style.opacity = (p > 0) ? 1 : 0;
     var px = p * W;
     wipe.setAttribute('width', px.toFixed(1));
     if (px > L && px < R) {
