@@ -419,6 +419,32 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
+        .card-head {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+    .card-head .card-icon { flex-shrink: 0; }
+
+    .card-cat {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .15rem .45rem;
+    }
+
+    .card-thumb {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
   </style>
     <script>
     if ('IntersectionObserver' in window) {
@@ -509,32 +535,40 @@
       <p class="section-title">Explorar</p>
       <div class="cards-grid">
 
-        <a class="card" href="/usp467/">
-          <div class="card-icon" style="background:#E05C35;border-radius:6px;display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;">
-          <span style="font-size:9px;font-weight:800;color:#fff;text-align:center;line-height:1.2;letter-spacing:.03em;">USP<br>&lt;467&gt;</span>
+                <a class="card" href="/usp467/">
+          <div class="card-head">
+            <div class="card-icon" style="background:#E05C35;border-radius:6px;display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;">
+              <span style="font-size:9px;font-weight:800;color:#fff;text-align:center;line-height:1.2;letter-spacing:.03em;">USP<br>&lt;467&gt;</span>
+            </div>
+            <span class="card-cat">GC</span>
           </div>
-          <span class="card-tag tag-live">Disponible</span>
+          <img class="card-thumb" src="/thumb-usp467.jpg" alt="" aria-hidden="true">
           <div class="card-title">Solventes Residuales USP &lt;467&gt;</div>
           <div class="card-desc">60 solventes con clase, PDE, límite en ppm y CAS. Buscá por nombre o filtrá por clase.</div>
           <div class="card-footer">Abrir herramienta →</div>
         </a>
 
-<a class="card" href="/helio-gc/">
-  <div class="card-icon">🔥</div>
-  <span class="card-tag tag-live">Disponible</span>
-  <div class="card-title">Consumo de Helio en GC</div>
-  <div class="card-desc">Calculá si tu laboratorio consume más Helio del que debería. Comparación de escenarios con Gas Saver y flujo optimizado.</div>
-  <div class="card-footer">Abrir herramienta →</div>
-</a>
+        <a class="card" href="/helio-gc/">
+          <div class="card-head">
+            <div class="card-icon">🔥</div>
+            <span class="card-cat">GC</span>
+          </div>
+          <img class="card-thumb" src="/thumb-helio.jpg" alt="" aria-hidden="true">
+          <div class="card-title">Consumo de Helio en GC</div>
+          <div class="card-desc">Calculá si tu laboratorio consume más Helio del que debería. Comparación de escenarios con Gas Saver y flujo optimizado.</div>
+          <div class="card-footer">Abrir herramienta →</div>
+        </a>
 
-  <a class="card" href="/videos/">
-    <div class="card-icon">🎬</div>
-    <img src="https://img.youtube.com/vi/H_99ORfJ818/mqdefault.jpg" alt="¿Cómo funciona un GC?" style="width:100%;border-radius:8px;display:block;aspect-ratio:16/9;object-fit:cover;">
-    <span class="card-tag tag-live">Disponible</span>
-    <div class="card-title">¿Cómo funciona un GC?</div>
-    <div class="card-desc">Componentes, principio de separación y detector — explicado desde cero, en 5 minutos.</div>
-    <div class="card-footer">Ver video →</div>
-  </a>
+        <a class="card" href="/videos/">
+          <div class="card-head">
+            <div class="card-icon">🎬</div>
+            <span class="card-cat">GC</span>
+          </div>
+          <img class="card-thumb" src="https://img.youtube.com/vi/H_99ORfJ818/maxresdefault.jpg" alt="" aria-hidden="true">
+          <div class="card-title">¿Cómo funciona un GC?</div>
+          <div class="card-desc">Componentes, principio de separación y detector — explicado desde cero, en 5 minutos.</div>
+          <div class="card-footer">Ver video →</div>
+        </a>
         
       </div>
 
