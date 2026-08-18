@@ -120,6 +120,12 @@
       object-fit: cover;
       object-position: 50% 50%;
     }
+        .hero-bg, .hero-glow {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 50%;
+    }
     .hero-overlay {
       position: absolute;
       inset: 0;
@@ -175,8 +181,8 @@
     .hero-cta:hover { opacity: .9; }
 
     @media (max-width: 600px) {
-      .hero { min-height: 280px; }
-      .hero-bg { object-position: center center; }
+      .hero { height: 65vw; min-height: 0; max-height: none; }
+       hero-bg, .hero-glow { object-position: center center; }
       .hero-inner {
         padding: 1rem 1rem 1.25rem;
         align-items: flex-start;
@@ -380,7 +386,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .anim-on .hero-bg, .anim-on .hero-text { animation: none; }
+      .anim-on .hero-bg, .anim-on .hero-text, .anim-on .hero-glow { animation: none; }
       .hero-overlay::after { animation: none; }
     }
 
@@ -397,6 +403,18 @@
       @media (prefers-reduced-motion: reduce) {
         .hero-lit { opacity: .9; animation: none; }  /* accesibilidad: encendidas fijas */
       }
+        .hero-media picture { position: absolute; inset: 0; }
+
+    .hero-glow { pointer-events: none; }
+
+    .anim-on .hero-glow {
+      animation: heroFoto 1.4s cubic-bezier(.22,.61,.36,1) both,
+                 pantallasOn 1.6s ease-out 1.1s both;
+    }
+    @keyframes pantallasOn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
   </style>
     <script>
     if ('IntersectionObserver' in window) {
@@ -450,8 +468,14 @@
 
   <section class="hero">
       <div class="hero-media">
-        <img class="hero-bg"  src="/hero-apagado.jpg" alt="Equipos de cromatografía en laboratorio">
-        <img class="hero-lit" src="/hero-luces.png" alt="" aria-hidden="true">
+        <picture>
+          <source media="(max-width: 600px)" srcset="/hero-apagado-cel.jpg">
+          <img class="hero-bg" src="/hero-apagado.jpg" alt="Equipos de cromatografía en laboratorio">
+        </picture>
+        <picture>
+          <source media="(max-width: 600px)" srcset="/hero-luces-cel.png">
+          <img class="hero-glow" src="/hero-luces.png" alt="" aria-hidden="true">
+        </picture>
       </div>
     <div class="hero-overlay"></div>
     <div class="hero-inner">
