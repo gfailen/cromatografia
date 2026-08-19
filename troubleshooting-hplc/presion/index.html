@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problemas de presión en HPLC — cromatografia.com.ar</title>
+<style>
+  :root{
+    --navy:#0f1b2d; --celeste:#38bdf8; --celeste-d:#0ea5e9;
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --bg:#f4f6f9; --card:#fff;
+    --amber-bg:#fef3c7; --amber-bd:#f59e0b; --amber-tx:#92400e;
+    --green-bg:#dcfce7; --green-tx:#166534;
+    --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+  a{color:var(--celeste-d)}
+  .header{background:var(--navy);color:#fff}
+  .header-in{max-width:1100px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .logo{font-size:20px;font-weight:700;letter-spacing:.2px}
+  .logo i{color:var(--celeste);font-style:normal}
+  .nav{display:flex;gap:22px;font-size:14px;flex-wrap:wrap}
+  .nav a{color:#cbd5e1;text-decoration:none}
+  .nav a:hover{color:#fff}
+  .crumb{max-width:1100px;margin:0 auto;padding:12px 20px;font-size:13px;color:var(--muted)}
+  .crumb a{color:var(--muted);text-decoration:none}
+  .wrap{max-width:820px;margin:0 auto;padding:8px 20px 60px}
+  h1{font-size:26px;margin:.2em 0 .1em}
+  .lead{color:var(--muted);margin:.2em 0 1.4em}
+  .badge{display:inline-block;background:var(--green-bg);color:var(--green-tx);font-size:12px;font-weight:600;letter-spacing:.04em;padding:3px 10px;border-radius:999px;vertical-align:middle;margin-left:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 3px rgba(15,27,45,.06);padding:22px 22px}
+  .pill{display:inline-block;background:#e0f2fe;color:#075985;font-size:12px;font-weight:700;letter-spacing:.05em;padding:3px 10px;border-radius:999px;margin-bottom:12px}
+  .q{font-size:19px;font-weight:600;margin:0 0 6px}
+  .hint{background:#f8fafc;border-left:3px solid var(--celeste-d);padding:10px 14px;border-radius:0 8px 8px 0;color:#334155;font-size:14px;margin:12px 0 18px}
+  .opts{display:flex;flex-direction:column;gap:12px}
+  .opt{text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .05s;font:inherit;color:inherit}
+  .opt:hover{border-color:var(--celeste-d);box-shadow:0 2px 8px rgba(14,165,233,.12)}
+  .opt:active{transform:scale(.995)}
+  .opt:focus-visible{outline:3px solid #bae6fd;outline-offset:2px}
+  .opt b{display:block;font-size:15px;margin-bottom:2px}
+  .opt span{display:block;color:var(--muted);font-size:13px}
+  .progress{height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-bottom:18px}
+  .progress i{display:block;height:100%;background:var(--celeste-d);width:0;transition:width .3s ease}
+  .back{background:none;border:none;color:var(--celeste-d);font:inherit;font-size:14px;cursor:pointer;padding:6px 0;margin-top:14px}
+  .back:hover{text-decoration:underline}
+  .sel{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.sel{grid-template-columns:1fr}}
+  .sel .opt b{font-size:16px}
+  .amber{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber-tx);border-radius:10px;padding:14px 16px;font-size:14px;margin:0 0 18px}
+  .amber b{color:var(--amber-tx)}
+  .res-title{font-size:20px;font-weight:700;margin:0 0 2px}
+  .res-sub{color:var(--muted);font-size:14px;margin:0 0 18px;font-style:italic}
+  details.cause{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
+  details.cause>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:10px;font-weight:600}
+  details.cause>summary::-webkit-details-marker{display:none}
+  details.cause>summary::after{content:"+";margin-left:auto;color:var(--celeste-d);font-size:20px;line-height:1}
+  details.cause[open]>summary::after{content:"–"}
+  .freq{font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:999px;text-transform:uppercase}
+  .f-muy{background:#fee2e2;color:#991b1b}
+  .f-comun{background:#ffedd5;color:#9a3412}
+  .f-ocas{background:#e0e7ff;color:#3730a3}
+  .cause-body{padding:2px 16px 16px}
+  .test{background:#ecfeff;border-left:3px solid #06b6d4;padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 10px;font-size:14px}
+  .test b,.act b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+  .act{font-size:14px;padding:0 2px}
+  .disc{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber-tx);border-radius:10px;padding:16px 18px;font-size:13.5px;margin:22px 0 0}
+  .actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+  .btn{font:inherit;font-size:14px;border-radius:8px;padding:10px 18px;cursor:pointer;border:1px solid var(--line);background:#fff}
+  .btn:hover{border-color:#cbd5e1}
+  .btn-primary{background:var(--celeste-d);border-color:var(--celeste-d);color:#fff}
+  .btn-primary:hover{background:#0284c7}
+  .footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:26px 20px}
+  .prov{font-size:12px;color:#b45309;background:#fffbeb;border:1px dashed #f59e0b;border-radius:8px;padding:6px 10px;margin-top:8px;display:inline-block}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  .print-header,.print-footer{display:none}
+  .back-top{display:inline-block;margin:0 0 14px}
+  .footer p{margin:.35em 0}
+  .footer .tm{font-size:11px;color:#9ca3af;max-width:760px;margin:10px auto 0;line-height:1.5}
+  sup{font-size:.68em;line-height:0}
+  @media print{
+    .header,.crumb,.nav,.back,.actions,.selector-wrap,.footer{display:none!important}
+    .card{box-shadow:none;border:none;padding:0}
+    .wrap{padding:0}
+    details.cause{border-color:#ccc}
+    details.cause>summary::after{display:none}
+    details.cause>.cause-body{display:block!important}
+    @page{margin:2.3cm 1.4cm 2.6cm}
+    .print-header{display:block;position:fixed;top:-1.7cm;left:0;right:0;text-align:center}
+    .print-header img{height:1cm}
+    .print-footer{display:block;position:fixed;bottom:-2cm;left:0;right:0;text-align:center;color:#555;border-top:1px solid #ccc;padding-top:4px}
+    .print-footer .addr{font-size:9px;line-height:1.35}
+    .print-footer .tm{font-size:7.5px;color:#888;margin-top:2px}
+    body{background:#fff}
+  }
+</style>
+</head>
+<body>
+<div class="print-header"><img src="data:image/png;base64,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" alt="AGS Analítica"></div>
+<div class="print-footer">
+  <div class="addr">Arenales 605 – Piso 15 (B1638BRG) Vicente López, Pcia. de Buenos Aires – Argentina · Tel: 011 4524 7247 · WhatsApp +54 11 5693 4883 · soporte@agsanalitica.com</div>
+  <div class="tm">* AGILENT®, ChemStation® y OpenLab® son propiedad de Agilent Technologies, Inc. AGS ANALÍTICA S.A. no es representante ni tiene vinculación con Agilent Technologies, Inc.</div>
+</div>
+<header class="header">
+  <div class="header-in">
+    <div class="logo">Cromatograf<i>IA</i>.com.ar</div>
+    <nav class="nav">
+      <a href="#">AGS Analítica</a>
+      <a href="#">Soporte técnico</a>
+      <a href="#">viales.com.ar</a>
+    </nav>
+  </div>
+</header>
+<div class="crumb"><a href="#">cromatografia.com.ar</a> / Troubleshooting HPLC / <strong style="color:#374151">Presión</strong></div>
+
+<main class="wrap">
+  <h1>Problemas de presión en HPLC <span class="badge">DISPONIBLE</span></h1>
+  <p class="lead">Elegí el síntoma y respondé 2–3 preguntas basadas en maniobras que discriminan cada causa. Llegás a las causas probables, cada una con la prueba que la confirma y la acción correctiva.</p>
+
+  <div id="app" class="card"></div>
+</main>
+
+<footer class="footer">
+  <p>Un proyecto de AGS Analítica · Herramienta de referencia, verificá siempre experimentalmente.</p>
+  <p class="tm">* AGILENT®, ChemStation® y OpenLab® son propiedad de Agilent Technologies, Inc. AGS ANALÍTICA S.A. no es representante ni tiene ninguna vinculación con Agilent Technologies, Inc.</p>
+</footer>
+
+<script>
+(function(){
+  var DATA = {
+    alta: {
+      label: 'Presión demasiado alta',
+      sub: 'Trepó, o saltó de golpe',
+      start: 'p1',
+      steps: {
+        p1: { q:'Paso 1 — ¿Cómo apareció?', hint:'Bifurca obstrucción física progresiva vs. cambio de método / precipitación repentina.', opts:[
+          {b:'Gradualmente, corrida tras corrida', s:'Trepó de a poco a lo largo de días/inyecciones.', next:'p2'},
+          {b:'De repente', s:'Salto brusco entre una corrida y la siguiente, muchas veces tras cambiar fase móvil, muestra o columna.', next:'p2', flag:'subita'}
+        ]},
+        p2: { q:'Paso 2 — Aislar sistema vs. columna (maniobra madre)', hint:'Quitá la columna, poné una unión (union) en su lugar y mirá la presión. Compará contra la presión normal registrada históricamente.', opts:[
+          {b:'La presión baja a la normal sin columna', s:'La columna es la responsable.', next:'p3b'},
+          {b:'La presión sigue alta sin columna', s:'El bloqueo está en el sistema.', next:'p3a'}
+        ]},
+        p3a: { q:'Paso 3A — Localizar el bloqueo en el sistema', hint:'Pasá la válvula de inyección a bypass (mainpass → bypass) y observá. Bypass saca del camino aguja, capilar de asiento y loop.', opts:[
+          {b:'En bypass la presión se normaliza', s:'Bloqueo en la ruta del inyector.', result:'r3aa'},
+          {b:'En bypass la presión sigue alta', s:'Bloqueo aguas arriba del inyector.', result:'r3ab'}
+        ]},
+        p3b: { q:'Paso 3B — Confirmar mecanismo en la columna', hint:'Invertí la columna (back-flush) hacia un descarte, sin el detector en línea, y lavá con solvente fuerte.', opts:[
+          {b:'La presión vuelve a bajar tras invertir y lavar', s:'Frit de entrada obstruido (reversible).', result:'r3ba'},
+          {b:'Baja parcialmente/nada, o vuelve a subir enseguida', s:'Contaminación / precipitación / empaque.', result:'r3bb'}
+        ]}
+      },
+      results: {
+        r3aa: { t:'Bloqueo en la ruta del inyector', s:'En bypass la presión cae → la restricción está en lo que bypass deja fuera.', causes:[
+          {n:'Capilar del asiento de aguja (needle-seat) obstruido', f:'muy común', fc:'f-muy', test:'Desconectar el capilar de asiento y medir la presión sola de esa pieza; si está alta, back-flushear o reemplazar.', act:'Reemplazar el needle-seat capillary. Filtrar muestra y usar tapas de vial de buena calidad para prevenir.'},
+          {n:'Aguja o loop parcialmente tapados', f:'común', fc:'f-comun', test:'Inspeccionar la aguja; probar con el loop desconectado si el diseño lo permite.', act:'Limpiar o reemplazar aguja/loop. Origen habitual: partículas de muestra o del septo.'},
+          {n:'Sello del rotor (rotor seal) rayado o con debris', f:'ocasional', fc:'f-ocas', test:'Correr el valve test de la utilidad de diagnóstico (ej. Lab Advisor) para descartar fuga interna o restricción.', act:'Reemplazar el rotor seal si está dañado.'}
+        ]},
+        r3ab: { t:'Bloqueo aguas arriba del inyector', s:'Sigue alta incluso en bypass → restricción aguas arriba. Quitar capilares uno por uno para ubicar el punto.', causes:[
+          {n:'Filtro en línea (in-line filter) saturado', f:'muy común', fc:'f-muy', test:'Es lo primero: reemplazar el frit del filtro en línea. Un alza de ~10% no corregida al cambiarlo apunta al siguiente elemento.', act:'Cambiar el frit del in-line filter. Pieza más barata y la que más protege la columna.'},
+          {n:'Capilar obstruido o aplastado', f:'común', fc:'f-comun', test:'Remover capilares de a uno siguiendo el flujo y medir; el tramo donde la presión cae al quitarlo contiene el bloqueo.', act:'Back-flushear el capilar hacia descarte; si no se libera, reemplazar.'},
+          {n:'Restricción en bomba o celda del detector', f:'menos frecuente', fc:'f-ocas', test:'Con columna, inyector y filtro descartados y aún alta, aislar la celda de flujo del detector; si baja, es la celda o el tubing de descarte.', act:'Revisar celda de flujo / tubing de waste. Chequear también viscosidad de fase móvil y setpoint de temperatura.'}
+        ]},
+        r3ba: { t:'Frit de entrada de la columna obstruido (reversible)', s:'La columna es la fuente y responde al back-flush: patrón clásico de partículas de matriz. Causa más común de presión alta en columna.', causes:[
+          {n:'Frit de entrada tapado por partículas de muestra', f:'muy común', fc:'f-muy', test:'Ya confirmado por la maniobra (invertir + lavar bajó la presión). Reinstalar la columna en sentido normal y verificar.', act:'Prevención — filtrar (0,22–0,45 µm) todo extracto, usar guard column y un in-line filter de 0,5 µm aguas abajo del automuestreador. Si reincide rápido, el guard cartridge ya cumplió su función: cambiarlo.'},
+          {n:'Matriz sucia sin cleanup previo', f:'frecuente en matrices reales', fc:'f-comun', test:'Revisar si el problema aparece solo con ciertas muestras; si sí, el cuello de botella es la preparación.', act:'Incorporar SPE u otro cleanup. El frit es el síntoma; la matriz es la causa raíz.'}
+        ]},
+        r3bb: { t:'Contaminación / precipitación / empaque comprometido (no reversible)', s:'La columna es la fuente pero el back-flush no la recupera. El mecanismo está dentro del lecho.', prov:true, causes:[
+          {n:'Precipitación de buffer dentro de la columna', f:'muy común con buffers + alto orgánico', fc:'f-muy', test:'Revisar el % de orgánico (fosfato con ACN alto precipita). Lavar el sistema (sin columna) con agua tibia para redisolver sales; luego evaluar la columna.', act:'Ajustar el gradiente para no superar el límite de solubilidad del buffer; incluir paso de transición acuoso entre buffer y orgánico. Nunca dejar buffer estancado.'},
+          {n:'Contaminación adsorbida (alto PM / matriz)', f:'común', fc:'f-comun', test:'Lavar con solvente fuerte según protocolo del fabricante para esa química; si recupera parcialmente, era adsorción.', act:'Rutina de lavado periódica; guard column como sacrificio.'},
+          {n:'Empaque colapsado o void en la cabeza de columna', f:'columna al final de su vida', fc:'f-ocas', test:'Si tras todo lo anterior sigue alta y además hay picos partidos/ensanchados, el lecho está dañado.', act:'Fin de vida útil, reemplazar. Documentar N° de inyecciones.'}
+        ]}
+      }
+    },
+    baja: {
+      label: 'Presión demasiado baja (o cae)',
+      sub: 'Pérdida de flujo o de restricción',
+      start: 'q1',
+      steps: {
+        q1: { q:'Paso 1 — ¿La presión bajó o siempre estuvo baja?', hint:'Presión baja casi siempre = pérdida de flujo real que llega a la columna, o pérdida de restricción.', opts:[
+          {b:'Cayó respecto de lo normal (antes andaba bien)', s:'Problema de flujo/fuga sobrevenido.', next:'q2'},
+          {b:'Baja de entrada, con columna/método nuevo', s:'Puede ser esperable (columna más corta, mayor DI, partícula más grande, o fase móvil menos viscosa).', result:'rbnew'}
+        ]},
+        q2: { q:'Paso 2 — Verificar el flujo entregado', hint:'Desconectar en la salida de la bomba (o del detector) y medir el flujo real con probeta/cronómetro contra el flujo seteado.', opts:[
+          {b:'El flujo entregado es menor al seteado', s:'La bomba no está entregando.', result:'r2a'},
+          {b:'El flujo entregado es correcto', s:'Hay una fuga aguas abajo o pérdida de restricción.', result:'r2b'}
+        ]}
+      },
+      results: {
+        rbnew: { t:'Presión baja esperable para la configuración', s:'Con una columna o método nuevo, una presión menor puede ser normal.', causes:[
+          {n:'Configuración de menor contrapresión', f:'no es falla', fc:'f-ocas', test:'Verificar la presión esperada para esa columna y fase móvil antes de diagnosticar falla (largo, DI, tamaño de partícula, viscosidad).', act:'Si está dentro del rango esperado, no hay nada que corregir. Registrar la nueva presión de referencia.'}
+        ]},
+        r2a: { t:'La bomba no entrega el flujo (aire, sello, starvation)', s:'Causa más frecuente de caída de presión: la bomba pierde cebado.', prov:true, causes:[
+          {n:'Aire atrapado en el cabezal de bomba', f:'muy común', fc:'f-muy', test:'Abrir la purga y purgar a caudal alto; observar burbujas en las líneas. Si al purgar la presión se recupera, era aire.', act:'Purgar/cebar. Desgasificar la fase móvil. Revisar que el sinker y el filtro de solvente estén sumergidos.'},
+          {n:'Solvente insuficiente / filtro de toma (sinker) obstruido', f:'común', fc:'f-comun', test:'Chequear nivel de botella y estado del frit del sinker; medir flujo con el sinker fuera de la botella en solvente limpio.', act:'Rellenar solvente; limpiar o reemplazar el frit del sinker.'},
+          {n:'Sello de pistón (pump seal) gastado', f:'desgaste esperable', fc:'f-comun', test:'Buscar goteo detrás del cabezal o solvente en el drenaje; correr el pump leak/pressure test de la utilidad de diagnóstico.', act:'Reemplazar sellos de bomba. Si hay ripple de presión alto, confirma sello o válvula de retención.'},
+          {n:'Válvula de retención (check valve) sucia o pegada', f:'común', fc:'f-comun', test:'Ripple de presión irregular y flujo errático apuntan a check valve; sonicar o reemplazar y volver a medir.', act:'Limpiar (sonicado) o reemplazar la check valve.'}
+        ]},
+        r2b: { t:'Fuga aguas abajo o pérdida de restricción', s:'El flujo entregado es correcto pero la presión no sube: se está yendo por algún lado o falta restricción.', causes:[
+          {n:'Fuga en una conexión / fitting', f:'muy común', fc:'f-muy', test:'Inspeccionar visualmente todas las uniones bajo presión; secar y buscar humedad/cristales de buffer en cada fitting.', act:'Reapretar o rehacer la conexión con ferrule nueva. Los cristales de buffer marcan el punto de fuga.'},
+          {n:'Void o pérdida de empaque en la columna', f:'columna gastada', fc:'f-comun', test:'Si la presión bajó junto con caída de eficiencia (picos anchos/partidos), el lecho perdió empaque.', act:'Reemplazar la columna.'},
+          {n:'Fase móvil menos viscosa que la anterior', f:'cambio de método', fc:'f-ocas', test:'Comparar composición actual vs. la de referencia; más orgánico o mayor temperatura bajan la viscosidad y la presión.', act:'No es falla — verificar que la presión esté dentro del rango esperado para esa fase móvil y temperatura.'}
+        ]}
+      }
+    }
+  };
+
+  var SUDDEN = 'Aparición súbita: antes de desarmar, verificá lo último que cambió — fase móvil nueva, columna recién instalada, muestra de matriz distinta, o un setpoint de temperatura más bajo (sube la viscosidad y la presión). Si algo de eso cambió justo antes, empezá por ahí.';
+  var DISC = 'El árbol prioriza la <b>maniobra que discrimina</b> cada causa, no una probabilidad numérica. El orden de las causas refleja la frecuencia típica reportada por los fabricantes y la literatura de troubleshooting de LC; en tu laboratorio el orden real puede variar según matriz, tipo de fase móvil y estado del equipo. Es una guía de orientación: verificá siempre experimentalmente antes de reemplazar partes. ¿Caso complejo o recurrente, o tu HPLC es Agilent<sup>®</sup>* o Knauer<sup>®</sup>? El servicio técnico de AGS Analítica lo resuelve: escribinos por <a href="https://api.whatsapp.com/send/?phone=541156934883&text&type=phone_number&app_absent=0" target="_blank" rel="noopener">WhatsApp</a> o a <a href="mailto:soporte@agsanalitica.com">soporte@agsanalitica.com</a>.';
+
+  var app = document.getElementById('app');
+  var st = { sym:null, step:null, hist:[], flags:{} };
+  function esc(s){return s;}
+
+  function renderSelector(){
+    st = { sym:null, step:null, hist:[], flags:{} };
+    var h = '<div class="selector-wrap"><p class="q" style="margin-bottom:16px">¿Qué está pasando con la presión?</p><div class="sel">';
+    ['alta','baja'].forEach(function(k){
+      var d=DATA[k];
+      h += '<button class="opt" data-sym="'+k+'"><b>'+d.label+'</b><span>'+d.sub+'</span></button>';
+    });
+    h += '</div></div>';
+    app.innerHTML = h;
+    app.querySelectorAll('[data-sym]').forEach(function(el){
+      el.onclick=function(){ st.sym=el.getAttribute('data-sym'); st.step=DATA[st.sym].start; st.hist=[]; st.flags={}; renderStep(); };
+    });
+  }
+
+  function depth(){ return st.hist.length + 1; }
+  function renderStep(){
+    var sym=DATA[st.sym], step=sym.steps[st.step];
+    var prog = Math.min(100, Math.round(depth()/3*100));
+    var backLbl = st.hist.length===0 ? '← Elegir otro síntoma' : '← Volver al paso anterior';
+    var h = '<button class="back back-top">'+backLbl+'</button>';
+    h += '<div class="progress"><i style="width:'+prog+'%"></i></div>';
+    h += '<span class="pill">PASO '+depth()+'</span>';
+    h += '<p class="q">'+step.q+'</p>';
+    if(step.hint) h += '<div class="hint">'+step.hint+'</div>';
+    h += '<div class="opts">';
+    step.opts.forEach(function(o,i){ h += '<button class="opt" data-i="'+i+'"><b>'+o.b+'</b><span>'+o.s+'</span></button>'; });
+    h += '</div>';
+    app.innerHTML = h;
+    app.querySelectorAll('[data-i]').forEach(function(el){
+      el.onclick=function(){
+        var o=step.opts[+el.getAttribute('data-i')];
+        st.hist.push(st.step);
+        if(o.flag) st.flags[o.flag]=true;
+        if(o.result) renderResult(o.result);
+        else { st.step=o.next; renderStep(); }
+      };
+    });
+    app.querySelector('.back').onclick=function(){
+      if(st.hist.length===0){ renderSelector(); }
+      else { st.step=st.hist.pop(); renderStep(); }
+    };
+  }
+
+  function renderResult(rid){
+    var sym=DATA[st.sym], r=sym.results[rid];
+    var h = '<div class="progress"><i style="width:100%"></i></div>';
+    h += '<p class="res-title">'+r.t+'</p><p class="res-sub">'+r.s+'</p>';
+    if(st.sym==='alta' && st.flags.subita){
+      h += '<div class="amber"><b>Nota — aparición súbita.</b> '+SUDDEN+'</div>';
+    }
+    r.causes.forEach(function(c,i){
+      h += '<details class="cause"'+(i===0?' open':'')+'><summary>'+c.n+' <span class="freq '+c.fc+'">'+c.f+'</span></summary><div class="cause-body">';
+      h += '<div class="test"><b>Prueba que la discrimina</b>'+c.test+'</div>';
+      h += '<div class="act"><b>Acción correctiva</b>'+c.act+'</div>';
+      h += '</div></details>';
+    });
+    if(r.prov){ h += '<div class="prov">⚑ Orden provisorio — pendiente de validar el ranking contra OTs reales de AGS.</div>'; }
+    h += '<div class="disc"><strong>Sobre esta herramienta.</strong> '+DISC+'</div>';
+    h += '<div class="actions"><button class="btn btn-primary" id="reset">Reiniciar</button><button class="btn" id="print">Imprimir / PDF</button><button class="back" style="margin-left:auto">← Volver</button></div>';
+    app.innerHTML = h;
+    document.getElementById('reset').onclick=renderSelector;
+    document.getElementById('print').onclick=function(){ document.querySelectorAll('details.cause').forEach(function(d){d.open=true;}); window.print(); };
+    app.querySelector('.back').onclick=function(){ st.step=st.hist.pop(); renderStep(); };
+  }
+
+  renderSelector();
+})();
+</script>
+</body>
+</html>
