@@ -532,7 +532,6 @@
           <g id="chroma-marks"></g>
         </svg>
       </div>
-      <p class="section-title">Explorar</p>
       <div class="cards-grid">
 
         <a class="card" href="/troubleshooting-hplc/presion/">
@@ -679,7 +678,7 @@
   var wipe = document.getElementById('chroma-wipe');
   var pen  = document.getElementById('chroma-pen');
 
-  var W = 1000, L = 60, R = 980, T = 46, B = 212, maxPA = 175;
+  var W = 1000, L = 60, R = 945, T = 46, B = 212, maxPA = 175;
   var ff = 'Arial, Helvetica, sans-serif', ax = '#8a8a8a', axt = '#444', mag = '#ea2f9a';
   function xAt(t) { return L + (t / 10) * (R - L); }
   function yAt(pa) { return B - pa / maxPA * (B - T); }
@@ -716,7 +715,7 @@
     axesG.appendChild(el('line', { x1: x, y1: B, x2: x, y2: B + 5, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
     if (m % 2 === 0) { var tx = el('text', { x: x, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'middle' }); tx.textContent = m; axesG.appendChild(tx); }
   }
-  var ml = el('text', { x: R + 14, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); ml.textContent = 'min'; axesG.appendChild(ml);
+  var ml = el('text', { x: 998, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); ml.textContent = 'min'; axesG.appendChild(ml);
   axesG.style.opacity = 1;
   var by = yAt(0);
   base.setAttribute('x1', L); base.setAttribute('y1', by); base.setAttribute('x2', R); base.setAttribute('y2', by);
