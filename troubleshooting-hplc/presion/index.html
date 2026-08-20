@@ -72,24 +72,22 @@
   .footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:26px 20px}
   .prov{font-size:12px;color:#b45309;background:#fffbeb;border:1px dashed #f59e0b;border-radius:8px;padding:6px 10px;margin-top:8px;display:inline-block}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-  .print-header,.print-footer{display:none}
+  .print-header,.print-footer,.print-contact{display:none}
   .back-top{display:inline-block;margin:0 0 14px}
   .footer p{margin:.35em 0}
   .footer .tm{font-size:11px;color:#9ca3af;max-width:760px;margin:10px auto 0;line-height:1.5}
   sup{font-size:.68em;line-height:0}
   @media print{
-    .header,.crumb,.nav,.back,.actions,.selector-wrap,.footer{display:none!important}
+    .header,.crumb,.nav,.back,.actions,.selector-wrap,.print-footer{display:none!important}
     .card{box-shadow:none;border:none;padding:0}
     .wrap{padding:0}
     details.cause{border-color:#ccc}
     details.cause>summary::after{display:none}
     details.cause>.cause-body{display:block!important}
-    @page{margin:2.3cm 1.4cm 2.6cm}
-    .print-header{display:block;position:fixed;top:-1.7cm;left:0;right:0;text-align:center}
-    .print-header img{height:1cm}
-    .print-footer{display:block;position:fixed;bottom:-2cm;left:0;right:0;text-align:center;color:#555;border-top:1px solid #ccc;padding-top:4px}
-    .print-footer .addr{font-size:9px;line-height:1.35}
-    .print-footer .tm{font-size:7.5px;color:#888;margin-top:2px}
+    @page{margin:12mm}
+    .print-header{display:block;text-align:center;padding:0 0 6mm}
+    .print-header img{height:1.4cm}
+    .print-contact{display:block;font-size:9px;color:#555;line-height:1.4;margin-top:8mm;border-top:1px solid #ccc;padding-top:3mm}
     body{background:#fff}
   }
 </style>
@@ -121,6 +119,7 @@
 
 <footer class="footer">
   <p>Un proyecto de AGS Analítica · Herramienta de referencia, verificá siempre experimentalmente.</p>
+  <p class="print-contact">Arenales 605 – Piso 15 (B1638BRG) Vicente López, Pcia. de Buenos Aires – Argentina · Tel: 011 4524 7247 · WhatsApp +54 11 5693 4883 · soporte@agsanalitica.com</p>
   <p class="tm">* AGILENT®, ChemStation® y OpenLab® son propiedad de Agilent Technologies, Inc. AGS ANALÍTICA S.A. no es representante ni tiene ninguna vinculación con Agilent Technologies, Inc.</p>
 </footer>
 
