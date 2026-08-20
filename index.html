@@ -326,7 +326,9 @@
       border-top: 1px solid rgba(255,255,255,.06);
       padding-top: 1rem;
     }
-    .chroma { padding: .5rem 0 1.5rem; }
+    .chroma-scroll { position: relative; height: 90vh; }
+    .chroma { padding: .5rem 0 1.5rem; position: sticky; top: 30vh; }
+    @media (prefers-reduced-motion: reduce) { .chroma-scroll { height: auto; } .chroma { position: static; } }
     .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
     #chroma-line { stroke: #1f4ed8; stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
     #chroma-base { stroke: #ea2f9a; stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -519,7 +521,7 @@
 
   <main>
     <div class="container">
-            <div class="chroma" aria-hidden="true">
+            <div class="chroma-scroll"><div class="chroma" aria-hidden="true">
         <svg class="chroma-svg" viewBox="0 0 1000 164" role="presentation">
           <defs>
             <clipPath id="chroma-clip"><rect id="chroma-wipe" x="0" y="0" width="0" height="164"></rect></clipPath>
@@ -532,7 +534,7 @@
           <circle id="chroma-pen" r="3.5" cx="0" cy="0"></circle>
           <g id="chroma-marks"></g>
         </svg>
-      </div>
+      </div></div>
       <div class="cards-grid">
 
         <a class="card" href="/troubleshooting-hplc/presion/">
@@ -743,12 +745,13 @@
     return;
   }
 
-  var START = 0.66, END = 0.04, ticking = false;
+  var scrollEl = document.querySelector('.chroma-scroll') || wrap, ticking = false;
   function draw() {
     ticking = false;
-    var r = wrap.getBoundingClientRect();
     var vh = window.innerHeight || document.documentElement.clientHeight;
-    var p = (vh * START - r.top) / (vh * (START - END));
+    var r = scrollEl.getBoundingClientRect();
+    var pinDist = scrollEl.offsetHeight - wrap.offsetHeight;
+    var p = pinDist > 0 ? (0.30 * vh - r.top) / pinDist : 0;
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
     var px = p * W;
     wipe.setAttribute('width', px.toFixed(1));
