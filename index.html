@@ -511,7 +511,7 @@
     <div class="hero-inner">
       <div class="hero-text">
         <h1>Cromatografía<br>por cromatografistas.</h1>
-        <p>Herramientas para el laboratorio.</p>
+        <p>Calculadoras, diagnósticos y utilidades para el laboratorio. Online y gratis.</p>
       </div>
     </div>
   </section>
@@ -519,9 +519,9 @@
   <main>
     <div class="container">
             <div class="chroma" aria-hidden="true">
-        <svg class="chroma-svg" viewBox="0 0 1000 245" role="presentation">
+        <svg class="chroma-svg" viewBox="0 0 1000 164" role="presentation">
           <defs>
-            <clipPath id="chroma-clip"><rect id="chroma-wipe" x="0" y="0" width="0" height="245"></rect></clipPath>
+            <clipPath id="chroma-clip"><rect id="chroma-wipe" x="0" y="0" width="0" height="164"></rect></clipPath>
           </defs>
           <g id="chroma-axes"></g>
           <g clip-path="url(#chroma-clip)">
@@ -678,7 +678,7 @@
   var wipe = document.getElementById('chroma-wipe');
   var pen  = document.getElementById('chroma-pen');
 
-  var W = 1000, L = 60, R = 945, T = 46, B = 212, maxPA = 175;
+  var W = 1000, L = 60, R = 945, T = 31, B = 141, maxPA = 175;
   var ff = 'Arial, Helvetica, sans-serif', ax = '#8a8a8a', axt = '#444', mag = '#ea2f9a';
   function xAt(t) { return L + (t / 10) * (R - L); }
   function yAt(pa) { return B - pa / maxPA * (B - T); }
@@ -701,7 +701,7 @@
     return s;
   }
 
-  var t1 = el('text', { x: 14, y: 18, fill: '#1a3fd0', 'font-family': ff, 'font-size': 13 }); t1.textContent = 'FID1 A, (AGS\\DEMO0007.D)'; axesG.appendChild(t1);
+  var t1 = el('text', { x: 14, y: 18, fill: '#1a3fd0', 'font-family': ff, 'font-size': 13 }); t1.textContent = 'FID1 A, (AGS\\AGILENT-FID-01)'; axesG.appendChild(t1);
   axesG.appendChild(el('line', { x1: L, y1: T, x2: L, y2: B, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
   axesG.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
   for (var pa = 0; pa <= 175; pa += 25) {
