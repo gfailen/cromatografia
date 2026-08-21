@@ -72,14 +72,16 @@
   .footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:26px 20px}
   .prov{font-size:12px;color:#b45309;background:#fffbeb;border:1px dashed #f59e0b;border-radius:8px;padding:6px 10px;margin-top:8px;display:inline-block}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-  .ags-support{max-width:820px;margin:2.5rem auto 0;background:#eef5fb;border:1px solid #d6e6f2;border-radius:12px;padding:1.15rem 1.4rem}
+  .ags-support{display:none;max-width:820px;margin:2.5rem auto 0;background:#eef5fb;border:1px solid #d6e6f2;border-radius:12px;padding:1.15rem 1.4rem}
+  .ags-support.show{display:block}
   .ags-support__inner{display:flex;flex-wrap:wrap;align-items:center;gap:1.1rem}
   .ags-support__logo{height:38px;width:auto;flex:0 0 auto}
   .ags-support__text{flex:1 1 240px}
   .ags-support__text h3{margin:0 0 .2rem;font-size:1.02rem;color:var(--navy)}
   .ags-support__text p{margin:0;color:var(--muted);font-size:.88rem}
   .ags-support__actions{display:flex;flex-direction:column;gap:.5rem;flex:0 0 auto}
-  .agsbtn{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1rem;border-radius:8px;font-weight:600;font-size:.9rem;text-decoration:none;color:#fff;transition:opacity .15s,transform .05s}
+  .agsbtn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .7rem;border-radius:8px;font-weight:600;font-size:.63rem;text-decoration:none;color:#fff;transition:opacity .15s,transform .05s}
+  .agsbtn svg{width:13px;height:13px}
   .agsbtn:active{transform:translateY(1px)}
   .agsbtn:hover{opacity:.92}
   .agsbtn--wa{background:#25D366}
@@ -134,8 +136,8 @@
   <div class="ags-support__inner">
     <img src="/logo-ags.png" alt="AGS Analítica" class="ags-support__logo">
     <div class="ags-support__text">
-      <h3>¿No lo resolviste? El servicio técnico de AGS Analítica lo resuelve.</h3>
-      <p>Instalación, calificación, mantenimiento y reparación de HPLC, GC, GC-MS y LC-MS.</p>
+      <h3>Si necesitás asistencia técnica, podés contactarnos.</h3>
+      <p>Instalación, calificación, mantenimiento y reparación de HPLC, GC, GC-MS y LC-MS. Agilent<sup>®</sup>*, Knauer<sup>®</sup> y Bruker<sup>®</sup>.</p>
     </div>
     <div class="ags-support__actions">
       <a class="agsbtn agsbtn--wa" href="https://wa.me/5491156934883?text=Hola%2C%20vengo%20de%20la%20herramienta%20de%20troubleshooting%20de%20presi%C3%B3n%20HPLC%20y%20necesito%20soporte." target="_blank" rel="noopener">
@@ -240,10 +242,13 @@
   var DISC = 'El árbol prioriza la <b>maniobra que discrimina</b> cada causa, no una probabilidad numérica. El orden de las causas refleja la frecuencia típica reportada por los fabricantes y la literatura de troubleshooting de LC; en tu laboratorio el orden real puede variar según matriz, tipo de fase móvil y estado del equipo. Es una guía de orientación: verificá siempre experimentalmente antes de reemplazar partes. ¿Caso complejo o recurrente, o tu HPLC es Agilent<sup>®</sup>* o Knauer<sup>®</sup>? El servicio técnico de AGS Analítica lo resuelve.';
 
   var app = document.getElementById('app');
+  var support = document.querySelector('.ags-support');
   var st = { sym:null, step:null, hist:[], flags:{} };
   function esc(s){return s;}
+  function showSupport(on){ if(support) support.classList.toggle('show', !!on); }
 
   function renderSelector(){
+    showSupport(false);
     st = { sym:null, step:null, hist:[], flags:{} };
     var h = '<div class="selector-wrap"><p class="q" style="margin-bottom:16px">¿Qué está pasando con la presión?</p><div class="sel">';
     ['alta','baja'].forEach(function(k){
@@ -259,6 +264,7 @@
 
   function depth(){ return st.hist.length + 1; }
   function renderStep(){
+    showSupport(false);
     var sym=DATA[st.sym], step=sym.steps[st.step];
     var prog = Math.min(100, Math.round(depth()/3*100));
     var backLbl = st.hist.length===0 ? '← Elegir otro síntoma' : '← Volver al paso anterior';
@@ -287,6 +293,7 @@
   }
 
   function renderResult(rid){
+    showSupport(true);
     var sym=DATA[st.sym], r=sym.results[rid];
     var h = '<div class="progress"><i style="width:100%"></i></div>';
     h += '<p class="res-title">'+r.t+'</p><p class="res-sub">'+r.s+'</p>';
