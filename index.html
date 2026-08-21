@@ -326,9 +326,9 @@
       border-top: 1px solid rgba(255,255,255,.06);
       padding-top: 1rem;
     }
-    .chroma-scroll { position: relative; height: 55vh; }
-    .chroma { padding: .5rem 0 1.5rem; position: sticky; top: 30vh; }
-    @media (prefers-reduced-motion: reduce) { .chroma-scroll { height: auto; } .chroma { position: static; } }
+    .chroma-scroll { position: relative; }
+    .chroma { padding: .5rem 0 1rem; }
+    @media (prefers-reduced-motion: reduce) { .chroma-scroll { height: auto; } }
     .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
     #chroma-line { stroke: #1f4ed8; stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
     #chroma-base { stroke: #ea2f9a; stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -745,14 +745,11 @@
     return;
   }
 
-  var scrollEl = document.querySelector('.chroma-scroll') || wrap, ticking = false;
-  function draw() {
-    ticking = false;
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var r = scrollEl.getBoundingClientRect();
-    var pinDist = scrollEl.offsetHeight - wrap.offsetHeight;
-    var p = pinDist > 0 ? (0.30 * vh - r.top) / pinDist : 0;
-    p = p < 0 ? 0 : (p > 1 ? 1 : p);
+  // Sin pin ni contenedor extra -> CERO espacio muerto arriba/abajo. La hoja
+  // scrollea normal; el cromatograma se dibuja SOLO (animacion por tiempo)
+  // cuando entra en el viewport. DURACION controla la velocidad del trazo.
+  var DURACION = 900; // ms
+  function applyP(p) {
     var px = p * W;
     wipe.setAttribute('width', px.toFixed(1));
     if (px > L && px < R) {
@@ -762,10 +759,29 @@
     } else { pen.style.opacity = 0; }
     markEls.forEach(function (mk) { mk.el.style.opacity = (px >= mk.x) ? 1 : 0; });
   }
-  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(draw); } }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
-  draw();
+  var started = false;
+  function animate() {
+    if (started) return; started = true;
+    var t0 = null;
+    function step(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / DURACION);
+      var e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // easeInOutQuad
+      applyP(e);
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  applyP(0);
+  if ('IntersectionObserver' in window) {
+    // Umbral alto: se dibuja recien cuando el cromatograma entra ENTERO en el
+    // viewport (no cuando asoma cortado en el borde), asi no arranca a medias
+    // en pantallas bajas (notebook).
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.intersectionRatio >= 0.9) { animate(); io.disconnect(); } });
+    }, { threshold: [0.9, 1] });
+    io.observe(wrap);
+  } else { animate(); }
 })();
 </script>
 <script>
