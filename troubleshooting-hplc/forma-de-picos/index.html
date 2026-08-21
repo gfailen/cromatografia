@@ -134,6 +134,37 @@
   .footer p{margin:.35em 0}
   .footer .tm{font-size:11px;color:#9ca3af;max-width:760px;margin:10px auto 0;line-height:1.5}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* --- armonizacion al patron nuevo: panel 2 columnas, pico rector --- */
+  .panel{display:flex;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:0 1px 3px rgba(15,27,45,.06);overflow:hidden;height:540px}
+  .peak-pane{flex:0 0 40%;max-width:40%;border-right:1px solid var(--line);background:#fcfdff;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:0}
+  .peak-pane .peak-hint{font-size:11px;color:#94a3b8;margin:0 0 12px}
+  .peak-pane svg{width:100%;max-width:260px;height:auto}
+  .peak-pane .peak-nm{font-size:16px;font-weight:600;margin-top:12px}
+  .peak-pane .peak-en{font-size:12px;color:var(--muted);font-style:italic}
+  .flow-pane{flex:1;min-width:0;padding:22px;overflow-y:auto}
+  @media(max-width:720px){
+    .panel{flex-direction:column;height:auto}
+    .peak-pane{flex:none;max-width:none;border-right:none;border-bottom:1px solid var(--line);padding:14px}
+    .peak-pane svg{max-height:150px}
+    .flow-pane{overflow:visible}
+  }
+  .trail{display:flex;flex-wrap:wrap;align-items:center;gap:3px 5px;margin:0 0 16px;padding:10px 12px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;font-size:12px}
+  .trail-lbl{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .trail-item{background:#fff;border:1px solid #e2e8f0;color:#334155;border-radius:6px;padding:3px 9px;font:inherit;font-size:12px;cursor:pointer}
+  .trail-item:hover{border-color:var(--celeste-d);color:var(--celeste-d)}
+  .trail-sep{color:#cbd5e1}
+  .res-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--celeste-d);font-weight:700;margin:0 0 2px}
+  .ficha-sec{margin:18px 0 0}
+  .ficha-sec h4{font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  .evidence{margin:0;padding-left:18px;color:#334155;font-size:14px}
+  .evidence li{margin:4px 0}
+  .checklist{margin:0;padding:0;list-style:none;counter-reset:ck}
+  .checklist>li{position:relative;border:1px solid var(--line);border-radius:10px;padding:12px 15px 12px 44px;margin-bottom:9px;counter-increment:ck;font-size:14px}
+  .checklist>li::before{content:counter(ck);position:absolute;left:12px;top:12px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;background:var(--celeste-d);color:#fff;border-radius:999px;font-size:12px;font-weight:700}
+  .btn-wa{background:#25D366;border-color:#25D366;color:#fff}
+  .btn-wa:hover{background:#20bd5a}
+  .ags-support{display:none}
+  .ags-support.show{display:block}
 </style>
 </head>
 <body>
@@ -164,7 +195,11 @@
     <div class="ctx-body" id="ctxBody"></div>
   </div>
 
-  <div id="app" class="card"></div>
+  <div id="app"></div>
+  <details style="max-width:820px;margin:14px auto 0;font-size:13px;color:#475569">
+    <summary style="cursor:pointer;color:var(--celeste-d);font-weight:600">Nota: canalización vs. volumen extracolumna</summary>
+    <p style="margin:8px 0 0"><b>Canalización</b> (<i>void</i>, en la literatura en inglés) es un hueco o canal preferencial <b>dentro</b> del relleno de la columna, por el que la fase móvil pasa sin atravesarlo de manera pareja. Es distinto del <b>volumen extracolumna</b>, que es el volumen del sistema <b>fuera</b> de la columna (tubos, conexiones, celda). Se confunden seguido y no son lo mismo.</p>
+  </details>
 </main>
 
 <section class="ags-support" aria-label="Soporte técnico AGS Analítica">
@@ -233,16 +268,16 @@
   /* ============ 3. Sintomas (Fase 1: tailing, fronting, negativo cableados) ============ */
   var SYMPTOMS = {
     tailing: {
-      name:'Cola', en:'tailing', glyph:GLYPH.tailing,
+      name:'Tailing', en:'Coleo', glyph:GLYPH.tailing,
       def:'El pico sube rápido y baja lento, dejando una cola hacia el lado del tiempo creciente.',
       numnote:'<b>Criterio numérico.</b> Factor de tailing USP (Tf = W₀,₀₅ / 2f, medido al 5 % de la altura) y factor de asimetría As (= b/a, al 10 %); ambos = 1,0 si es simétrico. No son convertibles entre sí. USP–NF pide, salvo indicación en contrario, factor de simetría del pico de cuantificación entre 0,8 y 1,8 (Ph. Eur. usa criterio equivalente). Columna nueva en condiciones del test: 1,0–1,5.',
-      q1:{ q:'¿En qué picos aparece la cola?', opts:[
+      q1:{ q:'¿En qué picos aparece el tailing?', opts:[
         {t:'En todos los picos del cromatograma', tags:['fisico']},
-        {t:'Solo en algunos, típicamente los básicos', tags:['quimico']},
-        {t:'Solo en uno', tags:['quimico','coelucion']}
+        {t:'Sólo en algunos, típicamente los analitos básicos', tags:['quimico']},
+        {t:'Sólo en uno', tags:['quimico','coelucion']}
       ]},
       q2:{ q:'¿Cómo apareció?', opts:[
-        {t:'De golpe, entre una secuencia y la siguiente', tags:['subito']},
+        {t:'De repente, entre una secuencia y la siguiente', tags:['subito']},
         {t:'Gradualmente, empeorando corrida tras corrida', tags:['desgaste-columna']}
       ]},
       causes:[
@@ -250,11 +285,11 @@
         {id:'frita', t:'Frita de entrada parcialmente obstruida', tags:['fisico','subito']},
         {id:'canalizacion', t:'Canalización en el relleno de la columna', tags:['fisico','desgaste-columna']},
         {id:'extracolumna', t:'Volumen extracolumna excesivo (tubos anchos, conexiones mal hechas, celda grande)', tags:['fisico']},
-        {id:'buffer', t:'Buffer con capacidad tamponante insuficiente o pH cerca del pKa del analito', tags:['quimico']},
+        {id:'buffer', t:'Buffer con capacidad insuficiente o pH cerca del pKa del analito', tags:['quimico']},
         {id:'sobrecarga-ix', t:'Sobrecarga de masa en modo de intercambio secundario', tags:['quimico']},
         {id:'degradacion', t:'Degradación de la fase estacionaria por pH extremo', tags:['desgaste-columna']}
       ],
-      maniobra:'<p>Inyectá un <b>estándar neutro</b> (tolueno, uracilo o naftaleno según tu método).</p>'+
+      maniobra:'<p>Inyectá un <b>estándar neutro (no ionizable)</b>: tolueno, uracilo o naftaleno según tu método.</p>'+
         '<p>· Si el <b>neutro también coletea</b> → el problema es físico: sistema o columna. Seguí por frita, canalización y volumen extracolumna.</p>'+
         '<p>· Si el <b>neutro sale simétrico</b> → el problema es químico: interacción con la fase. Seguí por pH de la fase móvil, capacidad del buffer y aditivos.</p>'
     },
@@ -264,7 +299,7 @@
       def:'El pico sube lento e inclinado y cae abruptamente en el máximo. Tf o As menores a 1,0.',
       numnote:'',
       q1:{ q:'¿En qué picos aparece?', opts:[
-        {t:'Solo en el pico más grande / mayoritario', tags:['sobrecarga']},
+        {t:'Sólo en el pico más grande / mayoritario', tags:['sobrecarga']},
         {t:'En todos los picos por igual', tags:['fisico']}
       ]},
       q2:{ q:'¿En qué solvente está disuelta la muestra?', opts:[
@@ -315,14 +350,97 @@
         '<p>· Si <b>no aparece</b> y trabajás con UV → revisá longitud de onda y pureza de la fase móvil.</p>'
     },
 
-    // Fase 2 (aún no cableados) — aparecen en el selector como "en preparación"
-    partido: { name:'Pico partido o con hombro', en:'split / shoulder', glyph:GLYPH.partido, soon:true },
-    ancho:   { name:'Pico ancho o achatado', en:'broad', glyph:GLYPH.ancho, soon:true },
-    fantasma:{ name:'Pico fantasma', en:'ghost peak', glyph:GLYPH.fantasma, soon:true },
-    primera: { name:'Solo en la primera inyección', en:'first-injection', glyph:GLYPH.primera, soon:true }
+    partido: {
+      name:'Pico partido o con hombro', en:'split / shoulder', glyph:GLYPH.partido,
+      def:'El pico se desdobla en dos, o presenta un hombro (un escalón) en la subida o en la bajada.',
+      numnote:'',
+      q1:{ q:'¿A qué picos afecta?', opts:[
+        {t:'A todos los picos del cromatograma', tags:['columna']},
+        {t:'Sólo a los primeros en eluir', tags:['efecto-solvente']},
+        {t:'Solo a uno o dos picos puntuales', tags:['quimico','coelucion']}
+      ]},
+      q2:{ q:'¿Cómo se ve el desdoblamiento?', opts:[
+        {t:'Dos mitades parejas, casi simétricas', tags:['columna']},
+        {t:'Un hombro chico adelante o atrás del pico principal', tags:['coelucion']},
+        {t:'Cambia de una inyección a otra', tags:['erratico']}
+      ]},
+      causes:[
+        {id:'frita', t:'Frita de entrada parcialmente obstruida', tags:['columna']},
+        {id:'canalizacion', t:'Canalización en el relleno de la columna', tags:['columna','desgaste-columna']},
+        {id:'efecto-solvente', t:'Solvente de inyección demasiado fuerte (afecta sobre todo a los picos tempranos)', tags:['efecto-solvente']},
+        {id:'coelucion', t:'Coelución real: una impureza o un producto de degradación saliendo junto al analito', tags:['coelucion']},
+        {id:'equilibrio', t:'Analito en equilibrio lento entre dos formas (tautómeros, rotámeros, estados de protonación cerca del pKa)', tags:['quimico']},
+        {id:'burbuja', t:'Burbuja de aire en la celda del detector o en la cabeza de bomba', tags:['erratico']},
+        {id:'acondicionamiento', t:'Columna mal acondicionada o cambio brusco de fase móvil', tags:['columna']}
+      ],
+      maniobra:'<p>Invertí la columna y lavala en contraflujo, <b>fuera del detector</b>, con fase móvil sin buffer.</p>'+
+        '<p>⚠ Verificá antes con el fabricante: en algunas columnas esto anula la garantía.</p>'+
+        '<p>· Si el pico <b>se recompone</b> → era la frita de entrada o el relleno.</p>'+
+        '<p>· Si <b>sigue partido</b> → no es la columna. Con partición solo en los picos tempranos, mirá el solvente de inyección. Con partición en un pico puntual, es química: probá cambiar el gradiente o la temperatura y observá si las dos mitades se separan (coelución) o se mantienen juntas (equilibrio lento).</p>'
+    },
+
+    ancho: {
+      name:'Pico ancho o achatado', en:'broad', glyph:GLYPH.ancho,
+      def:'El pico conserva su forma pero es notablemente más ancho y bajo que en el cromatograma de referencia. Cae la resolución y baja la relación señal/ruido.',
+      numnote:'',
+      q1:{ q:'¿A qué picos afecta?', opts:[
+        {t:'A todos por igual, incluidos los tempranos', tags:['extracolumna']},
+        {t:'Sólo a los que eluyen tarde', tags:['normal-o-gradiente']},
+        {t:'Sólo a algunos', tags:['quimico']}
+      ]},
+      q2:{ q:'¿Dónde empieza el pico?',
+        note:'El indicador confiable de que cambió la retención real es el punto donde el pico <b>empieza a levantarse</b> de la línea de base, no el ápice. Un pico que se ensancha o se vuelve asimétrico corre su ápice sin que haya cambiado el método: el máximo se desplaza por geometría, no por química.',
+        noteLabel:'Por qué el inicio del pico y no el ápice',
+        opts:[
+        {t:'El pico arranca a subir en el mismo momento que antes; solo es más ancho', tags:['dispersion']},
+        {t:'El pico entero arranca más tarde (o más temprano) que antes', tags:['retencion-real']}
+      ]},
+      causes:[
+        {id:'extracolumna', t:'Volumen extracolumna excesivo: tubos de diámetro interno grande, tramos largos, conexiones mal ajustadas, celda de detección de volumen alto', tags:['extracolumna','dispersion']},
+        {id:'caudal', t:'Caudal por debajo del programado (fuga, sello de bomba, burbuja)', tags:['retencion-real']},
+        {id:'fase-debil', t:'Composición de fase móvil más débil de la prevista (mal preparada, evaporación de orgánico, proporcionamiento desviado)', tags:['retencion-real']},
+        {id:'degradada', t:'Columna degradada: pérdida de eficiencia por desgaste', tags:['desgaste-columna']},
+        {id:'detector-cte', t:'Constante de tiempo del detector o frecuencia de muestreo mal seteadas (filtro demasiado agresivo)', tags:['dispersion']},
+        {id:'temp-baja', t:'Temperatura de columna más baja que la de método', tags:['retencion-real']},
+        {id:'vol-iny', t:'Volumen de inyección excesivo (sobrecarga de volumen)', tags:['dispersion']},
+        {id:'gradiente', t:'Gradiente mal formado o mezclado deficiente', tags:['gradiente']}
+      ],
+      maniobra:'<p>Sacá la columna y poné una unión directa entre inyector y detector. Inyectá y medí el ancho del pico que sale.</p>'+
+        '<p>· Si el pico ya sale <b>ancho sin columna</b> → el problema es el sistema: volumen extracolumna, tubos, celda o parámetros del detector. La columna está sana.</p>'+
+        '<p>· Si sale <b>angosto y agudo sin columna</b> → el sistema está bien y el problema es la columna o las condiciones cromatográficas.</p>'+
+        '<p>Complemento: verificá el caudal real recogiendo eluato en probeta durante 5 minutos y comparándolo con el programado. Una desviación de caudal explica ensanchamiento y corrimiento del inicio del pico al mismo tiempo.</p>'
+    },
+
+    fantasma: {
+      name:'Pico fantasma', en:'ghost peak', glyph:GLYPH.fantasma,
+      def:'Aparece un pico que no corresponde a ningún componente de la muestra inyectada.',
+      numnote:'',
+      q1:{ q:'¿Aparece también cuando inyectás blanco (diluyente solo)?', opts:[
+        {t:'Sí, con blanco también aparece', tags:['sistema-o-fase-movil']},
+        {t:'No, sólo con muestra real', tags:['carryover']},
+        {t:'No probé todavía (es el test más rápido: probalo)', tags:[]}
+      ]},
+      q2:{ q:'¿Aparece siempre en la misma posición?', opts:[
+        {t:'Sí, siempre al mismo tiempo de retención', tags:['fase-movil']},
+        {t:'Aparece después de inyectar una muestra concentrada', tags:['carryover']},
+        {t:'En gradiente, aparece al final o durante la rampa', tags:['acumulacion']}
+      ]},
+      causes:[
+        {id:'carryover', t:'Carryover del inyector: aguja, loop o sello con residuo de la inyección anterior', tags:['carryover']},
+        {id:'acumulacion', t:'Impureza en la fase móvil que se acumula en cabeza de columna y eluye con la rampa', tags:['acumulacion','fase-movil']},
+        {id:'contaminacion-fase', t:'Contaminación del agua, del solvente orgánico o del aditivo/buffer', tags:['fase-movil']},
+        {id:'lixiviado', t:'Material lixiviado de viales, tapas, septa, filtros de jeringa o tubos plásticos', tags:['fase-movil']},
+        {id:'retenido', t:'Componente retenido de una corrida previa que eluye tarde y cae en la corrida siguiente', tags:['acumulacion']},
+        {id:'degradacion-vial', t:'Producto de degradación del analito formado en el vial (temperatura, luz, tiempo en bandeja)', tags:['carryover']}
+      ],
+      maniobra:'<p>Corré tres blancos consecutivos <b>sin inyectar</b> (inyección de volumen cero o parando la secuencia del autosampler), y después un blanco <b>con inyección</b> del diluyente.</p>'+
+        '<p>· Si el fantasma aparece <b>sin inyectar</b> → viene de la fase móvil o del sistema, no del inyector.</p>'+
+        '<p>· Si aparece <b>solo cuando hay inyección</b> de blanco → es carryover o contaminación del diluyente/vial. Aumentá el lavado de aguja y probá viales nuevos.</p>'+
+        '<p>Complemento para acumulación: duplicá el tiempo de equilibrado antes de la inyección. Si el fantasma crece con el tiempo de espera, se está acumulando algo en cabeza de columna.</p>'
+    }
   };
   // orden de la grilla del selector
-  var SYM_ORDER = ['tailing','fronting','partido','ancho','negativo','fantasma','primera'];
+  var SYM_ORDER = ['tailing','fronting','partido','ancho','negativo','fantasma'];
 
   /* ============ 4. Motor de reglas de contexto (declarativo) ============
      Cada regla: { when:{campo:valor} o {all:[{campo,valor}...]},
@@ -347,6 +465,9 @@
       notice:'En SEC/exclusión no hay interacción iónica ni silanoles: mirá sobrecarga de volumen y adsorción no deseada.' },
     // Fronting
     { symptom:'fronting', when:{columna:'hilic'}, top:['efecto-solvente'] },
+    // Pico partido
+    { symptom:'partido', when:{columna:'hilic'}, notice:'En HILIC, un solvente de inyección demasiado acuoso puede partir los picos tempranos (inverso al efecto en fase reversa).' },
+    { symptom:'partido', when:{columna:'sec'}, notice:'En SEC/exclusión, un pico partido apunta a canalización o a sobrecarga de volumen, no a interacción química.' },
     // Edad de columna (todos)
     { when:{edad:'muyusada'}, bumpTags:['desgaste-columna'] },
     { when:{edad:'nueva'}, lowerTags:['desgaste-columna'] }
@@ -460,6 +581,61 @@
   function showSupport(on){ if(support) support.classList.toggle('show', !!on); }
   var state = { view:'selector', sym:null, a1:null, a2:null, inj:null };
 
+  function peakPaneHTML(s){
+    return '<div class="peak-pane"><p class="peak-hint">Tu cromatograma</p>'+s.glyph+
+      '<div class="peak-nm">'+s.name+'</div><div class="peak-en">('+s.en+')</div></div>';
+  }
+  function panelHTML(s, flow){
+    return '<div class="panel">'+peakPaneHTML(s)+'<div class="flow-pane">'+flow+'</div></div>';
+  }
+  function trailItems(){
+    var it=[];
+    if(state.a1 && !state.a1.fromCtx) it.push({lvl:'a1', t:state.a1.t});
+    if(state.a2) it.push({lvl:'a2', t:state.a2.t});
+    if(state.inj) it.push({lvl:'inj', t:(state.inj==='manual'?'Inyección manual':'Inyección automática')});
+    return it;
+  }
+  function renderTrail(){
+    var it=trailItems(); if(!it.length) return '';
+    var h='<div class="trail"><span class="trail-lbl">Recorrido:</span>';
+    it.forEach(function(x,i){ h += (i?'<span class="trail-sep">›</span>':'')+'<button class="trail-item" data-jump="'+x.lvl+'" title="Volver y cambiar">'+x.t+'</button>'; });
+    return h+'</div>';
+  }
+  function trailJump(lvl){
+    if(lvl==='a1'){ state.a1=null; state.a2=null; state.inj=null; }
+    else if(lvl==='a2'){ state.a2=null; state.inj=null; }
+    else if(lvl==='inj'){ state.inj=null; }
+    renderSymptom();
+  }
+  function stepBack(){
+    if(state.inj){ state.inj=null; }
+    else if(state.a2){ state.a2=null; }
+    else if(state.a1 && !state.a1.fromCtx){ state.a1=null; }
+    else { renderSelector(); return; }
+    renderSymptom();
+  }
+  function wireTrail(){ app.querySelectorAll('[data-jump]').forEach(function(b){ b.onclick=function(){ trailJump(b.getAttribute('data-jump')); }; }); }
+  function evidenceHTML(){
+    var ev=[];
+    if(state.a1 && !state.a1.fromCtx) ev.push(state.a1.t);
+    if(state.a2) ev.push(state.a2.t);
+    if(state.inj) ev.push(state.inj==='manual'?'Inyección manual':'Inyección automática');
+    if(!ev.length) return '';
+    return '<div class="ficha-sec"><h4>Evidencia</h4><ul class="evidence">'+ev.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>';
+  }
+  function buildMessages(diag){
+    var enc=encodeURIComponent, NL=String.fromCharCode(10);
+    var fwd='https://wa.me/?text='+enc('Hola, comparto el problema que estamos teniendo con un HPLC. La herramienta de troubleshooting de cromatografia.com.ar me dice lo siguiente: "'+diag+'"');
+    var agsMsg=['Hola, los contacto por un problema técnico que empecé a aislar usando la herramienta de troubleshooting de cromatografia.com.ar.','','El diagnóstico preliminar de la herramienta es "'+diag+'".','','Les paso nuestros datos:','Nombre del contacto: ','Cliente: ','Modelo del HPLC Agilent: ','Código interno del equipo: '].join(NL);
+    var agsWa='https://wa.me/5491156934883?text='+enc(agsMsg);
+    var agsMail='mailto:soporte@agsanalitica.com?subject='+enc('Consulta técnica - Troubleshooting HPLC (cromatografia.com.ar)')+'&body='+enc(agsMsg);
+    return { fwd:fwd, agsWa:agsWa, agsMail:agsMail };
+  }
+  function updateSupportLinks(msgs){
+    var wa=document.querySelector('.ags-support .agsbtn--wa'); if(wa) wa.href=msgs.agsWa;
+    var ml=document.querySelector('.ags-support .agsbtn--mail'); if(ml) ml.href=msgs.agsMail;
+  }
+
   function renderSelector(){
     showSupport(false);
     state = { view:'selector', sym:null, a1:null, a2:null, inj:null };
@@ -504,29 +680,25 @@
     var skipQ1 = s.q1.field && ctx[s.q1.field];
     if(skipQ1 && !state.a1) state.a1 = { tags:[], fromCtx:true };
 
-    // Progreso
-    var totalSteps = 2 + (needsInjection()?1:0);
-    var done = (state.a1?1:0) + (state.a2?1:0) + (state.inj?1:0);
-    var prog = Math.round(done/ (2 + (needsInjection()?1:0)) *100);
-
-    var h = '<button class="back back-top">← Elegir otro síntoma</button>';
-    h += '<div class="progress"><i style="width:'+prog+'%"></i></div>';
-
+    var backLbl = trailItems().length ? '← Volver al paso anterior' : '← Elegir otro síntoma';
+    var flow = '<button class="back back-top">'+backLbl+'</button>';
+    flow += renderTrail();
     if(!state.a1){
-      h += stepHTML('PASO 1', s.q1, 'a1', s.def, s.numnote);
+      flow += stepHTML('PASO 1', s.q1, 'a1', s.def, s.numnote);
     } else if(!state.a2){
-      h += stepHTML('PASO 2', s.q2, 'a2', null, null);
+      flow += stepHTML('PASO 2', s.q2, 'a2', null, null);
     } else if(needsInjection() && !state.inj){
-      h += stepHTML('PASO EXTRA', { q:'¿Cómo inyectás?', opts:[
+      flow += stepHTML('PASO EXTRA', { q:'¿Cómo inyectás?', opts:[
         {t:'Automática (autosampler)', set:{_inj:'auto'}, tags:[]},
         {t:'Manual (loop)', set:{_inj:'manual'}, tags:[]}
       ]}, 'inj', 'El comportamiento es irregular: el modo de inyección cambia las causas probables.', null);
     } else {
       renderResult(); return;
     }
-    app.innerHTML = h;
+    app.innerHTML = panelHTML(s, flow);
     wireStep();
-    app.querySelector('.back').onclick = renderSelector;
+    app.querySelector('.back').onclick = stepBack;
+    wireTrail();
     updateCounter();
   }
 
@@ -534,7 +706,9 @@
     var h = '<span class="pill">'+pill+'</span>';
     if(def) h += '<p class="res-def" style="margin-bottom:4px">'+def+'</p>';
     if(numnote) h += '<details class="note-num"><summary>Criterio numérico</summary><div style="margin-top:8px">'+numnote+'</div></details>';
-    h += '<p class="q">'+step.q+'</p><div class="opts" data-slot="'+slot+'">';
+    h += '<p class="q">'+step.q+'</p>';
+    if(step.note) h += '<details class="note-num" style="margin:0 0 12px"><summary>'+(step.noteLabel||'Aclaración')+'</summary><div style="margin-top:8px">'+step.note+'</div></details>';
+    h += '<div class="opts" data-slot="'+slot+'">';
     step.opts.forEach(function(o,i){ h += '<button class="opt" data-i="'+i+'"><b>'+o.t+'</b></button>'; });
     h += '</div>';
     return h;
@@ -574,42 +748,48 @@
       extra = ['Aguja o loop parcialmente obstruidos','Sello de la válvula de inyección desgastado','Volumen de lavado insuficiente (carryover)','Problema de sincronía de la válvula'];
     }
 
-    var h = '<button class="back back-top">← Volver</button>';
-    h += '<div class="progress"><i style="width:100%"></i></div>';
-    h += '<p class="res-title">'+s.name+' <span style="font-style:italic;color:#6b7280;font-size:15px">('+s.en+')</span></p>';
-    h += '<p class="res-def">'+s.def+'</p>';
+    var msgs = buildMessages(s.name);
 
-    r.notices.forEach(function(n){ h += '<div class="amber"><b>Según tu contexto.</b> '+n+'</div>'; });
+    var flow = '<button class="back back-top">← Volver</button>';
+    flow += renderTrail();
+    flow += '<p class="res-kicker">Diagnóstico</p>';
+    flow += '<p class="res-title">'+s.name+' <span style="font-style:italic;color:#6b7280;font-size:15px">('+s.en+')</span></p>';
+    flow += '<p class="res-def">'+s.def+'</p>';
+
+    r.notices.forEach(function(n){ flow += '<div class="amber"><b>Según tu contexto.</b> '+n+'</div>'; });
     if(r.count < r.baseCount){
-      h += '<div class="amber" style="background:#ecfeff;border-color:#cffafe;color:#0e7490"><b>'+r.baseCount+' causas → '+r.count+'.</b> Descarté las que no aplican a tu configuración.</div>';
+      flow += '<div class="amber" style="background:#ecfeff;border-color:#cffafe;color:#0e7490"><b>'+r.baseCount+' causas → '+r.count+'.</b> Descarté las que no aplican a tu configuración.</div>';
     }
 
-    h += '<div class="maniobra"><div class="mlab">La maniobra que discrimina</div>'+s.maniobra+'</div>';
+    flow += evidenceHTML();
+    flow += '<div class="maniobra"><div class="mlab">La maniobra que discrimina</div>'+s.maniobra+'</div>';
 
-    h += '<p class="cause-h">Causas probables (ordenadas por probabilidad)</p>';
-    r.causes.forEach(function(c,i){
-      h += '<div class="cause"><span class="rank">'+(i+1)+'.</span> <span class="ct">'+c.t+'</span>'+
-           '<div class="tags">'+(c.tags||[]).map(function(t){return '<span class="tg">'+t+'</span>';}).join('')+'</div></div>';
-    });
+    flow += '<div class="ficha-sec"><h4>Qué comprobar ahora</h4><ol class="checklist">';
+    r.causes.forEach(function(c){ flow += '<li>'+c.t+'</li>'; });
+    flow += '</ol></div>';
 
     if(extra.length){
-      h += '<p class="cause-h" style="margin-top:16px">Sumado por irreproducibilidad — inyección '+(inj==='manual'?'manual':'automática')+'</p>';
-      extra.forEach(function(t){ h += '<div class="cause"><span class="ct">'+t+'</span></div>'; });
+      flow += '<div class="ficha-sec"><h4>Sumado por irreproducibilidad — inyección '+(inj==='manual'?'manual':'automática')+'</h4><ol class="checklist">';
+      extra.forEach(function(t){ flow += '<li>'+t+'</li>'; });
+      flow += '</ol></div>';
     }
 
-    h += '<div class="disc"><strong>Sobre esta herramienta.</strong> Prioriza la <b>maniobra que discrimina</b> cada causa, no una probabilidad numérica. El orden refleja la frecuencia típica reportada por fabricantes y la literatura de troubleshooting de LC; en tu laboratorio puede variar según matriz, química y estado del equipo. Es una guía de orientación: verificá siempre experimentalmente antes de reemplazar partes.</div>';
-    h += '<div class="actions"><button class="btn btn-primary" id="reset">Empezar de nuevo</button><button class="btn" id="print">Imprimir / PDF</button></div>';
-    app.innerHTML = h;
-    document.getElementById('reset').onclick = renderSelector;
-    document.getElementById('print').onclick = function(){ window.print(); };
-    app.querySelector('.back').onclick = function(){
-      // volver un paso
+    flow += '<div class="disc"><strong>Sobre esta herramienta.</strong> Prioriza la <b>maniobra que discrimina</b> cada causa, no una probabilidad numérica. El orden refleja la frecuencia típica reportada por fabricantes y la literatura de troubleshooting de LC; en tu laboratorio puede variar según matriz, química y estado del equipo. Es una guía de orientación: verificá siempre experimentalmente antes de reemplazar partes.</div>';
+    flow += '<div class="actions"><button class="btn btn-primary" id="reset">Empezar de nuevo</button><button class="btn" id="change">Cambiar una respuesta</button><a class="btn btn-wa" href="'+msgs.fwd+'" target="_blank" rel="noopener">Enviar por WhatsApp</a><button class="btn" id="print">Imprimir / PDF</button></div>';
+    app.innerHTML = panelHTML(s, flow);
+    updateSupportLinks(msgs);
+    var changeFn = function(){
       if(state.inj){ state.inj=null; }
       else if(state.a2){ state.a2=null; }
       else if(state.a1 && !state.a1.fromCtx){ state.a1=null; }
       else { renderSelector(); return; }
       renderSymptom();
     };
+    document.getElementById('reset').onclick = renderSelector;
+    document.getElementById('print').onclick = function(){ window.print(); };
+    document.getElementById('change').onclick = changeFn;
+    app.querySelector('.back').onclick = changeFn;
+    wireTrail();
     updateCounter();
   }
 
