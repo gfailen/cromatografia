@@ -71,6 +71,52 @@
   .btn-primary:hover{background:#0284c7}
   .footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:26px 20px}
   .prov{font-size:12px;color:#b45309;background:#fffbeb;border:1px dashed #f59e0b;border-radius:8px;padding:6px 10px;margin-top:8px;display:inline-block}
+  /* barra de etapas */
+  .stages{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:0 0 20px;font-size:12.5px}
+  .stage{display:inline-flex;align-items:center;gap:6px;color:#94a3b8}
+  .stage i{font-style:normal;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:11px;background:#e5e7eb;color:#94a3b8}
+  .stage.done{color:var(--green-tx)}
+  .stage.done i{background:var(--green-bg);color:var(--green-tx)}
+  .stage.now{color:var(--ink);font-weight:600}
+  .stage.now i{background:var(--celeste-d);color:#fff}
+  .stage-sep{color:#cbd5e1}
+  /* recorrido visible (arbol) editable */
+  .trail{display:flex;flex-wrap:wrap;align-items:center;gap:3px 5px;margin:0 0 16px;padding:10px 12px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;font-size:12px}
+  .trail-lbl{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .trail-item{background:#fff;border:1px solid #e2e8f0;color:#334155;border-radius:6px;padding:3px 9px;font:inherit;font-size:12px;cursor:pointer;transition:all .12s}
+  .trail-item:hover{border-color:var(--celeste-d);color:var(--celeste-d);box-shadow:0 1px 4px rgba(14,165,233,.12)}
+  .trail-sep{color:#cbd5e1}
+  /* nodo: accion / prueba */
+  .node-action{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 15px;margin:0 0 16px;font-size:14.5px;color:#0c4a6e;line-height:1.55}
+  .node-action b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#0369a1;margin-bottom:4px}
+  /* por que esta prueba */
+  .why{margin:14px 0 4px;font-size:13.5px}
+  .why>summary,.ck-test>summary,.recorrido>summary{cursor:pointer;color:var(--celeste-d);list-style:none;font-weight:600}
+  .why>summary::-webkit-details-marker,.ck-test>summary::-webkit-details-marker,.recorrido>summary::-webkit-details-marker{display:none}
+  .why>summary::before,.ck-test>summary::before,.recorrido>summary::before{content:"\25B8  "}
+  .why[open]>summary::before,.ck-test[open]>summary::before,.recorrido[open]>summary::before{content:"\25BE  "}
+  .why-body{color:#475569;padding:8px 2px 0;line-height:1.55}
+  .opt-cant{border-style:dashed}
+  .opt-cant b{color:#64748b}
+  /* ficha de diagnostico */
+  .res-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--celeste-d);font-weight:700;margin:0 0 2px}
+  .ficha-sec{margin:18px 0 0}
+  .ficha-sec h4{font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  .evidence{margin:0;padding-left:18px;color:#334155;font-size:14px}
+  .evidence li{margin:4px 0}
+  .checklist{margin:0;padding:0;list-style:none;counter-reset:ck}
+  .checklist>li{position:relative;border:1px solid var(--line);border-radius:10px;padding:12px 15px 12px 46px;margin-bottom:10px;counter-increment:ck}
+  .checklist>li::before{content:counter(ck);position:absolute;left:12px;top:12px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:var(--celeste-d);color:#fff;border-radius:999px;font-size:12px;font-weight:700}
+  .ck-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+  .ck-n{font-weight:600}
+  .ck-act{font-size:14px;color:#334155}
+  .ck-test{margin-top:8px;font-size:13px}
+  .ck-test>div{color:#475569;padding:6px 0 2px}
+  .recorrido{margin:18px 0 0;font-size:13.5px}
+  .recorrido-list{margin:10px 0 0;padding-left:18px;color:#334155}
+  .recorrido-list li{margin:6px 0}
+  .recorrido-list .rq{display:block;color:var(--muted);font-size:12.5px}
+  .recorrido-list .ra{display:block;font-weight:600}
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   .ags-support{display:none;max-width:820px;margin:2.5rem auto 0;background:#eef5fb;border:1px solid #d6e6f2;border-radius:12px;padding:1.15rem 1.4rem}
   .ags-support.show{display:block}
@@ -92,13 +138,68 @@
   .footer p{margin:.35em 0}
   .footer .tm{font-size:11px;color:#9ca3af;max-width:760px;margin:10px auto 0;line-height:1.5}
   sup{font-size:.68em;line-height:0}
+  /* --- panel schematic-rector (altura fija, 2 columnas) --- */
+  .panel{display:flex;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:0 1px 3px rgba(15,27,45,.06);overflow:hidden;height:540px}
+  .schema-pane{flex:0 0 42%;max-width:42%;border-right:1px solid var(--line);background:#fcfdff;padding:16px;display:flex;flex-direction:column;min-width:0}
+  .schema-box{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .schema-box svg{max-width:100%;max-height:448px;height:auto}
+  .schema-hint{font-size:11px;color:#94a3b8;text-align:center;margin:0 0 6px}
+  .legend{display:flex;flex-wrap:wrap;gap:7px 12px;margin-top:12px;font-size:11px;color:#475569}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .flow-pane{flex:1;min-width:0;padding:22px;overflow-y:auto}
+  @media(max-width:720px){
+    .panel{flex-direction:column;height:auto}
+    .schema-pane{flex:none;max-width:none;border-right:none;border-bottom:1px solid var(--line)}
+    .schema-box svg{max-height:300px}
+    .flow-pane{overflow:visible}
+  }
+  /* estados de zona */
+  .zone .wash{fill:transparent;stroke:transparent;stroke-width:3;transition:fill .3s,stroke .3s}
+  .zone .lead{stroke:#cbd5e1;stroke-width:3}
+  .zone .dot{fill:#cbd5e1}
+  .zone .zlabel{font:600 58px system-ui,sans-serif;fill:#94a3b8}
+  .zone .zstate{font:600 34px system-ui,sans-serif;fill:transparent}
+  .zone.descartado .wash{fill:rgba(34,197,94,.16);stroke:#22c55e}
+  .zone.descartado .dot,.zone.descartado .lead{fill:#22c55e;stroke:#22c55e}
+  .zone.descartado .zlabel{fill:#166534}.zone.descartado .zstate{fill:#16a34a}
+  .zone.investigando .wash{fill:rgba(14,165,233,.15);stroke:#0ea5e9}
+  .zone.investigando .dot,.zone.investigando .lead{fill:#0ea5e9;stroke:#0ea5e9}
+  .zone.investigando .zlabel{fill:#075985}.zone.investigando .zstate{fill:#0284c7}
+  .zone.precaucion .wash{fill:rgba(245,158,11,.20);stroke:#f59e0b}
+  .zone.precaucion .dot,.zone.precaucion .lead{fill:#f59e0b;stroke:#f59e0b}
+  .zone.precaucion .zlabel{fill:#92400e}.zone.precaucion .zstate{fill:#b45309}
+  .zone.alerta .wash{fill:rgba(239,68,68,.20);stroke:#ef4444}
+  .zone.alerta .dot,.zone.alerta .lead{fill:#ef4444;stroke:#ef4444}
+  .zone.alerta .zlabel{fill:#991b1b}.zone.alerta .zstate{fill:#dc2626}
+  /* manometros del selector */
+  .gsel{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.gsel{grid-template-columns:1fr}}
+  .gcard{display:flex;flex-direction:column;align-items:center;text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 12px 16px;cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,box-shadow .15s}
+  .gcard:hover{border-color:var(--celeste-d);box-shadow:0 2px 12px rgba(14,165,233,.14)}
+  .gcard .gauge{width:100%;max-width:180px;height:auto;margin-bottom:8px}
+  .gcard b{font-size:15px}
+  .gcard .gsub{font-size:12px;color:var(--muted);margin-top:2px}
+  .g-track{fill:none;stroke:#e5e7eb;stroke-width:10;stroke-linecap:round}
+  .g-green{fill:none;stroke:#22c55e;stroke-width:10;opacity:.85}
+  .g-red{fill:none;stroke:#ef4444;stroke-width:10;opacity:.9}
+  .g-tick{stroke:#94a3b8;stroke-width:2}
+  .g-needle{stroke:#0f1b2d;stroke-width:4;stroke-linecap:round}
+  .g-needle.hot{stroke:#dc2626}
+  .g-hub{fill:#0f1b2d}
+  /* imagen de consumible en la ficha */
+  .ck-img{margin-top:10px;max-width:220px;width:100%;border:1px solid var(--line);border-radius:8px;display:block}
+  .btn-wa{background:#25D366;border-color:#25D366;color:#fff}
+  .btn-wa:hover{background:#20bd5a}
   @media print{
-    .header,.crumb,.nav,.back,.actions,.selector-wrap,.print-footer,.ags-support{display:none!important}
+    .header,.crumb,.nav,.back,.actions,.selector-wrap,.print-footer,.ags-support,.why,.stages,.schema-pane,.legend{display:none!important}
     .card{box-shadow:none;border:none;padding:0}
     .wrap{padding:0}
-    details.cause{border-color:#ccc}
-    details.cause>summary::after{display:none}
-    details.cause>.cause-body{display:block!important}
+    .panel{display:block;border:none;box-shadow:none;min-height:0}
+    .flow-pane{max-height:none;overflow:visible;padding:0}
+    .ck-test>summary,.recorrido>summary{display:none}
+    .ck-test>div,.recorrido-list{display:block!important}
+    .checklist>li{break-inside:avoid}
     @page{margin:12mm}
     .print-header{display:block;text-align:center;padding:0 0 6mm}
     .print-header img{height:1.4cm}
@@ -127,9 +228,22 @@
 
 <main class="wrap">
   <h1>Problemas de presión en HPLC</h1>
-  <p class="lead">Elegí el síntoma y respondé 2–3 preguntas basadas en maniobras que discriminan cada causa. Llegás a las causas probables, cada una con la prueba que la confirma y la acción correctiva.</p>
+  <p class="lead">Elegí el síntoma y seguí el diagnóstico guiado. El esquema del equipo te va mostrando qué zona se descarta y cuál queda bajo investigación, hasta localizar la causa.</p>
 
-  <div id="app" class="card"></div>
+  <div class="panel">
+    <div class="schema-pane">
+      <p class="schema-hint">Estado del diagnóstico</p>
+      <div class="schema-box" id="schemaBox"></div>
+      <div class="legend">
+        <span><i style="background:#94a3b8"></i>No evaluado</span>
+        <span><i style="background:#22c55e"></i>Descartado</span>
+        <span><i style="background:#0ea5e9"></i>En investigación</span>
+        <span><i style="background:#f59e0b"></i>Precaución</span>
+        <span><i style="background:#ef4444"></i>Localizado</span>
+      </div>
+    </div>
+    <div class="flow-pane"><div id="app"></div></div>
+  </div>
 </main>
 
 <section class="ags-support" aria-label="Soporte técnico AGS Analítica">
@@ -166,42 +280,42 @@
       sub: 'Trepó, o saltó de golpe',
       start: 'p1',
       steps: {
-        p1: { q:'Paso 1 — ¿Cómo apareció?', hint:'Bifurca obstrucción física progresiva vs. cambio de método / precipitación repentina.', opts:[
+        p1: { stage:'confirmar', q:'¿Cómo apareció la presión alta?', why:'Distingue una obstrucción física que progresa de a poco de un cambio de método o una precipitación repentina. Son dos caminos de diagnóstico distintos.', opts:[
           {b:'Gradualmente, corrida tras corrida', s:'Trepó de a poco a lo largo de días/inyecciones.', next:'p2'},
           {b:'De repente', s:'Salto brusco entre una corrida y la siguiente, muchas veces tras cambiar fase móvil, muestra o columna.', next:'p2', flag:'subita'}
         ]},
-        p2: { q:'Paso 2 — Aislar sistema vs. columna (maniobra madre)', hint:'Quitá la columna, poné una unión (union) en su lugar y mirá la presión. Compará contra la presión normal registrada históricamente.', opts:[
+        p2: { stage:'localizar', action:'Quitá la columna y poné una unión (union) en su lugar. Poné el flujo en marcha y mirá la presión, comparándola con la presión normal que registrás habitualmente.', why:'Es la maniobra madre del diagnóstico de presión: aislar la columna del resto del equipo dice de un solo golpe si el bloqueo está en la columna o en el sistema.', q:'¿Qué pasa con la presión sin la columna?', opts:[
           {b:'La presión baja a la normal sin columna', s:'La columna es la responsable.', next:'p3b'},
           {b:'La presión sigue alta sin columna', s:'El bloqueo está en el sistema.', next:'p3a'}
         ]},
-        p3a: { q:'Paso 3A — Localizar el bloqueo en el sistema', hint:'Pasá la válvula de inyección a bypass (mainpass → bypass) y observá. Bypass saca del camino aguja, capilar de asiento y loop.', opts:[
+        p3a: { stage:'localizar', action:'Pasá la válvula de inyección a bypass (mainpass → bypass) y observá la presión. En bypass quedan fuera del camino la aguja, el capilar de asiento y el loop.', why:'Bypass saca de la ruta la parte del inyector. Si la presión cae ahí, el bloqueo está en esas piezas; si sigue alta, está aguas arriba del inyector.', q:'¿Qué pasa en bypass?', opts:[
           {b:'En bypass la presión se normaliza', s:'Bloqueo en la ruta del inyector.', result:'r3aa'},
           {b:'En bypass la presión sigue alta', s:'Bloqueo aguas arriba del inyector.', result:'r3ab'}
         ]},
-        p3b: { q:'Paso 3B — Confirmar mecanismo en la columna', hint:'Invertí la columna (back-flush) hacia un descarte, sin el detector en línea, y lavá con solvente fuerte.', opts:[
+        p3b: { stage:'identificar', action:'Invertí la columna (back-flush) hacia un descarte, sin el detector en línea, y lavá con solvente fuerte.', why:'Un frit de entrada tapado por partículas se libera con el back-flush; una precipitación o un empaque dañado, no. Esto separa un problema reversible de uno que no lo es.', q:'¿Qué pasa al invertir y lavar la columna?', opts:[
           {b:'La presión vuelve a bajar tras invertir y lavar', s:'Frit de entrada obstruido (reversible).', result:'r3ba'},
           {b:'Baja parcialmente/nada, o vuelve a subir enseguida', s:'Contaminación / precipitación / empaque.', result:'r3bb'}
         ]}
       },
       results: {
         r3aa: { t:'Bloqueo en la ruta del inyector', s:'En bypass la presión cae → la restricción está en lo que bypass deja fuera.', causes:[
-          {n:'Capilar del asiento de aguja (needle-seat) obstruido', f:'muy común', fc:'f-muy', test:'Desconectar el capilar de asiento y medir la presión sola de esa pieza; si está alta, back-flushear o reemplazar.', act:'Reemplazar el needle-seat capillary. Filtrar muestra y usar tapas de vial de buena calidad para prevenir.'},
-          {n:'Aguja o loop parcialmente tapados', f:'común', fc:'f-comun', test:'Inspeccionar la aguja; probar con el loop desconectado si el diseño lo permite.', act:'Limpiar o reemplazar aguja/loop. Origen habitual: partículas de muestra o del septo.'},
-          {n:'Sello del rotor (rotor seal) rayado o con debris', f:'ocasional', fc:'f-ocas', test:'Correr el valve test de la utilidad de diagnóstico (ej. Lab Advisor) para descartar fuga interna o restricción.', act:'Reemplazar el rotor seal si está dañado.'}
+          {n:'Capilar del asiento de aguja (needle-seat) obstruido', f:'muy común', fc:'f-muy', test:'Desconectar el capilar de asiento y medir la presión sola de esa pieza; si está alta, back-flushear o reemplazar.', act:'Reemplazar el needle-seat capillary. Filtrar muestra y usar tapas de vial de buena calidad para prevenir.', img:'capilar-asiento-aguja.jpg'},
+          {n:'Aguja o loop parcialmente tapados', f:'común', fc:'f-comun', test:'Inspeccionar la aguja; probar con el loop desconectado si el diseño lo permite.', act:'Limpiar o reemplazar aguja/loop. Origen habitual: partículas de muestra o del septo.', img:['aguja.jpg','loop.jpg']},
+          {n:'Sello del rotor (rotor seal) rayado o con debris', f:'ocasional', fc:'f-ocas', test:'Correr el valve test de la utilidad de diagnóstico (ej. Lab Advisor) para descartar fuga interna o restricción.', act:'Reemplazar el rotor seal si está dañado.', img:'sello-rotor.jpg'}
         ]},
         r3ab: { t:'Bloqueo aguas arriba del inyector', s:'Sigue alta incluso en bypass → restricción aguas arriba. Quitar capilares uno por uno para ubicar el punto.', causes:[
-          {n:'Filtro en línea (in-line filter) saturado', f:'muy común', fc:'f-muy', test:'Es lo primero: reemplazar el frit del filtro en línea. Un alza de ~10% no corregida al cambiarlo apunta al siguiente elemento.', act:'Cambiar el frit del in-line filter. Pieza más barata y la que más protege la columna.'},
-          {n:'Capilar obstruido o aplastado', f:'común', fc:'f-comun', test:'Remover capilares de a uno siguiendo el flujo y medir; el tramo donde la presión cae al quitarlo contiene el bloqueo.', act:'Back-flushear el capilar hacia descarte; si no se libera, reemplazar.'},
-          {n:'Restricción en bomba o celda del detector', f:'menos frecuente', fc:'f-ocas', test:'Con columna, inyector y filtro descartados y aún alta, aislar la celda de flujo del detector; si baja, es la celda o el tubing de descarte.', act:'Revisar celda de flujo / tubing de waste. Chequear también viscosidad de fase móvil y setpoint de temperatura.'}
+          {n:'Filtro en línea (in-line filter) saturado', f:'muy común', fc:'f-muy', test:'Es lo primero: reemplazar el frit del filtro en línea. Un alza de ~10% no corregida al cambiarlo apunta al siguiente elemento.', act:'Cambiar el frit del in-line filter. Pieza más barata y la que más protege la columna.', img:'filtro-en-linea.jpg'},
+          {n:'Capilar obstruido o aplastado', f:'común', fc:'f-comun', test:'Remover capilares de a uno siguiendo el flujo y medir; el tramo donde la presión cae al quitarlo contiene el bloqueo.', act:'Back-flushear el capilar hacia descarte; si no se libera, reemplazar.', img:'capilar.jpg'},
+          {n:'Restricción en bomba o celda del detector', f:'menos frecuente', fc:'f-ocas', test:'Con columna, inyector y filtro descartados y aún alta, aislar la celda de flujo del detector; si baja, es la celda o el tubing de descarte.', act:'Revisar celda de flujo / tubing de waste. Chequear también viscosidad de fase móvil y setpoint de temperatura.', img:'celda-detector.jpg'}
         ]},
         r3ba: { t:'Frit de entrada de la columna obstruido (reversible)', s:'La columna es la fuente y responde al back-flush: patrón clásico de partículas de matriz. Causa más común de presión alta en columna.', causes:[
-          {n:'Frit de entrada tapado por partículas de muestra', f:'muy común', fc:'f-muy', test:'Ya confirmado por la maniobra (invertir + lavar bajó la presión). Reinstalar la columna en sentido normal y verificar.', act:'Prevención — filtrar (0,22–0,45 µm) todo extracto, usar guard column y un in-line filter de 0,5 µm aguas abajo del automuestreador. Si reincide rápido, el guard cartridge ya cumplió su función: cambiarlo.'},
+          {n:'Frit de entrada tapado por partículas de muestra', f:'muy común', fc:'f-muy', test:'Ya confirmado por la maniobra (invertir + lavar bajó la presión). Reinstalar la columna en sentido normal y verificar.', act:'Prevención — filtrar (0,22–0,45 µm) todo extracto, usar guard column y un in-line filter de 0,5 µm aguas abajo del automuestreador. Si reincide rápido, el guard cartridge ya cumplió su función: cambiarlo.', img:'frit-columna.jpg'},
           {n:'Matriz sucia sin cleanup previo', f:'frecuente en matrices reales', fc:'f-comun', test:'Revisar si el problema aparece solo con ciertas muestras; si sí, el cuello de botella es la preparación.', act:'Incorporar SPE u otro cleanup. El frit es el síntoma; la matriz es la causa raíz.'}
         ]},
         r3bb: { t:'Contaminación / precipitación / empaque comprometido (no reversible)', s:'La columna es la fuente pero el back-flush no la recupera. El mecanismo está dentro del lecho.', prov:true, causes:[
           {n:'Precipitación de buffer dentro de la columna', f:'muy común con buffers + alto orgánico', fc:'f-muy', test:'Revisar el % de orgánico (fosfato con ACN alto precipita). Lavar el sistema (sin columna) con agua tibia para redisolver sales; luego evaluar la columna.', act:'Ajustar el gradiente para no superar el límite de solubilidad del buffer; incluir paso de transición acuoso entre buffer y orgánico. Nunca dejar buffer estancado.'},
-          {n:'Contaminación adsorbida (alto PM / matriz)', f:'común', fc:'f-comun', test:'Lavar con solvente fuerte según protocolo del fabricante para esa química; si recupera parcialmente, era adsorción.', act:'Rutina de lavado periódica; guard column como sacrificio.'},
-          {n:'Empaque colapsado o void en la cabeza de columna', f:'columna al final de su vida', fc:'f-ocas', test:'Si tras todo lo anterior sigue alta y además hay picos partidos/ensanchados, el lecho está dañado.', act:'Fin de vida útil, reemplazar. Documentar N° de inyecciones.'}
+          {n:'Contaminación adsorbida (alto PM / matriz)', f:'común', fc:'f-comun', test:'Lavar con solvente fuerte según protocolo del fabricante para esa química; si recupera parcialmente, era adsorción.', act:'Rutina de lavado periódica; guard column como sacrificio.', img:'guard-column.jpg'},
+          {n:'Empaque colapsado o void en la cabeza de columna', f:'columna al final de su vida', fc:'f-ocas', test:'Si tras todo lo anterior sigue alta y además hay picos partidos/ensanchados, el lecho está dañado.', act:'Fin de vida útil, reemplazar. Documentar N° de inyecciones.', img:'columna.jpg'}
         ]}
       }
     },
@@ -210,11 +324,11 @@
       sub: 'Pérdida de flujo o de restricción',
       start: 'q1',
       steps: {
-        q1: { q:'Paso 1 — ¿La presión bajó o siempre estuvo baja?', hint:'Presión baja casi siempre = pérdida de flujo real que llega a la columna, o pérdida de restricción.', opts:[
+        q1: { stage:'confirmar', q:'¿La presión bajó o siempre estuvo baja?', why:'Una caída respecto de lo normal apunta a una fuga o pérdida de flujo sobrevenida. Una presión baja de entrada, con columna o método nuevo, puede ser esperable.', opts:[
           {b:'Cayó respecto de lo normal (antes andaba bien)', s:'Problema de flujo/fuga sobrevenido.', next:'q2'},
           {b:'Baja de entrada, con columna/método nuevo', s:'Puede ser esperable (columna más corta, mayor DI, partícula más grande, o fase móvil menos viscosa).', result:'rbnew'}
         ]},
-        q2: { q:'Paso 2 — Verificar el flujo entregado', hint:'Desconectar en la salida de la bomba (o del detector) y medir el flujo real con probeta/cronómetro contra el flujo seteado.', opts:[
+        q2: { stage:'localizar', action:'Desconectá en la salida de la bomba (o del detector) y medí el flujo real con probeta y cronómetro, comparándolo con el flujo seteado.', why:'Si la bomba no entrega el caudal, el problema es de la bomba (aire, sello, starvation). Si entrega bien, hay una fuga aguas abajo o una pérdida de restricción.', q:'¿El flujo entregado coincide con el seteado?', opts:[
           {b:'El flujo entregado es menor al seteado', s:'La bomba no está entregando.', result:'r2a'},
           {b:'El flujo entregado es correcto', s:'Hay una fuga aguas abajo o pérdida de restricción.', result:'r2b'}
         ]}
@@ -224,14 +338,14 @@
           {n:'Configuración de menor contrapresión', f:'no es falla', fc:'f-ocas', test:'Verificar la presión esperada para esa columna y fase móvil antes de diagnosticar falla (largo, DI, tamaño de partícula, viscosidad).', act:'Si está dentro del rango esperado, no hay nada que corregir. Registrar la nueva presión de referencia.'}
         ]},
         r2a: { t:'La bomba no entrega el flujo (aire, sello, starvation)', s:'Causa más frecuente de caída de presión: la bomba pierde cebado.', prov:true, causes:[
-          {n:'Aire atrapado en el cabezal de bomba', f:'muy común', fc:'f-muy', test:'Abrir la purga y purgar a caudal alto; observar burbujas en las líneas. Si al purgar la presión se recupera, era aire.', act:'Purgar/cebar. Desgasificar la fase móvil. Revisar que el sinker y el filtro de solvente estén sumergidos.'},
-          {n:'Solvente insuficiente / filtro de toma (sinker) obstruido', f:'común', fc:'f-comun', test:'Chequear nivel de botella y estado del frit del sinker; medir flujo con el sinker fuera de la botella en solvente limpio.', act:'Rellenar solvente; limpiar o reemplazar el frit del sinker.'},
-          {n:'Sello de pistón (pump seal) gastado', f:'desgaste esperable', fc:'f-comun', test:'Buscar goteo detrás del cabezal o solvente en el drenaje; correr el pump leak/pressure test de la utilidad de diagnóstico.', act:'Reemplazar sellos de bomba. Si hay ripple de presión alto, confirma sello o válvula de retención.'},
-          {n:'Válvula de retención (check valve) sucia o pegada', f:'común', fc:'f-comun', test:'Ripple de presión irregular y flujo errático apuntan a check valve; sonicar o reemplazar y volver a medir.', act:'Limpiar (sonicado) o reemplazar la check valve.'}
+          {n:'Aire atrapado en el cabezal de bomba', f:'muy común', fc:'f-muy', test:'Abrir la purga y purgar a caudal alto; observar burbujas en las líneas. Si al purgar la presión se recupera, era aire.', act:'Purgar/cebar. Desgasificar la fase móvil. Revisar que el filtro de entrada de solvente esté sumergido.'},
+          {n:'Solvente insuficiente / filtro de entrada de solvente obstruido', f:'común', fc:'f-comun', test:'Chequear nivel de botella y estado del filtro de entrada de solvente; medir el flujo con el filtro fuera de la botella, en solvente limpio.', act:'Rellenar solvente; limpiar o reemplazar el filtro de entrada de solvente.', img:'filtro-entrada-solvente.jpg'},
+          {n:'Sello de pistón (pump seal) gastado', f:'desgaste esperable', fc:'f-comun', test:'Buscar goteo detrás del cabezal o solvente en el drenaje; correr el pump leak/pressure test de la utilidad de diagnóstico.', act:'Reemplazar sellos de bomba. Si hay ripple de presión alto, confirma sello o válvula de retención.', img:'sello-piston.jpg'},
+          {n:'Válvula de retención (check valve) sucia o pegada', f:'común', fc:'f-comun', test:'Ripple de presión irregular y flujo errático apuntan a check valve; sonicar o reemplazar y volver a medir.', act:'Limpiar (sonicado) o reemplazar la check valve.', img:'valvula-retencion.jpg'}
         ]},
         r2b: { t:'Fuga aguas abajo o pérdida de restricción', s:'El flujo entregado es correcto pero la presión no sube: se está yendo por algún lado o falta restricción.', causes:[
-          {n:'Fuga en una conexión / fitting', f:'muy común', fc:'f-muy', test:'Inspeccionar visualmente todas las uniones bajo presión; secar y buscar humedad/cristales de buffer en cada fitting.', act:'Reapretar o rehacer la conexión con ferrule nueva. Los cristales de buffer marcan el punto de fuga.'},
-          {n:'Void o pérdida de empaque en la columna', f:'columna gastada', fc:'f-comun', test:'Si la presión bajó junto con caída de eficiencia (picos anchos/partidos), el lecho perdió empaque.', act:'Reemplazar la columna.'},
+          {n:'Fuga en una conexión / fitting', f:'muy común', fc:'f-muy', test:'Inspeccionar visualmente todas las uniones bajo presión; secar y buscar humedad/cristales de buffer en cada fitting.', act:'Reapretar o rehacer la conexión con ferrule nueva. Los cristales de buffer marcan el punto de fuga.', img:'ferrule-fitting.jpg'},
+          {n:'Void o pérdida de empaque en la columna', f:'columna gastada', fc:'f-comun', test:'Si la presión bajó junto con caída de eficiencia (picos anchos/partidos), el lecho perdió empaque.', act:'Reemplazar la columna.', img:'columna.jpg'},
           {n:'Fase móvil menos viscosa que la anterior', f:'cambio de método', fc:'f-ocas', test:'Comparar composición actual vs. la de referencia; más orgánico o mayor temperatura bajan la viscosidad y la presión.', act:'No es falla — verificar que la presión esté dentro del rango esperado para esa fase móvil y temperatura.'}
         ]}
       }
@@ -243,75 +357,257 @@
 
   var app = document.getElementById('app');
   var support = document.querySelector('.ags-support');
-  var st = { sym:null, step:null, hist:[], flags:{} };
-  function esc(s){return s;}
+  var st = { sym:null, step:null, hist:[], flags:{}, path:[] };
   function showSupport(on){ if(support) support.classList.toggle('show', !!on); }
+
+  /* --- esquema HPLC: carga + estados de zona --- */
+  var schemaBox = document.getElementById('schemaBox');
+  var Z = {}, curZoneKey = null;
+  fetch('/troubleshooting-hplc/esquema-hplc.svg').then(function(r){ return r.text(); }).then(function(svg){
+    schemaBox.innerHTML = svg;
+    schemaBox.querySelectorAll('.zone').forEach(function(g){ Z[g.getAttribute('data-zone')] = g; });
+    if(curZoneKey) applyZonesFor(curZoneKey); else resetZones();
+  }).catch(function(){});
+  function setZone(name, state, label){
+    var g = Z[name]; if(!g) return;
+    g.classList.remove('descartado','investigando','precaucion','alerta');
+    if(state) g.classList.add(state);
+    var t = g.querySelector('.zstate'); if(t) t.textContent = label || '';
+  }
+  function resetZones(){ Object.keys(Z).forEach(function(n){ setZone(n, null, ''); }); }
+  var ZONEMAP = {
+    'alta:p2':  { investigando:['columna'] },
+    'alta:p3a': { descartado:['columna'], investigando:['autosampler'] },
+    'alta:p3b': { descartado:['bomba','autosampler','detector'], investigando:['columna'] },
+    'baja:q2':  { investigando:['bomba'] },
+    'alta:r3aa':{ descartado:['columna','bomba','detector'], alerta:['autosampler'] },
+    'alta:r3ab':{ descartado:['columna','autosampler'], alerta:['bomba'], precaucion:['detector'] },
+    'alta:r3ba':{ descartado:['bomba','autosampler','detector'], alerta:['columna'] },
+    'alta:r3bb':{ descartado:['bomba','autosampler','detector'], alerta:['columna'] },
+    'baja:r2a': { alerta:['bomba'], precaucion:['solvente'] },
+    'baja:r2b': { descartado:['bomba'], precaucion:['autosampler','columna','detector'] }
+  };
+  function applyZonesFor(key){
+    curZoneKey = key;
+    resetZones();
+    var m = key && ZONEMAP[key]; if(!m) return;
+    (m.descartado ||[]).forEach(function(z){ setZone(z,'descartado','Descartado'); });
+    (m.investigando||[]).forEach(function(z){ setZone(z,'investigando','Investigando'); });
+    (m.precaucion ||[]).forEach(function(z){ setZone(z,'precaucion','Revisar'); });
+    (m.alerta     ||[]).forEach(function(z){ setZone(z,'alerta','Localizado'); });
+  }
+
+  var STAGES = [
+    { k:'confirmar',   label:'Confirmar problema' },
+    { k:'localizar',   label:'Localizar' },
+    { k:'identificar', label:'Identificar causa' },
+    { k:'accion',      label:'Acción' }
+  ];
+  function renderStages(currentKey){
+    var ci = STAGES.map(function(s){return s.k;}).indexOf(currentKey);
+    var h = '<div class="stages">';
+    STAGES.forEach(function(s,i){
+      var cls = i<ci ? 'done' : (i===ci ? 'now' : 'todo');
+      var mark = i<ci ? '✓' : (i===ci ? '●' : '○');
+      h += '<span class="stage '+cls+'"><i>'+mark+'</i>'+s.label+'</span>';
+      if(i<STAGES.length-1) h += '<span class="stage-sep">→</span>';
+    });
+    return h + '</div>';
+  }
+
+  function gauge(v, hot){
+    var cx=100, cy=112, R=74;
+    function pt(t,r){ var th=(150+240*t)*Math.PI/180; return [cx+r*Math.cos(th), cy+r*Math.sin(th)]; }
+    function poly(t0,t1,r){ var n=Math.max(8,Math.round((t1-t0)*90)), a=[]; for(var i=0;i<=n;i++){ var p=pt(t0+(t1-t0)*i/n,r); a.push(p[0].toFixed(1)+','+p[1].toFixed(1)); } return a.join(' '); }
+    var s='<svg viewBox="0 0 200 176" class="gauge" aria-hidden="true">';
+    s+='<polyline class="g-track" points="'+poly(0,1,R)+'"/>';
+    s+='<polyline class="g-green" points="'+poly(0.34,0.60,R)+'"/>';
+    s+='<polyline class="g-red" points="'+poly(0.80,1.0,R)+'"/>';
+    for(var i=0;i<9;i++){ var t=i/8, a=pt(t,R-9), b=pt(t,R+1); s+='<line class="g-tick" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'"/>'; }
+    var tip=pt(v,R-14), dx=tip[0]-cx, dy=tip[1]-cy, L=Math.sqrt(dx*dx+dy*dy), ux=dx/L, uy=dy/L;
+    s+='<line class="g-needle'+(hot?' hot':'')+'" x1="'+(cx-ux*16).toFixed(1)+'" y1="'+(cy-uy*16).toFixed(1)+'" x2="'+tip[0].toFixed(1)+'" y2="'+tip[1].toFixed(1)+'"/>';
+    s+='<circle class="g-hub" cx="'+cx+'" cy="'+cy+'" r="7"/></svg>';
+    return s;
+  }
 
   function renderSelector(){
     showSupport(false);
-    st = { sym:null, step:null, hist:[], flags:{} };
-    var h = '<div class="selector-wrap"><p class="q" style="margin-bottom:16px">¿Qué está pasando con la presión?</p><div class="sel">';
-    ['alta','baja'].forEach(function(k){
-      var d=DATA[k];
-      h += '<button class="opt" data-sym="'+k+'"><b>'+d.label+'</b><span>'+d.sub+'</span></button>';
-    });
-    h += '</div></div>';
+    applyZonesFor(null);
+    st = { sym:null, step:null, hist:[], flags:{}, path:[] };
+    var h = '<p class="q" style="margin-bottom:16px">¿Qué está pasando con la presión?</p><div class="gsel">';
+    h += '<button class="gcard" data-sym="alta">'+gauge(0.94,true)+'<b>'+DATA.alta.label+'</b><span class="gsub">'+DATA.alta.sub+'</span></button>';
+    h += '<button class="gcard" data-sym="baja">'+gauge(0.08,false)+'<b>'+DATA.baja.label+'</b><span class="gsub">'+DATA.baja.sub+'</span></button>';
+    h += '</div>';
     app.innerHTML = h;
     app.querySelectorAll('[data-sym]').forEach(function(el){
-      el.onclick=function(){ st.sym=el.getAttribute('data-sym'); st.step=DATA[st.sym].start; st.hist=[]; st.flags={}; renderStep(); };
+      el.onclick=function(){ st.sym=el.getAttribute('data-sym'); st.step=DATA[st.sym].start; st.hist=[]; st.flags={}; st.path=[]; renderStep(); };
     });
   }
 
-  function depth(){ return st.hist.length + 1; }
   function renderStep(){
     showSupport(false);
-    var sym=DATA[st.sym], step=sym.steps[st.step];
-    var prog = Math.min(100, Math.round(depth()/3*100));
+    applyZonesFor(st.sym+':'+st.step);
+    var step=DATA[st.sym].steps[st.step];
     var backLbl = st.hist.length===0 ? '← Elegir otro síntoma' : '← Volver al paso anterior';
     var h = '<button class="back back-top">'+backLbl+'</button>';
-    h += '<div class="progress"><i style="width:'+prog+'%"></i></div>';
-    h += '<span class="pill">PASO '+depth()+'</span>';
+    h += renderStages(step.stage);
+    h += renderTrail();
+    if(step.action) h += '<div class="node-action"><b>Acción / prueba</b>'+step.action+'</div>';
     h += '<p class="q">'+step.q+'</p>';
-    if(step.hint) h += '<div class="hint">'+step.hint+'</div>';
     h += '<div class="opts">';
     step.opts.forEach(function(o,i){ h += '<button class="opt" data-i="'+i+'"><b>'+o.b+'</b><span>'+o.s+'</span></button>'; });
+    if(step.action) h += '<button class="opt opt-cant" data-cant="1"><b>No puedo realizar esta prueba</b><span>Te muestro las causas posibles en este punto, ordenadas por frecuencia.</span></button>';
     h += '</div>';
+    if(step.why) h += '<details class="why"><summary>¿Por qué esta prueba?</summary><div class="why-body">'+step.why+'</div></details>';
     app.innerHTML = h;
     app.querySelectorAll('[data-i]').forEach(function(el){
       el.onclick=function(){
         var o=step.opts[+el.getAttribute('data-i')];
         st.hist.push(st.step);
+        st.path.push({ step:st.step, o:o });
         if(o.flag) st.flags[o.flag]=true;
         if(o.result) renderResult(o.result);
         else { st.step=o.next; renderStep(); }
       };
     });
-    app.querySelector('.back').onclick=function(){
-      if(st.hist.length===0){ renderSelector(); }
-      else { st.step=st.hist.pop(); renderStep(); }
-    };
+    var cantEl=app.querySelector('[data-cant]');
+    if(cantEl) cantEl.onclick=renderCant;
+    app.querySelector('.back').onclick=goBack;
+    wireTrail();
+  }
+
+  function goBack(){
+    if(st.hist.length===0){ renderSelector(); }
+    else { st.step=st.hist.pop(); st.path.pop(); renderStep(); }
+  }
+  function jumpTo(i){
+    st.step = st.path[i].step;
+    st.hist = st.hist.slice(0,i);
+    st.path = st.path.slice(0,i);
+    st.flags = {};
+    st.path.forEach(function(p){ if(p.o.flag) st.flags[p.o.flag]=true; });
+    renderStep();
+  }
+  function renderTrail(){
+    if(!st.path.length) return '';
+    var h = '<div class="trail"><span class="trail-lbl">Recorrido:</span>';
+    st.path.forEach(function(p,i){
+      h += (i? '<span class="trail-sep">›</span>':'') + '<button class="trail-item" data-jump="'+i+'" title="Volver y cambiar esta respuesta">'+p.o.b+'</button>';
+    });
+    return h + '</div>';
+  }
+  function wireTrail(){ app.querySelectorAll('[data-jump]').forEach(function(b){ b.onclick=function(){ jumpTo(+b.getAttribute('data-jump')); }; }); }
+
+  function freqRank(fc){ return fc==='f-muy'?0:(fc==='f-comun'?1:2); }
+
+  function collectResults(stepKey){
+    var sym=DATA[st.sym], seen={}, results=[], queue=[stepKey];
+    while(queue.length){
+      var sk=queue.shift(); if(seen[sk]) continue; seen[sk]=1;
+      var stp=sym.steps[sk]; if(!stp) continue;
+      stp.opts.forEach(function(o){ if(o.result){ if(results.indexOf(o.result)<0) results.push(o.result); } else if(o.next){ queue.push(o.next); } });
+    }
+    return results;
+  }
+
+  function evidenceHTML(){
+    if(!st.path.length) return '';
+    var h = '<div class="ficha-sec"><h4>Evidencia</h4><ul class="evidence">';
+    st.path.forEach(function(p){ h += '<li>'+p.o.b+'</li>'; });
+    return h + '</ul></div>';
+  }
+
+  function recorridoHTML(){
+    if(!st.path.length) return '';
+    var h = '<details class="recorrido"><summary>Ver recorrido</summary><ol class="recorrido-list">';
+    st.path.forEach(function(p){
+      var stp=DATA[st.sym].steps[p.step];
+      h += '<li><span class="rq">'+stp.q+'</span><span class="ra">'+p.o.b+'</span></li>';
+    });
+    return h + '</ol></details>';
+  }
+
+  function checklistHTML(causes, ranked){
+    var list = ranked ? causes.slice().sort(function(a,b){return freqRank(a.fc)-freqRank(b.fc);}) : causes;
+    var h = '<div class="ficha-sec"><h4>Qué comprobar ahora</h4><ol class="checklist">';
+    list.forEach(function(c){
+      h += '<li><div class="ck-h"><span class="ck-n">'+c.n+'</span> <span class="freq '+c.fc+'">'+c.f+'</span></div>';
+      h += '<div class="ck-act">'+c.act+'</div>';
+      if(c.img){ [].concat(c.img).forEach(function(fn){ h += '<img class="ck-img" src="/consumibles/'+fn+'" alt="'+c.n+'" onerror="this.remove()">'; }); }
+      h += '<details class="ck-test"><summary>Cómo confirmarla</summary><div>'+c.test+'</div></details></li>';
+    });
+    return h + '</ol></div>';
+  }
+
+  function buildMessages(diag){
+    var enc=encodeURIComponent, NL=String.fromCharCode(10);
+    var fwd='https://wa.me/?text='+enc('Hola, comparto el problema que estamos teniendo con un HPLC. La herramienta de troubleshooting de cromatografia.com.ar me dice lo siguiente: "'+diag+'"');
+    var agsMsg=['Hola, los contacto por un problema técnico que empecé a aislar usando la herramienta de troubleshooting de cromatografia.com.ar.','','El diagnóstico preliminar de la herramienta es "'+diag+'".','','Les paso nuestros datos:','Nombre del contacto: ','Cliente: ','Modelo del HPLC Agilent: ','Código interno del equipo: '].join(NL);
+    var agsWa='https://wa.me/5491156934883?text='+enc(agsMsg);
+    var agsMail='mailto:soporte@agsanalitica.com?subject='+enc('Consulta técnica - Troubleshooting HPLC (cromatografia.com.ar)')+'&body='+enc(agsMsg);
+    return { fwd:fwd, agsWa:agsWa, agsMail:agsMail };
+  }
+  function updateSupportLinks(msgs){
+    var wa=document.querySelector('.ags-support .agsbtn--wa'); if(wa) wa.href=msgs.agsWa;
+    var ml=document.querySelector('.ags-support .agsbtn--mail'); if(ml) ml.href=msgs.agsMail;
   }
 
   function renderResult(rid){
     showSupport(true);
-    var sym=DATA[st.sym], r=sym.results[rid];
-    var h = '<div class="progress"><i style="width:100%"></i></div>';
+    applyZonesFor(st.sym+':'+rid);
+    var r=DATA[st.sym].results[rid];
+    var h = renderStages('accion');
+    h += renderTrail();
+    h += '<p class="res-kicker">Diagnóstico</p>';
     h += '<p class="res-title">'+r.t+'</p><p class="res-sub">'+r.s+'</p>';
-    if(st.sym==='alta' && st.flags.subita){
-      h += '<div class="amber"><b>Nota — aparición súbita.</b> '+SUDDEN+'</div>';
-    }
-    r.causes.forEach(function(c,i){
-      h += '<details class="cause"'+(i===0?' open':'')+'><summary>'+c.n+' <span class="freq '+c.fc+'">'+c.f+'</span></summary><div class="cause-body">';
-      h += '<div class="test"><b>Prueba que la discrimina</b>'+c.test+'</div>';
-      h += '<div class="act"><b>Acción correctiva</b>'+c.act+'</div>';
-      h += '</div></details>';
-    });
+    if(st.sym==='alta' && st.flags.subita) h += '<div class="amber"><b>Nota — aparición súbita.</b> '+SUDDEN+'</div>';
+    h += evidenceHTML();
+    h += checklistHTML(r.causes, false);
     h += '<div class="disc"><strong>Sobre esta herramienta.</strong> '+DISC+'</div>';
-    h += '<div class="actions"><button class="btn btn-primary" id="reset">Reiniciar</button><button class="btn" id="print">Imprimir / PDF</button><button class="back" style="margin-left:auto">← Volver</button></div>';
+    var msgs = buildMessages(r.t);
+    h += '<div class="actions">'
+       + '<button class="btn btn-primary" id="reset">Reiniciar diagnóstico</button>'
+       + '<button class="btn" id="change">Cambiar una respuesta</button>'
+       + '<a class="btn btn-wa" href="'+msgs.fwd+'" target="_blank" rel="noopener">Enviar por WhatsApp</a>'
+       + '<button class="btn" id="print">Imprimir / PDF</button></div>';
     app.innerHTML = h;
-    document.getElementById('reset').onclick=renderSelector;
-    document.getElementById('print').onclick=function(){ document.querySelectorAll('details.cause').forEach(function(d){d.open=true;}); window.print(); };
-    app.querySelector('.back').onclick=function(){ st.step=st.hist.pop(); renderStep(); };
+    updateSupportLinks(msgs);
+    wireFicha(goBack);
+    wireTrail();
+  }
+
+  function renderCant(){
+    showSupport(true);
+    applyZonesFor(st.sym+':'+st.step);
+    var results=collectResults(st.step), causes=[], seen={};
+    results.forEach(function(rid){ DATA[st.sym].results[rid].causes.forEach(function(c){ if(!seen[c.n]){ seen[c.n]=1; causes.push(c); } }); });
+    var h = renderStages('accion');
+    h += renderTrail();
+    h += '<p class="res-kicker">Sin la prueba discriminante</p>';
+    h += '<p class="res-title">Causas posibles en este punto</p>';
+    h += '<div class="amber"><b>No pudiste hacer la prueba.</b> Sin esa maniobra no puedo aislar la causa con seguridad. Te dejo las causas posibles a partir de acá, ordenadas por la frecuencia típica reportada. Si podés, hacé la prueba para acortar la lista.</div>';
+    h += evidenceHTML();
+    h += checklistHTML(causes, true);
+    h += '<div class="disc"><strong>Sobre esta herramienta.</strong> '+DISC+'</div>';
+    var msgs = buildMessages('un problema de presión en HPLC (diagnóstico en curso)');
+    h += '<div class="actions">'
+       + '<button class="btn btn-primary" id="reset">Reiniciar diagnóstico</button>'
+       + '<button class="btn" id="change">Volver a la prueba</button>'
+       + '<a class="btn btn-wa" href="'+msgs.fwd+'" target="_blank" rel="noopener">Enviar por WhatsApp</a>'
+       + '<button class="btn" id="print">Imprimir / PDF</button></div>';
+    app.innerHTML = h;
+    updateSupportLinks(msgs);
+    wireFicha(renderStep);
+    wireTrail();
+  }
+
+  function wireFicha(changeFn){
+    var rs=document.getElementById('reset'); if(rs) rs.onclick=renderSelector;
+    var ch=document.getElementById('change'); if(ch) ch.onclick=changeFn;
+    var pr=document.getElementById('print'); if(pr) pr.onclick=function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.ck-test, .recorrido'), function(d){ d.open=true; });
+      window.print();
+    };
   }
 
   renderSelector();
