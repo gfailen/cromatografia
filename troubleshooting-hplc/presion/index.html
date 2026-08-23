@@ -281,10 +281,20 @@
       start: 'p1',
       steps: {
         p1: { stage:'confirmar', q:'¿Cómo apareció la presión alta?', why:'Distingue una obstrucción física que progresa de a poco de un cambio de método o una precipitación repentina. Son dos caminos de diagnóstico distintos.', opts:[
-          {b:'Gradualmente, corrida tras corrida', s:'Trepó de a poco a lo largo de días/inyecciones.', next:'p2'},
-          {b:'De repente', s:'Salto brusco entre una corrida y la siguiente, muchas veces tras cambiar fase móvil, muestra o columna.', next:'p2', flag:'subita'}
+          {b:'Gradualmente, corrida tras corrida', s:'Trepó de a poco a lo largo de días/inyecciones.', next:'g1'},
+          {b:'De repente', s:'Salto brusco entre una corrida y la siguiente, muchas veces tras cambiar fase móvil, muestra o columna.', next:'g1', flag:'subita'}
         ]},
-        p2: { stage:'localizar', action:'Quitá la columna y poné una unión (union) en su lugar. Poné el flujo en marcha y mirá la presión, comparándola con la presión normal que registrás habitualmente.', why:'Es la maniobra madre del diagnóstico de presión: aislar la columna del resto del equipo dice de un solo golpe si el bloqueo está en la columna o en el sistema.', q:'¿Qué pasa con la presión sin la columna?', opts:[
+        g1: { stage:'localizar', q:'¿Hay algún elemento de protección antes de la columna analítica?', why:'Una guard column, precolumna o filtro en línea son restricciones deliberadas que protegen a la columna, y se tapan antes que ella. Conviene descartarlas primero: es más rápido y barato que trabajar sobre la columna analítica.', opts:[
+          {b:'Sí, guard column o precolumna', s:'Se puede retirar sola, sin tocar la columna.', next:'g2'},
+          {b:'Sí, filtro en línea', s:'Se puede retirar solo, sin tocar la columna.', next:'g2'},
+          {b:'No tiene', s:'Vamos directo a la columna analítica.', next:'p2'},
+          {b:'No estoy seguro', s:'Vamos directo a la columna analítica.', next:'p2'}
+        ]},
+        g2: { stage:'localizar', action:'Detené el flujo y despresurizá. Retirá solamente la guard column, precolumna o filtro en línea —lo que tenga instalado—, sin tocar la columna analítica, y conectala directo a la línea. Restablecé el flujo y mirá la presión.', why:'La guard/filtro es sacrificial: si está tapada, conviene confirmarlo antes de tocar la columna analítica.', q:'¿La presión bajó al sacar la guard/filtro?', opts:[
+          {b:'Sí, bajó a la normal', s:'La guard/filtro es la responsable.', result:'rguard'},
+          {b:'Sigue alta', s:'La guard/filtro queda descartada.', next:'p2'}
+        ]},
+        p2: { stage:'localizar', action:'Quitá la columna analítica y poné una unión (union) en su lugar. Poné el flujo en marcha y mirá la presión, comparándola con la presión normal que registrás habitualmente.', why:'Es la maniobra madre del diagnóstico de presión: aislar la columna del resto del equipo dice de un solo golpe si el bloqueo está en la columna o en el sistema.', q:'¿Qué pasa con la presión sin la columna analítica?', opts:[
           {b:'La presión baja a la normal sin columna', s:'La columna es la responsable.', next:'p3b'},
           {b:'La presión sigue alta sin columna', s:'El bloqueo está en el sistema.', next:'p3a'}
         ]},
@@ -296,7 +306,7 @@
           {b:'Sí, sigue anormalmente alta', s:'El problema está en el módulo de bomba o su circuito de purga.', result:'r4a'},
           {b:'No, cae a un valor bajo', s:'La bomba entrega bien; la restricción está aguas abajo.', result:'r3ab'}
         ]},
-        p3b: { stage:'identificar', action:'Invertí la columna (back-flush) hacia un descarte, sin el detector en línea, y lavá con solvente fuerte. ⚠ Verificá antes con el fabricante: en algunas columnas esto anula la garantía.', why:'Un frit de entrada tapado por partículas se libera con el back-flush; una precipitación o un empaque dañado, no. Esto separa un problema reversible de uno que no lo es.', q:'¿Qué pasa al invertir y lavar la columna?', opts:[
+        p3b: { stage:'identificar', action:'Antes de nada, confirmá con el fabricante si tu columna admite back-flush y cuál es el procedimiento/solvente de regeneración recomendado para esa fase estacionaria — no todas las columnas lo permiten, y en algunas anula la garantía. Si está permitido: invertí la columna hacia un descarte, sin el detector en línea, y lavá con el solvente indicado.', why:'Un frit de entrada tapado por partículas se libera con el back-flush; una precipitación o un empaque dañado, no. Esto separa un problema reversible de uno que no lo es.', q:'¿Qué pasa al invertir y lavar la columna?', opts:[
           {b:'La presión vuelve a bajar tras invertir y lavar', s:'Frit de entrada obstruido (reversible).', result:'r3ba'},
           {b:'Baja parcialmente/nada, o vuelve a subir enseguida', s:'Contaminación / precipitación / empaque.', result:'r3bb'}
         ]}
@@ -314,9 +324,13 @@
         ]},
         r4a: { t:'Restricción en el módulo de bomba o su circuito de purga', s:'Con la purga abierta —bombeando directo al descarte, sin pasar por autosampler, columna ni detector— la presión sigue alta: el problema está adentro de la bomba.', causes:[
           {n:'Frit de PTFE de la purge valve obstruido', f:'muy común', fc:'f-muy', test:'Con la purga activa, medí la presión. En equipos Agilent (ref. bombas 1260 Infinity II) debería caer a un rango aproximado de 0–5 bar; una presión bastante mayor apunta a este frit.', act:'Reemplazar el frit de PTFE de la purge valve, siguiendo el procedimiento del fabricante para esa válvula.'},
-          {n:'Otro problema interno de la bomba (sello, válvula de retención, línea de purga obstruida)', f:'ocasional', fc:'f-ocas', test:'Si el frit de la purge valve ya se descartó y la purga sigue sin bajar la presión, revisar sellos y válvulas de retención con la utilidad de diagnóstico del equipo.', act:'Reemplazar sellos o válvulas de retención según corresponda.'}
+          {n:'Obstrucción en la línea de purga o en la propia purge valve, más allá del frit', f:'ocasional', fc:'f-ocas', test:'Si el frit de la purge valve ya se reemplazó y la purga sigue sin bajar la presión, revisar la línea de purga y la válvula con la utilidad de diagnóstico del equipo.', act:'Limpiar o reemplazar la línea de purga o la purge valve según corresponda.'}
         ]},
-        r3ba: { t:'Frit de entrada de la columna obstruido (reversible)', s:'La columna es la fuente y responde al back-flush: patrón clásico de partículas de matriz. Causa más común de presión alta en columna.', causes:[
+        rguard: { t:'Guard column, precolumna o filtro en línea obstruido', s:'Al sacarla y conectar la columna analítica directo, la presión volvió a la normal: la restricción estaba ahí, no en la columna.', causes:[
+          {n:'Guard column o precolumna saturada', f:'muy común con matriz compleja', fc:'f-muy', test:'Ya confirmado por la maniobra (la presión bajó al retirarla).', act:'Reemplazar el cartridge o el frit de la guard column. Prevención — filtrar (0,22–0,45 µm) todo extracto y reemplazarla con más frecuencia que la analítica.', img:'guard-column.jpg'},
+          {n:'Filtro en línea saturado', f:'común', fc:'f-comun', test:'Ya confirmado por la maniobra.', act:'Cambiar el frit del filtro en línea.', img:'filtro-en-linea.jpg'}
+        ]},
+        r3ba: { t:'Frit de entrada de la columna, compatible con obstrucción (reversible)', s:'La presión bajó al invertir y lavar la columna: es compatible con un frit de entrada tapado, patrón clásico de partículas de matriz. El lavado también puede disolver otra restricción reversible, así que no queda 100% confirmado.', causes:[
           {n:'Frit de entrada tapado por partículas de muestra', f:'muy común', fc:'f-muy', test:'Ya confirmado por la maniobra (invertir + lavar bajó la presión). Reinstalar la columna en sentido normal y verificar.', act:'Prevención — filtrar (0,22–0,45 µm) todo extracto, usar guard column y un in-line filter de 0,5 µm aguas abajo del automuestreador. Si reincide rápido, el guard cartridge ya cumplió su función: cambiarlo.', img:'frit-columna.jpg'},
           {n:'Matriz sucia sin cleanup previo', f:'frecuente en matrices reales', fc:'f-comun', test:'Revisar si el problema aparece solo con ciertas muestras; si sí, el cuello de botella es la preparación.', act:'Incorporar SPE u otro cleanup. El frit es el síntoma; la matriz es la causa raíz.'}
         ]},
@@ -336,9 +350,13 @@
           {b:'Cayó respecto de lo normal (antes andaba bien)', s:'Problema de flujo/fuga sobrevenido.', next:'q2'},
           {b:'Baja de entrada, con columna/método nuevo', s:'Puede ser esperable (columna más corta, mayor DI, partícula más grande, o fase móvil menos viscosa).', result:'rbnew'}
         ]},
-        q2: { stage:'localizar', action:'Desconectá en la salida de la bomba (o del detector) y medí el flujo real con probeta y cronómetro, comparándolo con el flujo seteado.', why:'Si la bomba no entrega el caudal, el problema es de la bomba (aire, sello, starvation). Si entrega bien, hay una fuga aguas abajo o una pérdida de restricción.', q:'¿El flujo entregado coincide con el seteado?', opts:[
-          {b:'El flujo entregado es menor al seteado', s:'La bomba no está entregando.', result:'r2a'},
-          {b:'El flujo entregado es correcto', s:'Hay una fuga aguas abajo o pérdida de restricción.', result:'r2b'}
+        q2: { stage:'localizar', action:'Aislá la bomba del resto del sistema. Si el equipo tiene purge/prime, abrí la purga y medí el caudal directamente en su salida a waste durante un tiempo conocido (probeta o balanza + cronómetro). Compará contra el caudal seteado. Si no tiene purga equivalente, aislá igual la salida de la bomba antes del resto del sistema, siguiendo el procedimiento del fabricante.', why:'La purga conecta la bomba directo al descarte, sin pasar por autosampler, columna ni detector: es la forma más limpia de saber si la bomba entrega lo que debería, aislada del resto.', q:'¿El caudal real de la bomba coincide aproximadamente con el seteado?', opts:[
+          {b:'Es menor al seteado', s:'La bomba / alimentación de solvente no está entregando correctamente.', result:'r2a'},
+          {b:'Coincide con el seteado', s:'La bomba entrega bien; hay que seguir aguas abajo.', next:'q3'}
+        ]},
+        q3: { stage:'localizar', action:'Reconectá el sistema y medí el caudal a la salida del detector, de la misma forma (probeta o balanza + tiempo).', why:'La bomba entrega bien pero la presión sigue baja: falta ver si se está perdiendo caudal en el camino (fuga) o si el sistema simplemente ofrece menos restricción que antes.', q:'¿El caudal en la salida del detector coincide con el que entrega la bomba?', opts:[
+          {b:'Coincide', s:'No se pierde caudal; falta restricción en algún punto.', result:'r2b'},
+          {b:'Es menor al de la bomba', s:'Se está perdiendo caudal en el camino.', result:'r2c'}
         ]}
       },
       results: {
@@ -351,10 +369,12 @@
           {n:'Sello de pistón (pump seal) gastado', f:'desgaste esperable', fc:'f-comun', test:'Buscar goteo detrás del cabezal o solvente en el drenaje; correr el pump leak/pressure test de la utilidad de diagnóstico.', act:'Reemplazar sellos de bomba. Si hay ripple de presión alto, confirma sello o válvula de retención.', img:'sello-piston.jpg'},
           {n:'Válvula de retención (check valve) sucia o pegada', f:'común', fc:'f-comun', test:'Ripple de presión irregular y flujo errático apuntan a check valve; sonicar o reemplazar y volver a medir.', act:'Limpiar (sonicado) o reemplazar la check valve.', img:'valvula-retencion.jpg'}
         ]},
-        r2b: { t:'Fuga aguas abajo o pérdida de restricción', s:'El flujo entregado es correcto pero la presión no sube: se está yendo por algún lado o falta restricción.', causes:[
-          {n:'Fuga en una conexión / fitting', f:'muy común', fc:'f-muy', test:'Inspeccionar visualmente todas las uniones bajo presión; secar y buscar humedad/cristales de buffer en cada fitting.', act:'Reapretar o rehacer la conexión con ferrule nueva. Los cristales de buffer marcan el punto de fuga.', img:'ferrule-fitting.jpg'},
+        r2b: { t:'Pérdida de restricción, sin fuga de caudal', s:'El caudal es correcto en toda la línea: no se está perdiendo caudal, pero el sistema opone menos resistencia que antes.', causes:[
           {n:'Void o pérdida de empaque en la columna', f:'columna gastada', fc:'f-comun', test:'Si la presión bajó junto con caída de eficiencia (picos anchos/partidos), el lecho perdió empaque.', act:'Reemplazar la columna.', img:'columna.jpg'},
           {n:'Fase móvil menos viscosa que la anterior', f:'cambio de método', fc:'f-ocas', test:'Comparar composición actual vs. la de referencia; más orgánico o mayor temperatura bajan la viscosidad y la presión.', act:'No es falla — verificar que la presión esté dentro del rango esperado para esa fase móvil y temperatura.'}
+        ]},
+        r2c: { t:'Fuga entre la bomba y el detector', s:'La bomba entrega el caudal correcto, pero a la salida del detector sale menos: se está perdiendo caudal en el camino.', causes:[
+          {n:'Fuga en una conexión / fitting', f:'muy común', fc:'f-muy', test:'Inspeccionar visualmente todas las uniones bajo presión; secar y buscar humedad/cristales de buffer en cada fitting.', act:'Reapretar o rehacer la conexión con ferrule nueva. Los cristales de buffer marcan el punto de fuga.', img:'ferrule-fitting.jpg'}
         ]}
       }
     }
@@ -389,13 +409,17 @@
     'alta:p3b': { descartado:['bomba','autosampler','detector'], investigando:['columna'] },
     'baja:q2':  { investigando:['bomba'] },
     'alta:r3aa':{ descartado:['columna','bomba','detector'], alerta:['autosampler'] },
-    'alta:p4':  { descartado:['columna','autosampler'], investigando:['bomba'] },
+    'alta:g2':  { investigando:['columna'] },
+    'alta:rguard': { alerta:['columna'] },
+    'alta:p4':  { descartado:['columna'], investigando:['bomba','autosampler'] },
     'alta:r4a': { descartado:['columna','autosampler','detector'], alerta:['bomba'] },
-    'alta:r3ab':{ descartado:['columna','autosampler','bomba'], precaucion:['detector'] },
+    'alta:r3ab':{ descartado:['columna','bomba'], investigando:['autosampler'], precaucion:['detector'] },
     'alta:r3ba':{ descartado:['bomba','autosampler','detector'], alerta:['columna'] },
     'alta:r3bb':{ descartado:['bomba','autosampler','detector'], alerta:['columna'] },
     'baja:r2a': { alerta:['bomba'], precaucion:['solvente'] },
-    'baja:r2b': { descartado:['bomba'], precaucion:['autosampler','columna','detector','solvente'] },
+    'baja:q3':  { descartado:['bomba'], investigando:['autosampler','columna','detector'] },
+    'baja:r2b': { descartado:['bomba'], precaucion:['columna','solvente'] },
+    'baja:r2c': { descartado:['bomba'], precaucion:['autosampler','columna','detector'] },
     'baja:rbnew': { precaucion:['columna','solvente'] }
   };
   function applyZonesFor(key){
