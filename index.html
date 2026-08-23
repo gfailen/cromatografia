@@ -261,6 +261,37 @@
     .card-footer { font-size: .78rem; font-weight: 600; color: var(--primary); }
     .card.external .card-footer { color: var(--accent); }
 
+    /* card AGS destacada ("¿Quiénes somos?") */
+    .card-featured { background: #0d1b35; border-color: #0d1b35; color: #fff; }
+    .card-featured .card-desc { color: #cbd5e1; }
+    .card-featured .card-footer { color: #7dd3fc; }
+    .card-featured:hover { border-color: #7dd3fc; box-shadow: 0 4px 20px rgba(14,165,233,.25); }
+
+    /* card Soporte técnico: botones de contacto directo */
+    .card-support-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .1rem; }
+    .agsbtn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .48rem .85rem; border-radius: 8px;
+      font-weight: 600; font-size: .74rem; text-decoration: none; color: #fff;
+      transition: opacity .15s, transform .05s;
+    }
+    .agsbtn svg { width: 14px; height: 14px; }
+    .agsbtn:hover { opacity: .9; }
+    .agsbtn:active { transform: translateY(1px); }
+    .agsbtn--wa { background: #25D366; }
+    .agsbtn--mail { background: #0d1b35; }
+    .card-footer-link { font-size: .78rem; font-weight: 600; color: var(--accent); text-decoration: none; }
+    .card-footer-link:hover { text-decoration: underline; }
+
+    /* card viales.com.ar: CTA de compra */
+    .card-cta-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--accent); color: #fff; font-weight: 700; font-size: .82rem;
+      padding: .55rem 1rem; border-radius: 8px; margin-top: .2rem;
+      transition: background .15s;
+    }
+    .card-cta:hover .card-cta-btn { background: #0284c7; }
+
     /* blurred coming-soon content */
     .card.coming-soon .blur-content {
       filter: blur(5px);
@@ -601,23 +632,33 @@
       <p class="section-title">Links útiles</p>
       <div class="cards-grid">
 
-        <a class="card external" href="https://www.agsanalitica.com" target="_blank" rel="noopener">
-          <div class="card-icon" style="background:none;padding:0;"><img src="/AGS_Logo.jpg" alt="AGS Analítica" style="width:44px;height:44px;object-fit:contain;border-radius:8px;" /></div>
-          <span class="card-tag tag-link">AGS Analítica</span>
-          <div class="card-title">Sobre nosotros</div>
+        <a class="card external card-featured" href="https://www.agsanalitica.com" target="_blank" rel="noopener">
+          <div class="card-icon" style="background:#fff;padding:6px;"><img src="/AGS_Logo.jpg" alt="AGS Analítica" style="width:32px;height:32px;object-fit:contain;border-radius:6px;" /></div>
+          <span class="card-tag tag-link" style="background:rgba(255,255,255,.14);color:#93c5fd;">AGS Analítica</span>
+          <div class="card-title">¿Quiénes somos?</div>
           <div class="card-desc">Representantes de Bruker, Knauer, Joint Analytical Systems, Peak Scientific y DataApex en Argentina.</div>
           <div class="card-footer">agsanalitica.com →</div>
         </a>
 
-        <a class="card external" href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">
+        <div class="card card-support">
           <div class="card-icon">🔧</div>
           <span class="card-tag tag-link">AGS Analítica</span>
           <div class="card-title">Soporte técnico</div>
           <div class="card-desc">Servicio técnico especializado en cromatografía líquida y gaseosa. Instalación, calificación y mantenimiento.</div>
-          <div class="card-footer">agsanalitica.com/soporte →</div>
-        </a>
+          <div class="card-support-actions">
+            <a class="agsbtn agsbtn--wa" href="https://wa.me/5491156934883?text=Hola%2C%20quiero%20consultar%20sobre%20soporte%20t%C3%A9cnico." target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.05 1.02-1.05 2.5 0 1.47 1.08 2.9 1.23 3.1.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.71.64.72.23 1.37.2 1.89.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35zM12 2a10 10 0 0 0-8.6 15.06L2 22l5.06-1.33A10 10 0 1 0 12 2z"/></svg>
+              WhatsApp
+            </a>
+            <a class="agsbtn agsbtn--mail" href="mailto:soporte@agsanalitica.com?subject=Consulta%20t%C3%A9cnica%20desde%20cromatografia.com.ar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg>
+              Email
+            </a>
+          </div>
+          <a class="card-footer-link" href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Ver todos los servicios →</a>
+        </div>
 
-        <a class="card external" href="https://www.viales.com.ar" target="_blank" rel="noopener">
+        <a class="card external card-cta" href="https://www.viales.com.ar" target="_blank" rel="noopener">
           <div class="card-icon" style="background:#eff6ff;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 3h6M9 3v7l-4 8a1 1 0 00.9 1.5h12.2A1 1 0 0025 18l-4-8V3"/>
@@ -628,7 +669,7 @@
           <span class="card-tag tag-link">Consumibles</span>
           <div class="card-title">viales.com.ar</div>
           <div class="card-desc">Viales, tapas, insertos y consumibles para cromatografía. Envío a todo el país.</div>
-          <div class="card-footer">viales.com.ar →</div>
+          <span class="card-cta-btn">Comprar consumibles →</span>
         </a>
 
       </div>
