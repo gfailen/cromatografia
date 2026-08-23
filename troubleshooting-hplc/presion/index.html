@@ -288,11 +288,15 @@
           {b:'La presión baja a la normal sin columna', s:'La columna es la responsable.', next:'p3b'},
           {b:'La presión sigue alta sin columna', s:'El bloqueo está en el sistema.', next:'p3a'}
         ]},
-        p3a: { stage:'localizar', action:'Pasá la válvula de inyección a bypass (mainpass → bypass) y observá la presión. En bypass quedan fuera del camino la aguja, el capilar de asiento y el loop.', why:'Bypass saca de la ruta la parte del inyector. Si la presión cae ahí, el bloqueo está en esas piezas; si sigue alta, está aguas arriba del inyector.', q:'¿Qué pasa en bypass?', opts:[
+        p3a: { stage:'localizar', action:'Pasá la válvula de inyección a bypass (mainpass → bypass) y observá la presión. En bypass quedan fuera del camino la aguja, el capilar de asiento y el loop.', why:'Bypass saca de la ruta la parte del inyector. Si la presión cae ahí, el bloqueo está en esas piezas; si sigue alta, está fuera de esa ruta.', q:'¿Qué pasa en bypass?', opts:[
           {b:'En bypass la presión se normaliza', s:'Bloqueo en la ruta del inyector.', result:'r3aa'},
-          {b:'En bypass la presión sigue alta', s:'Bloqueo aguas arriba del inyector.', result:'r3ab'}
+          {b:'En bypass la presión sigue alta', s:'El bloqueo está fuera de la ruta bypassada.', next:'p4'}
         ]},
-        p3b: { stage:'identificar', action:'Invertí la columna (back-flush) hacia un descarte, sin el detector en línea, y lavá con solvente fuerte.', why:'Un frit de entrada tapado por partículas se libera con el back-flush; una precipitación o un empaque dañado, no. Esto separa un problema reversible de uno que no lo es.', q:'¿Qué pasa al invertir y lavar la columna?', opts:[
+        p4: { stage:'localizar', action:'Cerrá la purge valve de la bomba y volvé a abrirla (Purge), dejando pasar flujo directo al descarte. Eso saca del camino al autosampler, la columna y el detector. Poné un flujo prudente y mirá la presión.', why:'El circuito de purga conecta la bomba directo al descarte, sin pasar por el resto del sistema. Si ahí la presión sigue alta, el problema está adentro de la bomba o de su circuito de purga; si cae, está más adelante en el camino.', q:'Con la purga abierta, ¿la presión sigue alta?', opts:[
+          {b:'Sí, sigue anormalmente alta', s:'El problema está en el módulo de bomba o su circuito de purga.', result:'r4a'},
+          {b:'No, cae a un valor bajo', s:'La bomba entrega bien; la restricción está aguas abajo.', result:'r3ab'}
+        ]},
+        p3b: { stage:'identificar', action:'Invertí la columna (back-flush) hacia un descarte, sin el detector en línea, y lavá con solvente fuerte. ⚠ Verificá antes con el fabricante: en algunas columnas esto anula la garantía.', why:'Un frit de entrada tapado por partículas se libera con el back-flush; una precipitación o un empaque dañado, no. Esto separa un problema reversible de uno que no lo es.', q:'¿Qué pasa al invertir y lavar la columna?', opts:[
           {b:'La presión vuelve a bajar tras invertir y lavar', s:'Frit de entrada obstruido (reversible).', result:'r3ba'},
           {b:'Baja parcialmente/nada, o vuelve a subir enseguida', s:'Contaminación / precipitación / empaque.', result:'r3bb'}
         ]}
@@ -303,10 +307,14 @@
           {n:'Aguja o loop parcialmente tapados', f:'común', fc:'f-comun', test:'Inspeccionar la aguja; probar con el loop desconectado si el diseño lo permite.', act:'Limpiar o reemplazar aguja/loop. Origen habitual: partículas de muestra o del septo.', img:['aguja.jpg','loop.jpg']},
           {n:'Sello del rotor (rotor seal) rayado o con debris', f:'ocasional', fc:'f-ocas', test:'Correr el valve test de la utilidad de diagnóstico (ej. Lab Advisor) para descartar fuga interna o restricción.', act:'Reemplazar el rotor seal si está dañado.', img:'sello-rotor.jpg'}
         ]},
-        r3ab: { t:'Bloqueo aguas arriba del inyector', s:'Sigue alta incluso en bypass → restricción aguas arriba. Quitar capilares uno por uno para ubicar el punto.', causes:[
+        r3ab: { t:'Bloqueo fuera de la ruta bypassada del inyector', s:'Sigue alta en bypass, y la bomba entrega bien con la purga abierta → la restricción está entre la bomba y el inyector, o en el detector. Quitar capilares uno por uno para ubicar el punto.', causes:[
           {n:'Filtro en línea (in-line filter) saturado', f:'muy común', fc:'f-muy', test:'Es lo primero: reemplazar el frit del filtro en línea. Un alza de ~10% no corregida al cambiarlo apunta al siguiente elemento.', act:'Cambiar el frit del in-line filter. Pieza más barata y la que más protege la columna.', img:'filtro-en-linea.jpg'},
           {n:'Capilar obstruido o aplastado', f:'común', fc:'f-comun', test:'Remover capilares de a uno siguiendo el flujo y medir; el tramo donde la presión cae al quitarlo contiene el bloqueo.', act:'Back-flushear el capilar hacia descarte; si no se libera, reemplazar.', img:'capilar.jpg'},
-          {n:'Restricción en bomba o celda del detector', f:'menos frecuente', fc:'f-ocas', test:'Con columna, inyector y filtro descartados y aún alta, aislar la celda de flujo del detector; si baja, es la celda o el tubing de descarte.', act:'Revisar celda de flujo / tubing de waste. Chequear también viscosidad de fase móvil y setpoint de temperatura.', img:'celda-detector.jpg'}
+          {n:'Restricción en la celda del detector', f:'menos frecuente', fc:'f-ocas', test:'Con columna, inyector, filtro y bomba/purga ya descartados y aún alta, aislar la celda de flujo del detector; si baja, es la celda o el tubing de descarte.', act:'Revisar celda de flujo / tubing de waste. Chequear también viscosidad de fase móvil y setpoint de temperatura.', img:'celda-detector.jpg'}
+        ]},
+        r4a: { t:'Restricción en el módulo de bomba o su circuito de purga', s:'Con la purga abierta —bombeando directo al descarte, sin pasar por autosampler, columna ni detector— la presión sigue alta: el problema está adentro de la bomba.', causes:[
+          {n:'Frit de PTFE de la purge valve obstruido', f:'muy común', fc:'f-muy', test:'Con la purga activa, medí la presión. En equipos Agilent (ref. bombas 1260 Infinity II) debería caer a un rango aproximado de 0–5 bar; una presión bastante mayor apunta a este frit.', act:'Reemplazar el frit de PTFE de la purge valve, siguiendo el procedimiento del fabricante para esa válvula.'},
+          {n:'Otro problema interno de la bomba (sello, válvula de retención, línea de purga obstruida)', f:'ocasional', fc:'f-ocas', test:'Si el frit de la purge valve ya se descartó y la purga sigue sin bajar la presión, revisar sellos y válvulas de retención con la utilidad de diagnóstico del equipo.', act:'Reemplazar sellos o válvulas de retención según corresponda.'}
         ]},
         r3ba: { t:'Frit de entrada de la columna obstruido (reversible)', s:'La columna es la fuente y responde al back-flush: patrón clásico de partículas de matriz. Causa más común de presión alta en columna.', causes:[
           {n:'Frit de entrada tapado por partículas de muestra', f:'muy común', fc:'f-muy', test:'Ya confirmado por la maniobra (invertir + lavar bajó la presión). Reinstalar la columna en sentido normal y verificar.', act:'Prevención — filtrar (0,22–0,45 µm) todo extracto, usar guard column y un in-line filter de 0,5 µm aguas abajo del automuestreador. Si reincide rápido, el guard cartridge ya cumplió su función: cambiarlo.', img:'frit-columna.jpg'},
@@ -363,7 +371,7 @@
   /* --- esquema HPLC: carga + estados de zona --- */
   var schemaBox = document.getElementById('schemaBox');
   var Z = {}, curZoneKey = null;
-  fetch('/troubleshooting-hplc/esquema-hplc.svg').then(function(r){ return r.text(); }).then(function(svg){
+  fetch('/troubleshooting-hplc/esquema-hplc.svg').then(function(r){ if(!r.ok) throw new Error('esquema no disponible'); return r.text(); }).then(function(svg){
     schemaBox.innerHTML = svg;
     schemaBox.querySelectorAll('.zone').forEach(function(g){ Z[g.getAttribute('data-zone')] = g; });
     if(curZoneKey) applyZonesFor(curZoneKey); else resetZones();
@@ -381,11 +389,14 @@
     'alta:p3b': { descartado:['bomba','autosampler','detector'], investigando:['columna'] },
     'baja:q2':  { investigando:['bomba'] },
     'alta:r3aa':{ descartado:['columna','bomba','detector'], alerta:['autosampler'] },
-    'alta:r3ab':{ descartado:['columna','autosampler'], alerta:['bomba'], precaucion:['detector'] },
+    'alta:p4':  { descartado:['columna','autosampler'], investigando:['bomba'] },
+    'alta:r4a': { descartado:['columna','autosampler','detector'], alerta:['bomba'] },
+    'alta:r3ab':{ descartado:['columna','autosampler','bomba'], precaucion:['detector'] },
     'alta:r3ba':{ descartado:['bomba','autosampler','detector'], alerta:['columna'] },
     'alta:r3bb':{ descartado:['bomba','autosampler','detector'], alerta:['columna'] },
     'baja:r2a': { alerta:['bomba'], precaucion:['solvente'] },
-    'baja:r2b': { descartado:['bomba'], precaucion:['autosampler','columna','detector'] }
+    'baja:r2b': { descartado:['bomba'], precaucion:['autosampler','columna','detector','solvente'] },
+    'baja:rbnew': { precaucion:['columna','solvente'] }
   };
   function applyZonesFor(key){
     curZoneKey = key;
@@ -478,7 +489,12 @@
 
   function goBack(){
     if(st.hist.length===0){ renderSelector(); }
-    else { st.step=st.hist.pop(); st.path.pop(); renderStep(); }
+    else {
+      st.step=st.hist.pop(); st.path.pop();
+      st.flags = {};
+      st.path.forEach(function(p){ if(p.o.flag) st.flags[p.o.flag]=true; });
+      renderStep();
+    }
   }
   function jumpTo(i){
     st.step = st.path[i].step;
