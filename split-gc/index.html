@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Relación de split en GC — cromatografia.com.ar</title>
+<meta name="description" content="Movés el split ratio y mirá en vivo el trade-off real: la resolución mejora, pero la señal se acerca al ruido. Con animación del flujo de carrier en el inlet." />
+<link rel="icon" href="/favicon.ico" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JDNY6YDF3N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JDNY6YDF3N');
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f1f5f9; --surface:#fff; --border:#e2e8f0; --text:#0f172a; --muted:#64748b;
+    --primary:#1d4ed8; --he:#0ea5e9;
+  }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+
+  header { background:#0d1b35; color:#fff; padding:0 1.25rem; }
+  .header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; gap:1rem; }
+  .logo { font-size:1.25rem; font-weight:700; letter-spacing:-0.02em; text-decoration:none; color:#fff; white-space:nowrap; }
+  .logo-ia { color:#38bdf8; font-style:italic; }
+  .header-tagline { font-size:0.75rem; color:#93c5fd; white-space:nowrap; }
+  .header-tagline a { color:#93c5fd; text-decoration:none; }
+  .header-tagline a:hover { color:#fff; }
+  nav { display:flex; align-items:center; gap:.15rem; flex-wrap:wrap; justify-content:flex-end; }
+  nav a { color:#bfdbfe; text-decoration:none; font-size:0.8rem; padding:.3rem .6rem; border-radius:6px; transition:color .15s,background .15s; white-space:nowrap; }
+  nav a:hover { color:#fff; background:rgba(255,255,255,.1); }
+  @media (max-width:600px){ header{padding:0 1rem} .header-inner{height:auto;flex-wrap:wrap;padding:.6rem 0;gap:.3rem} .header-tagline{display:none} nav{width:100%;justify-content:flex-start;gap:.1rem;padding-bottom:.3rem} nav a{font-size:.72rem;padding:.25rem .45rem} }
+
+  .breadcrumb { background:var(--surface); border-bottom:1px solid var(--border); padding:.45rem 2rem; font-size:.75rem; color:var(--muted); }
+  .breadcrumb a { color:var(--primary); text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+
+  main { flex:1; padding:.9rem 2rem 2rem; }
+  .container { max-width:1320px; margin:0 auto; }
+
+  .tool-header { display:flex; align-items:flex-start; justify-content:space-between;
+                 gap:1.25rem; flex-wrap:wrap; margin-bottom:.75rem; }
+  .tool-header-txt { flex:1 1 520px; min-width:300px; }
+  .tool-tag { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:.18rem .5rem; border-radius:4px; background:#dcfce7; color:#15803d; margin-bottom:.4rem; }
+  .tool-title { font-size:1.35rem; font-weight:800; letter-spacing:-.02em; margin-bottom:.3rem; }
+  .tool-desc { font-size:.85rem; color:var(--muted); line-height:1.55; max-width:720px; }
+
+  .tool-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; }
+  .wrap { padding:1.25rem 1.4rem 1.6rem; }
+
+  .ctrl-row { position:sticky; top:0; z-index:20; background:var(--surface);
+              display:flex; flex-wrap:wrap; gap:.65rem 1.25rem; align-items:center;
+              margin:-1.25rem -1.4rem 1rem; padding:.8rem 1.4rem;
+              border-bottom:1px solid var(--border);
+              border-radius:14px 14px 0 0; }
+  .cond-inline { flex:1 1 250px; min-width:230px; font-size:.72rem; line-height:1.55; color:var(--muted); }
+  .cond-mobile { display:none; font-size:.72rem; line-height:1.55; color:var(--muted); margin:-.5rem 0 .9rem; }
+  @media (max-width:760px){
+    .cond-inline { display:none; }
+    .cond-mobile { display:block; }
+    .ctrl-row { gap:.5rem; padding:.6rem 1.4rem; }
+  }
+  .cond-inline b { color:var(--text); }
+  .split-top { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.15rem; }
+  .ctrl-group { display:flex; flex-direction:column; gap:.5rem; }
+  .ctrl-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  /* el slider es LO que se toca: se destaca como bloque interactivo */
+  .split-group { flex:2.4 1 420px; min-width:320px; background:#eff6ff; border:1.5px solid #bfdbfe;
+                 border-radius:12px; padding:.55rem .9rem .5rem; }
+  .split-group .ctrl-label { color:var(--primary); }
+  .split-hint { font-size:.66rem; color:#3b82f6; font-weight:600; margin-top:-.2rem; }
+  .split-group input[type=range] { height:24px; cursor:pointer; }
+  .split-slider-row { display:flex; align-items:center; gap:1rem; padding-bottom:14px; }
+  /* Slider de una sola pista, sin tramo "recorrido" pintado de azul (por eso no
+     se usa accent-color): track parejo + una bolita, track/thumb estilizados a
+     mano en ambos motores. */
+  input[type=range] { flex:1; -webkit-appearance:none; appearance:none; background:transparent; cursor:pointer; }
+  input[type=range]::-webkit-slider-runnable-track { height:6px; border-radius:3px; background:var(--border); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%;
+    background:#fff; border:3px solid var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.25);
+    margin-top:-5px; cursor:pointer;
+  }
+  input[type=range]::-moz-range-track { height:6px; border-radius:3px; background:var(--border); }
+  input[type=range]::-moz-range-thumb {
+    width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid var(--primary);
+    box-shadow:0 1px 3px rgba(0,0,0,.25); cursor:pointer;
+  }
+  .slider-wrap { flex:1; position:relative; }
+  .slider-wrap input[type=range] { width:100%; display:block; }
+  .tick-opt { position:absolute; top:calc(100% + 3px); transform:translateX(-50%); font-size:.6rem;
+              font-weight:700; color:#15803d; white-space:nowrap; pointer-events:none; }
+  .tick-opt::before { content:''; position:absolute; left:50%; top:-6px; width:2px; height:6px;
+                      background:#15803d; transform:translateX(-50%); }
+  .split-readout { white-space:nowrap; font-size:1.1rem; font-weight:800; font-variant-numeric:tabular-nums; color:var(--text); min-width:70px; }
+  .col-info { font-size:.78rem; color:var(--muted); }
+  .col-info b { color:var(--text); }
+
+  .flow-row { display:flex; flex-wrap:wrap; gap:.6rem; margin-bottom:1.5rem; }
+  .flow-chip { background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:.5rem .8rem; font-size:.78rem; }
+  .flow-chip b { display:block; font-size:.95rem; font-variant-numeric:tabular-nums; color:var(--text); }
+  .flow-chip.split b { color:#b45309; }
+
+  .panel { display:flex; gap:1.1rem; flex-wrap:wrap; align-items:flex-start; }
+  .inlet-pane { flex:1.25 1 380px; min-width:320px; }
+  .pairs-pane { flex:1.6 1 420px; min-width:340px; display:flex; flex-direction:column; gap:1rem; }
+  .guide-col  { flex:1 1 265px; min-width:255px; display:flex; flex-direction:column; gap:.7rem; }
+  .pane-title { font-size:.74rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:.45rem; }
+  svg { width:100%; height:auto; display:block; }
+  .axis-label { font-size:14px; fill:#8794a5; }
+  .gridline { stroke:#eef2f6; stroke-width:1; }
+  .baseline { stroke:#cbd5e1; stroke-width:1; }
+  .noise-band { fill:#fde68a; opacity:.35; }
+
+  .pair-box { background:#fbfcfe; border:1px solid var(--border); border-radius:10px; padding:.7rem .85rem; }
+  .vd-credit { display:flex; align-items:center; gap:.6rem; margin-top:1rem;
+               padding-top:.85rem; border-top:1px solid var(--border); }
+  .vd-credit img { height:22px; width:auto; display:block; }
+  .vd-credit span { font-size:.68rem; color:var(--muted); }
+  .chrom-legend { display:none; align-items:flex-start; gap:.5rem; margin-top:.4rem;
+                  font-size:.72rem; line-height:1.5; color:#8794a5; }
+  .chrom-legend i { flex-shrink:0; display:block; width:24px; margin-top:.55rem;
+                    border-top:1.6px dashed #94a3b8; }
+  .chrom-legend b { color:#475569; }
+  .pair-head { display:flex; justify-content:flex-end; align-items:baseline; margin-bottom:.4rem; flex-wrap:wrap; gap:.5rem; }
+  .pair-nums { gap:1.6rem !important; }
+  .pair-name { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .pair-nums { display:flex; gap:1rem; }
+  .num-box { text-align:right; }
+  .num-box .nl { font-size:.62rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  .num-box .nv { font-size:1.15rem; font-weight:800; font-variant-numeric:tabular-nums; }
+  .formula-box { margin-top:.45rem; font-size:.7rem; color:var(--muted); line-height:1.8;
+                 background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:.6rem .8rem; }
+  .formula-box b { color:var(--text); }
+  .formula-box .num { font-variant-numeric:tabular-nums; color:#0f172a; font-weight:700; }
+  .nv.good{color:#15803d} .nv.warn{color:#b45309} .nv.bad{color:#b91c1c}
+
+  .inlet-labels { font-size:11.5px; fill:#475569; }
+  .inlet-labels.fixed { fill:#64748b; }
+  .inlet-labels.split { fill:#b45309; font-weight:700; }
+
+
+  /* ===== Guia paso a paso ===== */
+  .guide-bar { display:flex; align-items:flex-end; gap:.5rem; flex-direction:column; flex-shrink:0; }
+  @media (max-width:820px){ .guide-bar { align-items:flex-start; margin-top:.4rem; } }
+  .guide-btn { display:inline-flex; align-items:center; gap:.5rem; font-family:inherit; cursor:pointer;
+               font-size:.82rem; font-weight:700; padding:.55rem 1rem; border-radius:9px;
+               border:1.5px solid var(--primary); background:var(--primary); color:#fff;
+               transition:background .15s, color .15s, border-color .15s; }
+  .guide-btn:hover { background:#1e40af; border-color:#1e40af; }
+  .guide-btn[aria-pressed="false"] { background:#fff; color:var(--primary); }
+  .guide-btn[aria-pressed="false"]:hover { background:#eff6ff; }
+  .guide-btn svg { width:15px; height:15px; flex-shrink:0; }
+  .guide-bar-hint { font-size:.72rem; color:var(--muted); text-align:right; max-width:240px; }
+  @media (max-width:820px){ .guide-bar-hint { text-align:left; } }
+
+  body:not(.guide-on) .guide-el { display:none !important; }
+
+  .guide-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+                 border-radius:50%; background:var(--primary); color:#fff; font-size:.76rem; font-weight:800;
+                 flex-shrink:0; line-height:1; }
+  .step-head { display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem; }
+  .split-group .step-head { margin-bottom:.35rem; }
+  .step-head .st { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+                   color:var(--primary); }
+
+  .guide-callout { margin-top:0; background:#fff; border:1px solid #bfdbfe;
+                   border-left:3px solid var(--primary); border-radius:8px; padding:.75rem .9rem;
+                   font-size:.8rem; line-height:1.62; color:#334155; }
+  .guide-callout p + p { margin-top:.5rem; }
+  .guide-callout b { color:var(--text); }
+  .guide-callout .hl { font-variant-numeric:tabular-nums; font-weight:800; color:var(--primary); }
+  .guide-why { margin-top:1rem; background:#eff6ff; border:1px solid #dbeafe; border-radius:9px;
+               padding:.65rem .9rem; font-size:.78rem; line-height:1.6; color:#334155; }
+  .guide-why b { color:var(--primary); }
+
+  .guide-verdict { margin-top:.6rem; padding:.5rem .65rem; border-radius:6px; font-size:.78rem;
+                   font-weight:600; line-height:1.55; }
+  .gv-info{background:#eff6ff;color:#1d4ed8} .gv-good{background:#dcfce7;color:#15803d}
+  .gv-warn{background:#ffedd5;color:#9a3412} .gv-bad{background:#fee2e2;color:#b91c1c}
+
+  .share-bar { display:flex; height:15px; border-radius:8px; overflow:hidden; margin:.55rem 0 .35rem;
+               background:#f59e0b; }
+  .share-col { background:var(--primary); min-width:2px; }
+  .share-legend { display:flex; justify-content:space-between; gap:1rem; font-size:.68rem; color:var(--muted); }
+  .share-legend .sl-col b { color:var(--primary); }
+  .share-legend .sl-vent b { color:#b45309; }
+  .share-legend b { font-variant-numeric:tabular-nums; }
+
+  .pulse { animation:guidePulse 2s ease-out infinite; }
+  @keyframes guidePulse {
+    0%   { box-shadow:0 0 0 0 rgba(29,78,216,.34); }
+    70%  { box-shadow:0 0 0 13px rgba(29,78,216,0); }
+    100% { box-shadow:0 0 0 0 rgba(29,78,216,0); }
+  }
+  @media (prefers-reduced-motion: reduce){ .pulse{animation:none} }
+
+  .disclaimer { margin-top:1.2rem; font-size:.75rem; color:var(--muted); line-height:1.65; background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:.9rem 1rem; }
+  .disclaimer b { color:var(--text); }
+
+  footer { background:#0d1b35; color:#94a3b8; padding:2.5rem 2rem; font-size:.78rem; line-height:1.7; }
+  .footer-inner { max-width:1200px; margin:0 auto; display:flex; flex-direction:column; gap:1.25rem; }
+  .footer-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; padding-bottom:1.25rem; border-bottom:1px solid rgba(255,255,255,.08); }
+  .footer-brand { font-size:1rem; font-weight:700; color:#fff; letter-spacing:-.01em; }
+  .footer-brand span { color:#60a5fa; }
+  .footer-links { display:flex; gap:1.25rem; flex-wrap:wrap; }
+  .footer-links a { color:#94a3b8; text-decoration:none; transition:color .15s; }
+  .footer-links a:hover { color:#fff; }
+  .footer-disclaimer { color:#64748b; font-size:.73rem; line-height:1.6; }
+  .footer-disclaimer p + p { margin-top:.75rem; }
+  .footer-copy { color:#475569; font-size:.72rem; border-top:1px solid rgba(255,255,255,.06); padding-top:1rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">Cromatograf<span class="logo-ia">IA</span>.com.ar</a>
+    <span class="header-tagline">Un proyecto de <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a></span>
+    <nav>
+      <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a>
+      <a href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Soporte técnico</a>
+      <a href="https://www.viales.com.ar" target="_blank" rel="noopener">viales.com.ar</a>
+    </nav>
+  </div>
+</header>
+
+<div class="breadcrumb"><a href="/">cromatografia.com.ar</a> / Relación de split en GC</div>
+
+<main>
+  <div class="container">
+
+    <div class="tool-header">
+      <div class="tool-header-txt">
+        <span class="tool-tag">Beta</span>
+        <div class="tool-title">Relación de split: resolución vs. sensibilidad</div>
+        <div class="tool-desc">Inlet split/splitless tipo Agilent SSL, solo Helio. Movés la relación de split y aparece el compromiso central del método: los picos <b>se resuelven mejor</b>, pero la señal se hunde hacia el ruido. Hay un punto óptimo estrecho — buscalo con el slider.</div>
+      </div>
+
+      <div class="guide-bar">
+        <button type="button" id="guideBtn" class="guide-btn" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 18h6"></path><path d="M10 21.5h4"></path>
+            <path d="M12 2.5a6 6 0 0 0-3.6 10.8c.6.45.9 1.1.9 1.8v.4h5.4v-.4c0-.7.3-1.35.9-1.8A6 6 0 0 0 12 2.5z"></path>
+          </svg>
+          <span id="guideBtnTxt">Ocultar la gu&iacute;a</span>
+        </button>
+        <span class="guide-bar-hint" id="guideHint">Los pasos <b>1</b> y <b>2</b> se actualizan solos mientras mov&eacute;s el slider.</span>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="wrap">
+
+        <div class="ctrl-row">
+          <div class="ctrl-group split-group" id="splitGroup">
+            <div class="split-top">
+              <span class="guide-badge guide-el">1</span>
+              <span class="ctrl-label">Relación de split</span>
+              <span class="split-hint guide-el">&mdash; empez&aacute; por ac&aacute;: mov&eacute; el slider y mir&aacute; los picos &rarr;</span>
+            </div>
+            <div class="split-slider-row">
+              <div class="slider-wrap">
+                <input type="range" id="splitSlider" min="0" max="1000" step="1" value="0">
+                <span class="tick-opt" id="tickOpt">50:1 óptimo</span>
+              </div>
+              <span class="split-readout" id="splitVal">1:1</span>
+            </div>
+          </div>
+
+          <div class="cond-inline"><b>Condiciones fijas &middot;</b> Helio &middot; inlet SSL 250&nbsp;&deg;C &middot; columna 1,0&nbsp;mL/min &middot; purga de septum 3,0&nbsp;mL/min &middot; ruido 0,07&nbsp;pA</div>
+        </div>
+
+        <div class="cond-mobile"><b>Condiciones fijas &middot;</b> Helio &middot; inlet SSL 250&nbsp;&deg;C &middot; columna 1,0&nbsp;mL/min &middot; purga de septum 3,0&nbsp;mL/min &middot; ruido 0,07&nbsp;pA</div>
+
+        <div class="panel">
+          <div class="inlet-pane">
+            <div class="pane-title">Flujo de He en el inlet (SSL)</div>
+            <svg id="inletSvg" viewBox="0 0 420 400"></svg>
+            <div class="formula-box" id="formulaBox"></div>
+          </div>
+          <div class="pairs-pane">
+            <div class="pane-title">Señal del FID</div>
+            <div class="pair-box">
+              <div class="step-head guide-el">
+                <span class="guide-badge">2</span>
+                <span class="st">Mir&aacute; la forma de los picos</span>
+              </div>
+              <div class="pair-head">
+                <div class="pair-nums">
+                  <div class="num-box"><div class="nl">Ancho a ½ altura</div><div class="nv" id="wVal">-</div></div>
+                  <div class="num-box"><div class="nl">Relación señal/ruido</div><div class="nv" id="snB">-</div></div>
+                  <div class="num-box"><div class="nl">Resolución entre picos</div><div class="nv" id="rsB">-</div></div>
+                </div>
+              </div>
+              <svg id="chromB" viewBox="0 0 560 270"></svg>
+              <div class="chrom-legend" id="chromLegend"><i></i><span>Silueta punteada: el <b>ancho</b> que ten&iacute;an estos mismos picos a 1:1, dibujada a la altura actual para que compares s&oacute;lo el ancho.</span></div>
+              <div class="vd-credit">
+                <img src="/logo-ags.png" alt="AGS Analítica">
+                <span>Herramienta diseñada por AGS Analítica S.A.&reg;</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="guide-col guide-el">
+            <div class="guide-callout">
+              <div class="step-head">
+                <span class="guide-badge">1</span>
+                <span class="st">Qu&eacute; est&aacute;s cambiando</span>
+              </div>
+              <p id="g1Frac"></p>
+              <div class="share-bar"><div class="share-col" id="g1Bar"></div></div>
+              <div class="share-legend">
+                <span class="sl-col">A la columna &middot; <b id="g1Pct"></b></span>
+                <span class="sl-vent"><b id="g1Vent"></b> &middot; al venteo</span>
+              </div>
+              <p id="g1Sweep"></p>
+            </div>
+
+            <div class="guide-callout">
+              <div class="step-head">
+                <span class="guide-badge">2</span>
+                <span class="st">Qu&eacute; les pasa a los picos</span>
+              </div>
+              <p id="g2Body"></p>
+              <div class="guide-verdict" id="g2Verdict"></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="guide-why guide-el"><b>&iquest;Para qu&eacute; sirve entonces subir el split?</b> No se trata de &laquo;tirar muestra&raquo;: es la forma de meter en la columna una banda de inyecci&oacute;n angosta, y con eso picos m&aacute;s finos y mejor resueltos. Se paga en sensibilidad &mdash; por eso, cuando lo que falta es se&ntilde;al y no resoluci&oacute;n, se inyecta en <b>splitless</b>.</p>
+
+        <div class="disclaimer">
+          <p><b>Sobre el modelo.</b> Simulación a partir de un caso de referencia: a 1:1 los picos de metanol y etanol miden 140 pA sobre un offset de línea de base de 10 pA, con tiempos de retención de 4,95 y 5,05 min y un ruido de FID de 0,07 pA pico a pico. <b>Señal:</b> al subir el split entra menos masa en proporción inversa, así que altura y área se dividen por el mismo factor (50:1 &rarr; 2,8 pA, 200:1 &rarr; 0,70 pA, 700:1 &rarr; 0,20 pA). Con este ruido la se&ntilde;al reci&eacute;n toca el l&iacute;mite de cuantificaci&oacute;n usual (S/R = 10) cerca de 200:1, y el de detecci&oacute;n (S/R = 3) cerca de 700:1 &mdash; bastante despu&eacute;s del &oacute;ptimo de resoluci&oacute;n. Hasta 100:1 la escala del eje Y acompa&ntilde;a a la se&ntilde;al; a partir de ah&iacute; queda fija y son los picos los que se hunden dentro del ruido. <b>Ancho:</b> el ancho de la banda de inyección está gobernado por el tiempo de barrido del inlet (&tau; = V<sub>efectivo</sub>/F<sub>total</sub>, y F<sub>total</sub> crece con el split), y las varianzas se suman: <i>&sigma;&sup2;<sub>total</sub> = &sigma;&sup2;<sub>columna</sub> + (V<sub>ef</sub>/F<sub>total</sub>)&sup2;</i>. El volumen efectivo usado (0,133 mL) se calibró para que la resolución llegue a línea de base a 50:1; es un valor plausible para un liner de split, pero <b>no proviene de una medición</b>. Los analitos del ejemplo (metanol y etanol) y sus alturas son ilustrativos: no salen de una corrida real. En un método con rampa y horno inicial frío, el reenfoque en cabeza de columna amortigua bastante este efecto, así que la mejora de resolución real suele ser menor que la mostrada acá. En la animación del inlet, todas las partículas de una misma línea van a igual velocidad; la línea de split acelera con su caudal, con una escala comprimida (raíz cuadrada) para que siga siendo legible a 320:1. El esquema omite el módulo EPC, las válvulas y los sensores, y no modela la discriminación de split. Verificá siempre experimentalmente.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tool-comments" data-tool="Relación de split en GC"></div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <span class="footer-brand">cromatografia<span>.com.ar</span></span>
+      <div class="footer-links">
+        <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a>
+        <a href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Soporte técnico</a>
+        <a href="https://www.viales.com.ar" target="_blank" rel="noopener">viales.com.ar</a>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      <p>Las herramientas disponibles en cromatografia.com.ar son de carácter informativo y de referencia. Los resultados obtenidos deben ser verificados por el usuario contra las fuentes regulatorias oficiales vigentes antes de ser utilizados en decisiones técnicas, analíticas o regulatorias. AGS ANALÍTICA S.A. no asume responsabilidad alguna por el uso de la información proporcionada sin la correspondiente verificación.</p>
+      <p>AGS ANALÍTICA S.A. cumple con la Ley Nacional de Protección de Datos Personales N° 25.326.</p>
+    </div>
+    <div class="footer-copy">&copy; 2026 AGS ANALÍTICA S.A. &mdash; Un proyecto de <a href="https://www.agsanalitica.com" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:none;">AGS Analítica</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== 1. Flujos fijos ===== */
+  var COL_FLOW = 1.0;   // mL/min, fijo
+  var SEPTUM_PURGE = 3.0; // mL/min, fijo
+  function splitFlow(sr){ return sr*COL_FLOW; }
+  function totalFlow(sr){ return COL_FLOW + SEPTUM_PURGE + splitFlow(sr); }
+
+  /* ===== 2. Modelo de picos =====
+     Par de referencia: metanol (tR 4,95) y etanol (tR 5,05) sobre un offset de
+     linea de base de 10 pA. Ruido del FID: 0,07 pA pico a pico.
+     Al subir el split entra menos masa, en proporcion inversa:
+        altura(sr) = H_AT_1 / sr    ->  el area cae en el mismo factor      */
+  var H_AT_1  = 140;     // pA, altura (sobre el offset) a split 1:1
+  var OFFSET  = 10;      // pA, offset de linea de base del FID
+  var TR1     = 4.95;    // min, metanol
+  var TR2     = 5.05;    // min, etanol
+  var D_TR    = TR2-TR1; // min
+  var NOISE_PP = 0.07;   // pA, ruido pico a pico
+  var AN1 = 'Metanol', AN2 = 'Etanol';
+  // Con 0,07 pA de ruido la altura marca los hitos analiticos asi:
+  //   1:1   -> 140 pA   (S/R 2000)
+  //   50:1  -> 2,80 pA  (S/R 40)   <- aca la resolucion llega a linea de base
+  //   200:1 -> 0,70 pA  (S/R 10)   <- limite de cuantificacion
+  //   700:1 -> 0,20 pA  (S/R 2,9)  <- por debajo del limite de deteccion
+
+  /* El ancho SI cambia con el split. Mecanismo: el ancho de la banda de inyeccion
+     esta gobernado por el tiempo de barrido del inlet, tau = V_efectivo/F_total,
+     y F_total crece con el split. Las varianzas se suman:
+        sigma_total^2 = sigma_columna^2 + (V_efectivo/F_total)^2
+     V_EFF y SIGMA_COL calibrados para que Rs=0,80 a 1:1 (picos solapados) y
+     Rs=1,50 (linea de base) a 50:1.
+     V_EFF=0,133 mL es un volumen de vapor plausible dentro de un liner de split. */
+  var V_EFF     = 0.13274294; // mL, volumen efectivo barrido del liner
+  var SIGMA_COL = 0.01648439; // min, ancho intrinseco que aporta la columna
+
+  function totalInletFlow(sr){ return COL_FLOW*(1+sr) + SEPTUM_PURGE; }         // mL/min
+  function sigmaTotal(sr){
+    var sInj = V_EFF/totalInletFlow(sr);
+    return Math.sqrt(SIGMA_COL*SIGMA_COL + sInj*sInj);
+  }
+  function widthHalf(sr){ return 2.35482*sigmaTotal(sr); }                       // min
+  function peakHeight(sr){ return H_AT_1/sr; }                                   // pA sobre el offset
+  function peakArea(sr){ return peakHeight(sr)*sigmaTotal(sr)*Math.sqrt(2*Math.PI); } // pA*min
+  function resolutionRs(sr){ return D_TR/(4*sigmaTotal(sr)); }
+  function snRatio(sr){ return peakHeight(sr)/NOISE_PP; }
+  // Eje Y: hasta 100:1 autoescala siguiendo a la señal (como un sistema de datos
+  // real). A partir de ahi la escala QUEDA FIJA, asi que los picos se ven bajar
+  // de verdad hasta perderse dentro del ruido, que ya es visible en esa escala.
+  var SR_FREEZE = 100;
+  function yRange(sr){
+    var srEff = Math.min(sr, SR_FREEZE);
+    var sigMax = OFFSET + peakHeight(srEff) + NOISE_PP/2;
+    var sigMin = OFFSET - NOISE_PP/2;
+    var rng = sigMax - sigMin;
+    return { min: sigMin - 0.06*rng, max: sigMax + 0.10*rng };
+  }
+
+  function splitLabel(sr){ return sr.toFixed(0) + ':1'; }
+
+  /* Slider en DOS TRAMOS. El primer 60% del recorrido cubre 1:1 a 100:1 de forma
+     lineal -- ahi esta toda la zona de decision, y conviene que se mueva de forma
+     proporcional y predecible. El 40% restante cubre 100:1 a 700:1: es el tramo
+     donde ya no cambia nada (el S/R solo termina de caer), asi que se comprime.
+     El quiebre cae justo donde la quimica deja de cambiar. */
+  var SLIDER_MAX = 1000, BREAK_F = 0.60, BREAK_SR = 100, SR_MIN = 1, SR_MAX = 700;
+  function splitFromSlider(v){
+    var f = v/SLIDER_MAX;
+    var s = f <= BREAK_F
+      ? SR_MIN + (f/BREAK_F)*(BREAK_SR-SR_MIN)
+      : BREAK_SR + ((f-BREAK_F)/(1-BREAK_F))*(SR_MAX-BREAK_SR);
+    return Math.round(s);
+  }
+  function sliderFromSplit(sr){
+    var f = sr<=BREAK_SR
+      ? (sr-SR_MIN)/(BREAK_SR-SR_MIN)*BREAK_F
+      : BREAK_F + (sr-BREAK_SR)/(SR_MAX-BREAK_SR)*(1-BREAK_F);
+    return f*SLIDER_MAX;
+  }
+
+  /* Ruido determinista: se genera UNA sola vez y despues solo se reescala. Asi,
+     al mover el slider, el ruido no "parpadea" -- se ve crecer, que es justamente
+     el efecto del autoescalado del eje Y sobre un ruido de amplitud fija. */
+  var NOISE_N = 1200;
+  var noiseSeq = (function(){
+    var s = 987654321;
+    function rnd(){ s = (s*1664525 + 1013904223) % 4294967296; return s/4294967296; }
+    var raw = [], i;
+    for(i=0;i<NOISE_N;i++) raw.push(rnd()*2-1);
+    // suavizado leve: ruido de detector real, no pixeles sueltos
+    var sm = [];
+    for(i=0;i<NOISE_N;i++){
+      sm.push((raw[(i-1+NOISE_N)%NOISE_N] + raw[i] + raw[(i+1)%NOISE_N])/3);
+    }
+    var mn = Math.min.apply(null, sm), mx = Math.max.apply(null, sm);
+    return sm.map(function(v){ return (v-mn)/(mx-mn) - 0.5; }); // pico a pico = 1
+  })();
+
+  /* ===== 3. Render ===== */
+  var state = { sr: 1 };
+  var guideOn = true;
+  try { guideOn = (localStorage.getItem('splitGuide') !== 'off'); } catch(e){}
+
+  function svgEl(tag, attrs){
+    var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for(var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  // paso "lindo" (1/2/5 x 10^n) para las marcas del eje
+  function niceStep(range, target){
+    var raw = range/target;
+    var mag = Math.pow(10, Math.floor(Math.log(raw)/Math.LN10));
+    var norm = raw/mag;
+    var step = norm<1.5?1 : norm<3?2 : norm<7?5 : 10;
+    return step*mag;
+  }
+  function fmt(v, dec){ return v.toFixed(dec).replace('.',','); }
+  // hasta 2 decimales, sin ceros al final: 100 -> "100", 12.5 -> "12,5", 6.25 -> "6,25"
+  function fmtAuto(v){
+    return v.toFixed(2).replace(/\.?0+$/,'').replace('.',',');
+  }
+
+  function renderChrom(){
+    var svg = document.getElementById('chromB');
+    svg.innerHTML = '';
+    var W=560,H=270, padL=68,padR=14,padT=18,padB=48;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+    var baseY = padT+plotH;
+
+    var sr = state.sr;
+    var h = peakHeight(sr);          // pA sobre el offset
+    var yr = yRange(sr);             // pA, la escala Y sigue a la señal
+    var yMin = yr.min, yMax = yr.max;
+    var sigma = sigmaTotal(sr);
+    var xMin = 4.79, xMax = 5.21;    // min, ventana FIJA (los tR no cambian)
+
+    function xPix(t){ return padL + (t-xMin)/(xMax-xMin)*plotW; }
+    function yPix(pA){ return baseY - ((pA-yMin)/(yMax-yMin))*plotH; }
+
+    // --- eje Y (pA) ---
+    svg.appendChild(svgEl('line',{x1:padL,y1:padT,x2:padL,y2:baseY,class:'baseline'}));
+    var stepY = niceStep(yMax-yMin, 4);
+    var decY = stepY<1 ? (stepY<0.1?2:1) : 0;
+    var firstY = Math.ceil(yMin/stepY)*stepY;
+    for(var v=firstY; v<=yMax+1e-9; v+=stepY){
+      var yy = yPix(v);
+      svg.appendChild(svgEl('line',{x1:padL,y1:yy,x2:padL+plotW,y2:yy,class:'gridline'}));
+      var tl = svgEl('text',{x:padL-7,y:yy+4,'text-anchor':'end',class:'axis-label'});
+      tl.textContent = fmt(v,decY); svg.appendChild(tl);
+    }
+
+    // --- eje X (min) ---
+    svg.appendChild(svgEl('line',{x1:padL,y1:baseY,x2:padL+plotW,y2:baseY,class:'baseline'}));
+    for(var t=4.80; t<=5.201; t+=0.05){
+      var xx = xPix(t);
+      svg.appendChild(svgEl('line',{x1:xx,y1:padT,x2:xx,y2:baseY,class:'gridline'}));
+      var xl = svgEl('text',{x:xx,y:H-24,'text-anchor':'middle',class:'axis-label'});
+      xl.textContent = fmt(t,2); svg.appendChild(xl);
+    }
+    var xlab = svgEl('text',{x:padL+plotW/2,y:H-4,'text-anchor':'middle',class:'axis-label'});
+    xlab.textContent = 'Tiempo (min)'; svg.appendChild(xlab);
+
+    // --- guia: forma que tenian los picos a 1:1, llevada a la altura actual.
+    //     Solo cambia el ANCHO, asi que el angostamiento queda a la vista aunque
+    //     la escala Y se mueva. ---
+    if(guideOn && sr > 1.02){
+      var sig0 = sigmaTotal(1), gs = 700, dg = '';
+      for(var k=0;k<=gs;k++){
+        var tg = xMin + k*(xMax-xMin)/gs;
+        var q1 = h*Math.exp(-Math.pow(tg-TR1,2)/(2*sig0*sig0));
+        var q2 = h*Math.exp(-Math.pow(tg-TR2,2)/(2*sig0*sig0));
+        dg += (k===0?'M':'L') + xPix(tg).toFixed(1) + ',' + yPix(OFFSET+q1+q2).toFixed(2) + ' ';
+      }
+      svg.appendChild(svgEl('path',{d:dg, fill:'none', stroke:'#94a3b8', 'stroke-width':1.2,
+        'stroke-dasharray':'4 3', 'stroke-linejoin':'round', 'vector-effect':'non-scaling-stroke'}));
+    }
+    var legEl = document.getElementById('chromLegend');
+    if(legEl) legEl.style.display = (guideOn && sr > 1.02) ? 'flex' : 'none';
+
+    // --- traza: offset + dos gaussianas + ruido de 0,7 pA p-p ---
+    var steps = 900, d = '';
+    for(var i=0;i<=steps;i++){
+      var tt = xMin + i*(xMax-xMin)/steps;
+      var g1 = h*Math.exp(-Math.pow(tt-TR1,2)/(2*sigma*sigma));
+      var g2 = h*Math.exp(-Math.pow(tt-TR2,2)/(2*sigma*sigma));
+      var n  = noiseSeq[i % NOISE_N]*NOISE_PP;
+      var pA = OFFSET + g1 + g2 + n;
+      d += (i===0?'M':'L') + xPix(tt).toFixed(1) + ',' + yPix(pA).toFixed(2) + ' ';
+    }
+    svg.appendChild(svgEl('path',{d:d, fill:'none', stroke:'#0ea5e9', 'stroke-width':1.4,
+      'stroke-linejoin':'round','vector-effect':'non-scaling-stroke'}));
+
+    // --- linea de base de integracion (como la marca un integrador) ---
+    var sn = snRatio(sr);
+    if(sn >= 3){ // por debajo de S/R=3 el integrador ya no detectaria los picos
+      var intA = TR1 - 2.6*sigma, intB = TR2 + 2.6*sigma, valley = (TR1+TR2)/2;
+      var yBase = yPix(OFFSET);
+      var gInt = svgEl('g',{stroke:'#e0218a','stroke-width':1.4,fill:'none'});
+      gInt.appendChild(svgEl('line',{x1:xPix(intA),y1:yBase,x2:xPix(intB),y2:yBase}));
+      [intA, valley, intB].forEach(function(t){
+        gInt.appendChild(svgEl('line',{x1:xPix(t),y1:yBase-4,x2:xPix(t),y2:yBase+4}));
+      });
+      svg.appendChild(gInt);
+    }
+
+    // --- nombre de cada analito, arriba de su pico ---
+    var apexY = yPix(OFFSET + h);
+    var labY = Math.max(padT+34, apexY-10);
+    [[TR1,AN1],[TR2,AN2]].forEach(function(p){
+      var an = svgEl('text',{x:xPix(p[0]), y:labY, 'text-anchor':'middle',
+        'font-size':15, 'font-weight':600, fill:'#475569'});
+      an.textContent = p[1]; svg.appendChild(an);
+    });
+
+    // --- badge de estado, arriba a la derecha: las 3 zonas de S/R en color ---
+    var rsNow = resolutionRs(sr), legend=null, fg=null, bg=null;
+    if(sn < 3){              legend='Señal/ruido: no permite confirmar la presencia de los compuestos'; fg='#b91c1c'; bg='#fee2e2'; }
+    else if(sn < 10){        legend='Señal/ruido demasiado baja para cuantificar';                      fg='#9a3412'; bg='#ffedd5'; }
+    else if(rsNow >= 1.495){ legend='Buena resolución · señal suficiente para cuantificar';             fg='#15803d'; bg='#dcfce7'; }
+    if(legend){
+      var g = svgEl('g',{});
+      var wt = svgEl('text',{x:0,y:0,'font-size':14,'font-weight':700,fill:fg});
+      wt.textContent = legend;
+      g.appendChild(wt); svg.appendChild(g);      // hay que estar en el DOM para medir
+      var tw = wt.getComputedTextLength(), px=10, bh=23;
+      var bx = padL+plotW-4-tw-2*px;
+      g.insertBefore(svgEl('rect',{x:bx,y:padT-1,width:tw+2*px,height:bh,rx:10.5,fill:bg}), wt);
+      wt.setAttribute('x', bx+px); wt.setAttribute('y', padT+15);
+    }
+
+    // --- numeros ---
+    var rs = resolutionRs(sr);
+    var rsEl = document.getElementById('rsB');
+    rsEl.textContent = fmt(rs,2);
+    rsEl.className = 'nv ' + (rs<1.0?'bad':rs<1.495?'warn':'good');
+
+    var wEl = document.getElementById('wVal');
+    wEl.textContent = fmt(widthHalf(sr),4)+' min';
+    wEl.className = 'nv';
+
+    var snEl = document.getElementById('snB');
+    snEl.textContent = (sn>=10 ? sn.toFixed(0) : fmt(sn,1)) + ':1';
+    snEl.className = 'nv ' + (sn<3?'bad':sn<10?'warn':'good');
+
+  }
+
+  /* ===== 4. Esquema del inlet (simplificado a partir del diagrama de flujo real de
+     un split/splitless de Agilent: se omiten el modulo EPC, las valvulas y los
+     sensores. Queda la plomeria fisica y el camino real del gas: el carrier entra
+     por el costado, baja DENTRO del liner arrastrando la muestra, y en el fondo se
+     divide -- una parte chica entra a la columna y el resto sube por los costados
+     del liner (el anillo entre liner y cuerpo) antes de salir por el split vent. */
+  var inletSvg = document.getElementById('inletSvg');
+
+  var IX = 160;        // eje del inlet
+  var BODY = { x0:125, x1:195, y0:58, y1:252 };
+  var ORING = { y0:86, y1:94 };  // o-ring que sella el liner arriba (se ve en corte)
+  var LINER = { x0:148, x1:172, y0:87, y1:234 };
+  var SEAL = { y0:234, y1:246 };
+  var PURGE_Y = 73;    // purga de septum: arriba de todo
+  var CARRIER_Y = 80;  // carrier: entra alto, ENCIMA del o-ring
+  var SPLIT_Y = 125;   // split vent: sale mas ABAJO, del anillo (debajo del o-ring)
+  var ANN_L = 136, ANN_R = 184;  // ejes de los dos anillos (izq y der) alrededor del liner
+
+  // --- Coil de la columna: espiral eliptica, como el coil real dentro del horno ---
+  var COIL = { cx:295, cy:322, rx0:66, rx1:76, ry0:42, ry1:50, turns:2.5 };
+  function coilPoints(){
+    // Sentido ANTIHORARIO (a decreciente): entra por la izquierda y lo primero que
+    // hace es bajar. Asi, al final, llega al lado derecho SUBIENDO desde abajo y
+    // sigue de largo hacia el detector, sin el codo abrupto del sentido contrario.
+    var pts=[], steps=280;
+    for(var i=0;i<=steps;i++){
+      var t=i/steps, a=Math.PI - 2*Math.PI*COIL.turns*t;
+      var rx=COIL.rx0+(COIL.rx1-COIL.rx0)*t, ry=COIL.ry0+(COIL.ry1-COIL.ry0)*t;
+      pts.push([ COIL.cx+rx*Math.cos(a), COIL.cy+ry*Math.sin(a) ]);
+    }
+    return pts;
+  }
+  var COIL_PTS = coilPoints();
+  var COIL_IN  = COIL_PTS[0];
+  var COIL_END = COIL_PTS[COIL_PTS.length-1];
+  var DET = { x0:346, x1:396, y0:160, y1:214 };
+
+  var PATHS = {
+    // el carrier entra por el costado y baja por dentro del liner
+    main:   [[26,CARRIER_Y],[IX,CARRIER_Y],[IX,LINER.y1-6]],
+    purge:  [[BODY.x1-3,PURGE_Y],[240,PURGE_Y],[240,20]],
+    // el split sube por los DOS anillos laterales y recien despues sale por el tubing
+    splitR: [[IX,LINER.y1-6],[ANN_R,LINER.y1-6],[ANN_R,SPLIT_Y],[340,SPLIT_Y],[340,20]],
+    splitL: [[IX,LINER.y1-6],[ANN_L,LINER.y1-6],[ANN_L,SPLIT_Y],[340,SPLIT_Y],[340,20]],
+    col:    [[IX,LINER.y1-6],[IX,COIL.cy],[COIL_IN[0],COIL_IN[1]]]
+              .concat(COIL_PTS)
+              .concat([[COIL_END[0],COIL_END[1]],[COIL_END[0],DET.y1]])
+  };
+  function pathLength(pts){
+    var L=0; for(var i=1;i<pts.length;i++) L += Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
+    return L;
+  }
+  var PATH_LEN = {};
+  Object.keys(PATHS).forEach(function(k){ PATH_LEN[k]=pathLength(PATHS[k]); });
+
+  function pointAtDistance(pts, len, dist){
+    var d = ((dist % len) + len) % len;
+    for(var i=1;i<pts.length;i++){
+      var segLen = Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
+      if(d<=segLen || i===pts.length-1){
+        var t = segLen===0 ? 0 : d/segLen;
+        return [ pts[i-1][0]+(pts[i][0]-pts[i-1][0])*t, pts[i-1][1]+(pts[i][1]-pts[i-1][1])*t ];
+      }
+      d -= segLen;
+    }
+    return pts[pts.length-1];
+  }
+
+  var SPEED = 26; // px/seg de referencia, para 1 mL/min
+  // La velocidad de cada corriente sale de SU caudal. Se comprime con un exponente
+  // (no lineal) porque el split real llega a ser 700x el de columna y a escala
+  // lineal seria un borron. Dentro de una misma linea todas van igual de rapido.
+  function speedFor(flow){ return SPEED * Math.pow(flow, 0.33); }
+
+  function poly(pts){ return 'M '+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' L '); }
+  function arrowUp(x,y,c){ return svgEl('path',{d:'M '+(x-5)+','+(y+7)+' L '+x+','+y+' L '+(x+5)+','+(y+7), fill:'none', stroke:c,'stroke-width':2}); }
+  function arrowRight(x,y,c){ return svgEl('path',{d:'M '+(x-7)+','+(y-5)+' L '+x+','+y+' L '+(x-7)+','+(y+5), fill:'none', stroke:c,'stroke-width':2}); }
+  function txt(x,y,s,cls,anchor){
+    var t=svgEl('text',{x:x,y:y,class:'inlet-labels'+(cls?' '+cls:''),'text-anchor':anchor||'start'});
+    t.textContent=s; return t;
+  }
+
+  function drawInletStatic(){
+    inletSvg.innerHTML = '';
+    var GRAY='#94a3b8', ORANGE='#b45309', BLUE='#0ea5e9', COLCOL='#e8871a';
+
+    // ---------- jeringa ----------
+    inletSvg.appendChild(svgEl('rect',{x:IX-6,y:4,width:12,height:34,rx:2,fill:'#f1f5f9',stroke:GRAY}));
+    inletSvg.appendChild(svgEl('rect',{x:IX-9,y:0,width:18,height:5,rx:1,fill:GRAY}));
+    inletSvg.appendChild(svgEl('line',{x1:IX,y1:38,x2:IX,y2:125,stroke:'#64748b','stroke-width':1.4}));
+    inletSvg.appendChild(txt(IX+12,14,'Jeringa'));
+
+    // ---------- cuerpo del inlet (weldment) ----------
+    inletSvg.appendChild(svgEl('rect',{x:BODY.x0,y:BODY.y0,width:BODY.x1-BODY.x0,height:BODY.y1-BODY.y0,rx:5,fill:'#eef2f7',stroke:'#cbd5e1'}));
+    // septum
+    inletSvg.appendChild(svgEl('rect',{x:BODY.x0+3,y:BODY.y0,width:BODY.x1-BODY.x0-6,height:11,rx:2,fill:'#7c8698'}));
+    inletSvg.appendChild(txt(BODY.x1+6,BODY.y0+8,'Septum'));
+    // o-ring del liner: se dibuja ANTES que el liner, asi el liner lo tapa al medio
+    // y queda visible solo a los costados -- que es como se ve en corte.
+    inletSvg.appendChild(svgEl('rect',{x:LINER.x0-14,y:ORING.y0,width:(LINER.x1-LINER.x0)+28,height:ORING.y1-ORING.y0,
+      rx:3.5,fill:'#e8973a',stroke:'#b45309','stroke-width':1}));
+    // liner (tubo de vidrio), llega hasta arriba
+    inletSvg.appendChild(svgEl('rect',{x:LINER.x0,y:LINER.y0,width:LINER.x1-LINER.x0,height:LINER.y1-LINER.y0,
+      fill:'#ffffff',stroke:'#7dd3fc','stroke-width':1.6}));
+    inletSvg.appendChild(txt(BODY.x0-6,ORING.y0+6,'O-ring',null,'end'));
+    inletSvg.appendChild(txt(BODY.x0-6,LINER.y0+70,'Liner',null,'end'));
+    // sello de oro
+    inletSvg.appendChild(svgEl('rect',{x:LINER.x0-8,y:SEAL.y0,width:(LINER.x1-LINER.x0)+16,height:SEAL.y1-SEAL.y0,rx:2,
+      fill:'#e0b43c',stroke:'#b8860b','stroke-width':1.2}));
+    inletSvg.appendChild(txt(BODY.x0-6,SEAL.y0+9,'Sello de oro',null,'end'));
+    inletSvg.appendChild(txt(BODY.x1+6,BODY.y1-6,'Inlet weldment'));
+
+    // ---------- carrier: entra POR EL COSTADO ----------
+    inletSvg.appendChild(svgEl('line',{x1:26,y1:CARRIER_Y,x2:BODY.x0,y2:CARRIER_Y,stroke:BLUE,'stroke-width':2.4}));
+    inletSvg.appendChild(arrowRight(BODY.x0,CARRIER_Y,BLUE));
+    inletSvg.appendChild(txt(26,CARRIER_Y-16,'Flujo total (He)'));
+    var f1=txt(26,CARRIER_Y-5,'—'); f1.setAttribute('id','totalFlowLbl'); inletSvg.appendChild(f1);
+
+    // ---------- purga de septum ----------
+    inletSvg.appendChild(svgEl('path',{d:poly(PATHS.purge),stroke:GRAY,'stroke-width':2,fill:'none'}));
+    inletSvg.appendChild(arrowUp(240,20,GRAY));
+    inletSvg.appendChild(txt(246,20,'Purga de septum','fixed'));
+    inletSvg.appendChild(txt(246,31,'3,0 mL/min','fixed'));
+
+    // ---------- split vent ----------
+    inletSvg.appendChild(svgEl('path',{d:poly([[BODY.x1,SPLIT_Y],[340,SPLIT_Y],[340,20]]),stroke:ORANGE,'stroke-width':2,fill:'none'}));
+    inletSvg.appendChild(arrowUp(340,20,ORANGE));
+    inletSvg.appendChild(svgEl('circle',{cx:340,cy:70,r:7,fill:'#fde68a',stroke:ORANGE,'stroke-width':1.4}));
+    inletSvg.appendChild(txt(330,73,'Split vent trap','fixed','end'));
+    inletSvg.appendChild(txt(348,20,'Flujo de split','split'));
+    var f2=txt(348,31,'—','split'); f2.setAttribute('id','splitFlowLbl'); inletSvg.appendChild(f2);
+
+    // ---------- tuerca de columna + columna + coil ----------
+    // tuerca de columna: cuerpo cilindrico alargado con moleteado, y ferrula abajo
+    var ny = BODY.y1;
+    inletSvg.appendChild(svgEl('rect',{x:IX-12,y:ny,width:24,height:26,rx:2,fill:'#d8dee7',stroke:'#94a3b8','stroke-width':1.2}));
+    for(var k=1;k<=4;k++){
+      inletSvg.appendChild(svgEl('line',{x1:IX-12,y1:ny+k*5,x2:IX+12,y2:ny+k*5,stroke:'#a8b2c0','stroke-width':0.9}));
+    }
+    inletSvg.appendChild(svgEl('rect',{x:IX-7,y:ny+26,width:14,height:9,rx:1,fill:'#c2cad6',stroke:'#94a3b8','stroke-width':1.1}));
+    inletSvg.appendChild(svgEl('path',{d:'M '+(IX-5)+','+(ny+35)+' L '+(IX+5)+','+(ny+35)+' L '+(IX+3)+','+(ny+41)+' L '+(IX-3)+','+(ny+41)+' Z',
+      fill:'#e0b43c',stroke:'#b8860b','stroke-width':1}));
+    inletSvg.appendChild(txt(IX+18,ny+16,'Tuerca de columna','fixed'));
+    // columna: sube desde la tuerca, ATRAVIESA el sello de oro y asoma 1-2 mm
+    // por encima (como es en la realidad: la punta de la columna entra al
+    // liner pinchando el sello) -- por eso el primer punto del trazo queda
+    // arriba de SEAL.y0, no en la tuerca -- y despues baja + coil, en naranja
+    // como una J&W.
+    inletSvg.appendChild(svgEl('path',{d:poly([[IX,SEAL.y0-7],[IX,COIL.cy],[COIL_IN[0],COIL_IN[1]]]),
+      stroke:COLCOL,'stroke-width':2.2,fill:'none','stroke-linejoin':'round'}));
+    inletSvg.appendChild(svgEl('path',{d:poly(COIL_PTS),stroke:COLCOL,'stroke-width':2.2,fill:'none','stroke-linecap':'round'}));
+    inletSvg.appendChild(txt(COIL.cx,COIL.cy+COIL.ry1+16,'Columna capilar · 1,0 mL/min','fixed','middle'));
+
+    // ---------- tramo al detector + bloque detector ----------
+    inletSvg.appendChild(svgEl('line',{x1:COIL_END[0],y1:COIL_END[1],x2:COIL_END[0],y2:DET.y1,stroke:COLCOL,'stroke-width':2.2}));
+    inletSvg.appendChild(svgEl('rect',{x:DET.x0,y:DET.y0,width:DET.x1-DET.x0,height:DET.y1-DET.y0,rx:4,
+      fill:'#e0f2fe',stroke:'#7dd3fc','stroke-width':1.4}));
+    inletSvg.appendChild(txt((DET.x0+DET.x1)/2,DET.y0+24,'Detector',null,'middle'));
+    inletSvg.appendChild(txt((DET.x0+DET.x1)/2,DET.y0+37,'FID',null,'middle'));
+
+    ['gMain','gPurge','gSplitL','gSplitR','gCol'].forEach(function(id){
+      inletSvg.appendChild(svgEl('g',{id:id}));
+    });
+  }
+  drawInletStatic();
+
+  function drawStream(gId, pathKey, count, color, radius, opacity, distTraveled){
+    var g = document.getElementById(gId);
+    g.innerHTML = '';
+    var pts = PATHS[pathKey], len = PATH_LEN[pathKey];
+    for(var i=0;i<count;i++){
+      var d = distTraveled + (len/count)*i; // espaciado parejo, misma velocidad para todas
+      var xy = pointAtDistance(pts, len, d);
+      g.appendChild(svgEl('circle',{cx:xy[0].toFixed(1), cy:xy[1].toFixed(1), r:radius, fill:color, opacity:opacity}));
+    }
+  }
+
+  var lastTs = null;
+  var dist = { main:0, purge:0, col:0, split:0 };
+  function animate(ts){
+    if(lastTs===null) lastTs = ts;
+    var dt = Math.min(0.05, (ts-lastTs)/1000); lastTs = ts;
+    var sr = state.sr;
+
+    dist.main  += speedFor(totalFlow(sr))*dt;   // acelera: es el caudal total
+    dist.purge += speedFor(SEPTUM_PURGE)*dt;    // fijo
+    dist.col   += speedFor(COL_FLOW)*dt;        // fijo
+    dist.split += speedFor(splitFlow(sr))*dt;   // acelera con el split
+
+    drawStream('gMain','main', 7, '#0ea5e9', 2.6, .85, dist.main);
+    drawStream('gPurge','purge', 3, '#94a3b8', 2.3, .8, dist.purge);
+    drawStream('gCol','col', 14, '#0ea5e9', 2.6, .8, dist.col);
+    drawStream('gSplitL','splitL', 7, '#b45309', 2.6, .85, dist.split);
+    drawStream('gSplitR','splitR', 7, '#b45309', 2.6, .85, dist.split + PATH_LEN.splitR/14);
+
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  /* ===== 5. Wiring ===== */
+  function renderAll(){
+    document.getElementById('splitVal').textContent = splitLabel(state.sr);
+    document.getElementById('totalFlowLbl').textContent = fmt(totalFlow(state.sr),1)+' mL/min';
+    document.getElementById('splitFlowLbl').textContent = fmt(splitFlow(state.sr),1)+' mL/min';
+    document.getElementById('formulaBox').innerHTML =
+      '<b>Relación de split</b> = flujo de split &frasl; flujo de columna<br>'+
+      '<b>Flujo de split</b> = relación de split × flujo de columna = '+
+        state.sr+' × '+fmt(COL_FLOW,1)+' = <span class="num">'+fmt(splitFlow(state.sr),1)+' mL/min</span><br>'+
+      '<b>Flujo total</b> = columna + split + purga de septum = '+
+        fmt(COL_FLOW,1)+' + '+fmt(splitFlow(state.sr),1)+' + '+fmt(SEPTUM_PURGE,1)+
+        ' = <span class="num">'+fmt(totalFlow(state.sr),1)+' mL/min</span>';
+    renderChrom();
+    renderGuide();
+  }
+  /* La guia narra, con los numeros del momento, las dos cosas que el visitante
+     tiene que ver: (1) cuanta muestra entra realmente a la columna y por que sube
+     el flujo total, y (2) que le pasa a la forma de los picos como consecuencia. */
+  function renderGuide(){
+    if(!guideOn) return;
+    var sr = state.sr;
+    var N = sr + 1;                       // 1 parte a columna + sr partes al venteo
+    var pctCol = 100/N;
+    var tot = totalFlow(sr), sweep = tot/totalFlow(1);
+    var w = widthHalf(sr), wRef = widthHalf(1);
+    var rs = resolutionRs(sr), sn = snRatio(sr);
+
+    document.getElementById('g1Frac').innerHTML =
+      'Decide <b>qué fracción de lo que inyectás llega a la columna</b>: de cada ' +
+      '<span class="hl">' + N + '</span> moléculas que se vaporizan en el liner, ' +
+      '<b>1 entra</b> y <span class="hl">' + sr + '</span> salen por el venteo.';
+    document.getElementById('g1Bar').style.width = pctCol.toFixed(3) + '%';
+    document.getElementById('g1Pct').textContent = (pctCol>=10 ? fmt(pctCol,1) : fmt(pctCol,2)) + ' %';
+    document.getElementById('g1Vent').textContent = (100-pctCol>=99.9 ? fmt(100-pctCol,2) : fmt(100-pctCol,1)) + ' %';
+    document.getElementById('g1Sweep').innerHTML =
+      'Ese gas tiene que salir por algún lado: el <b>flujo total</b> sube a ' +
+      '<span class="hl">' + fmt(tot,1) + ' mL/min</span> y el liner se barre ' +
+      '<span class="hl">' + fmt(sweep,1) + '&times;</span> más rápido que a 1:1, así que la banda ' +
+      'de inyección entra más angosta.';
+
+    document.getElementById('g2Body').innerHTML =
+      'Entra menos masa, así que los picos <b>bajan</b>; y como la banda de inyección es más ' +
+      'corta, además <b>se angostan</b>: el ancho a ½ altura es de <span class="hl">' + fmt(w,4) +
+      ' min</span>, un <span class="hl">' + fmt(100*w/wRef,0) + ' %</span> del que tenían a 1:1' +
+      (sr > 1.02 ? ' &mdash; es la silueta gris punteada del gráfico' : '') +
+      '. Al angostarse se separan: <b>Rs = <span class="hl">' + fmt(rs,2) + '</span></b>, con ' +
+      'señal/ruido <span class="hl">' + (sn>=10 ? sn.toFixed(0) : fmt(sn,1)) + ':1</span>.';
+
+    var cls, msg;
+    if(sn < 3){
+      cls='gv-bad';
+      msg='Te pasaste: los picos se perdieron en el ruido. Ganaste resolución sobre algo que ya no se puede ni detectar.';
+    } else if(sn < 10){
+      cls='gv-warn';
+      msg='Resuelven bien, pero la señal quedó por debajo del límite de cuantificación usual (S/R = 10). Estás más allá del óptimo.';
+    } else if(rs >= 1.495){
+      cls='gv-good';
+      msg = sr > 60
+        ? 'Resolvés a línea de base y todavía sobra señal, pero fijate que la resolución ya casi no mejora: la banda de inyección dejó de ser lo que limita el ancho. De acá para arriba, más split sólo cuesta sensibilidad.'
+        : 'Acá está el compromiso que buscabas: resolución a línea de base (Rs ≥ 1,5) y todavía señal de sobra para cuantificar.';
+    } else {
+      cls='gv-info';
+      msg='Todavía coeluyen (Rs < 1,5). Subí el split: la banda de inyección se acorta, los picos se angostan y se terminan de separar.';
+    }
+    var v = document.getElementById('g2Verdict');
+    v.className = 'guide-verdict ' + cls;
+    v.textContent = msg;
+  }
+
+  /* boton de la guia */
+  var splitGroup = document.getElementById('splitGroup');
+  var guideBtn = document.getElementById('guideBtn');
+  var guideBtnTxt = document.getElementById('guideBtnTxt');
+  var guideHint = document.getElementById('guideHint');
+  var touched = false;
+  function applyGuide(){
+    document.body.classList.toggle('guide-on', guideOn);
+    guideBtn.setAttribute('aria-pressed', guideOn ? 'true' : 'false');
+    guideBtnTxt.innerHTML = guideOn ? 'Ocultar la gu&iacute;a' : 'Mostrar la gu&iacute;a paso a paso';
+    guideHint.style.display = guideOn ? '' : 'none';
+    splitGroup.classList.toggle('pulse', guideOn && !touched);
+    renderAll();
+  }
+  guideBtn.addEventListener('click', function(){
+    guideOn = !guideOn;
+    try { localStorage.setItem('splitGuide', guideOn ? 'on' : 'off'); } catch(e){}
+    applyGuide();
+  });
+
+  var slider = document.getElementById('splitSlider');
+  slider.addEventListener('input', function(e){
+    if(!touched){ touched = true; splitGroup.classList.remove('pulse'); }
+    state.sr = splitFromSlider(parseFloat(e.target.value));
+    renderAll();
+  });
+
+  // marca del optimo (50:1) alineada con el centro del thumb
+  var tickOpt = document.getElementById('tickOpt');
+  function placeTick(){
+    var w = slider.offsetWidth;
+    if(!w) return;
+    var thumb = 16; // ancho aprox del thumb: el recorrido util es w - thumb
+    var f = sliderFromSplit(50)/SLIDER_MAX;
+    tickOpt.style.left = (thumb/2 + f*(w-thumb)).toFixed(1)+'px';
+  }
+  placeTick();
+  window.addEventListener('resize', placeTick);
+
+  applyGuide();
+})();
+</script>
+<script src="/comments.js" defer></script>
+</body>
+</html>

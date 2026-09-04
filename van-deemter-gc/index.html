@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Van Deemter y resolución en GC — cromatografia.com.ar</title>
+<meta name="description" content="Elegí el carrier gas y movés la velocidad lineal: mirá en vivo cómo cambia la curva de Van Deemter y cómo se resuelven (o no) los picos de un cromatograma real de GC." />
+<link rel="icon" href="/favicon.ico" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JDNY6YDF3N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-JDNY6YDF3N');
+</script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:#f1f5f9; --surface:#fff; --border:#e2e8f0; --text:#0f172a; --muted:#64748b;
+    --primary:#1d4ed8; --primary-light:#eff6ff; --accent:#0ea5e9;
+    --he:#ea580c; --h2:#dc2626; --n2:#16a34a;
+  }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+
+  header { background:#0d1b35; color:#fff; padding:0 1.25rem; }
+  .header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; gap:1rem; }
+  .logo { font-size:1.25rem; font-weight:700; letter-spacing:-0.02em; text-decoration:none; color:#fff; white-space:nowrap; }
+  .logo-ia { color:#38bdf8; font-style:italic; }
+  .header-tagline { font-size:0.75rem; color:#93c5fd; white-space:nowrap; }
+  .header-tagline a { color:#93c5fd; text-decoration:none; }
+  .header-tagline a:hover { color:#fff; }
+  nav { display:flex; align-items:center; gap:.15rem; flex-wrap:wrap; justify-content:flex-end; }
+  nav a { color:#bfdbfe; text-decoration:none; font-size:0.8rem; padding:.3rem .6rem; border-radius:6px; transition:color .15s,background .15s; white-space:nowrap; }
+  nav a:hover { color:#fff; background:rgba(255,255,255,.1); }
+  @media (max-width:600px){ header{padding:0 1rem} .header-inner{height:auto;flex-wrap:wrap;padding:.6rem 0;gap:.3rem} .header-tagline{display:none} nav{width:100%;justify-content:flex-start;gap:.1rem;padding-bottom:.3rem} nav a{font-size:.72rem;padding:.25rem .45rem} }
+
+  .breadcrumb { background:var(--surface); border-bottom:1px solid var(--border); padding:.6rem 2rem; font-size:.78rem; color:var(--muted); }
+  .breadcrumb a { color:var(--primary); text-decoration:none; }
+  .breadcrumb a:hover { text-decoration:underline; }
+
+  main { flex:1; padding:2rem; }
+  .container { max-width:1200px; margin:0 auto; }
+
+  .tool-header { margin-bottom:1.5rem; }
+  .tool-meta { display:flex; flex-direction:column; gap:.45rem; }
+  .tool-title { font-size:1.4rem; font-weight:800; letter-spacing:-.02em; }
+  .tool-desc { font-size:.875rem; color:var(--muted); line-height:1.6; }
+
+  .tool-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .wrap { padding:1.75rem 1.75rem 2rem; }
+
+  /* --- controles --- */
+  .ctrl-row { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:flex-end; margin-bottom:1.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+  .ctrl-group { display:flex; flex-direction:column; gap:.5rem; }
+  .ctrl-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .gas-btns { display:flex; gap:.4rem; }
+  .gas-btn { font-family:inherit; font-size:.85rem; font-weight:700; padding:.5rem 1.05rem; border-radius:8px;
+             border:1.5px solid var(--border); background:#fff; cursor:pointer; color:var(--muted); transition:all .15s; }
+  .gas-btn:hover { border-color:#cbd5e1; color:var(--text); }
+  .gas-btn.active { color:#fff; }
+  .gas-btn[data-gas="he"].active { border-color:var(--he); background:var(--he); }
+  .gas-btn[data-gas="h2"].active { border-color:var(--h2); background:var(--h2); }
+  .gas-btn[data-gas="n2"].active { border-color:var(--n2); background:var(--n2); }
+
+  .vel-group { flex:1; min-width:280px; }
+  .vel-slider-row { display:flex; align-items:center; gap:1rem; }
+  /* Slider de una sola pista PAREJA (igual estetica que split-gc): sin tramo
+     "recorrido" coloreado por accent-color, solo track gris + una bolita. La
+     zona optima NO se pinta en el track -- se marca debajo, con dos tics
+     finitos (uno en cada extremo del rango) y el rotulo en el medio, igual que
+     el tic de "50:1 optimo" de split-gc pero de dos puntas porque aca es un
+     rango, no un valor puntual. */
+  input[type=range] { flex:1; -webkit-appearance:none; appearance:none; background:transparent; cursor:pointer; }
+  input[type=range]::-webkit-slider-runnable-track { height:6px; border-radius:3px; background:var(--border); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%;
+    background:#fff; border:3px solid var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.25);
+    margin-top:-5px; cursor:pointer;
+  }
+  input[type=range]::-moz-range-track { height:6px; border-radius:3px; background:var(--border); }
+  input[type=range]::-moz-range-thumb {
+    width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid var(--primary);
+    box-shadow:0 1px 3px rgba(0,0,0,.25); cursor:pointer;
+  }
+  .vel-readout { display:flex; gap:1.25rem; white-space:nowrap; }
+  .vel-readout-item { display:flex; flex-direction:column; gap:.15rem; }
+  .vel-readout-label { font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .vel-readout b { font-size:.85rem; font-variant-numeric:tabular-nums; }
+
+  /* el slider es LO que se toca: se destaca como bloque interactivo, igual que en split-gc */
+  .vel-group { flex:2.4 1 420px; min-width:320px; background:#eff6ff; border:1.5px solid #bfdbfe;
+               border-radius:12px; padding:.55rem .9rem .5rem; }
+  .vel-group .ctrl-label { color:var(--primary); }
+  .vel-slider-wrap { position:relative; flex:1; }
+  .vel-slider-wrap input[type=range] { display:block; width:100%; }
+  .vel-zone-ticks { position:relative; height:14px; margin-top:3px; }
+  .vel-tick { position:absolute; top:0; width:2px; height:6px; transform:translateX(-50%); transition:left .15s, background-color .15s; }
+  .vel-zone-label { position:absolute; top:8px; font-size:.64rem; font-weight:700;
+                    white-space:nowrap; transform:translateX(-50%); transition:left .15s, color .15s; }
+  .vel-zone-label span { position:absolute; transform:translateX(-50%); transition:left .15s, color .15s; }
+
+  .col-info { font-size:.78rem; color:var(--muted); }
+  .col-info b { color:var(--text); }
+
+  /* --- panel dos columnas --- */
+  .panel { display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .vd-pane { flex:1 1 340px; min-width:300px; }
+  .chrom-pane { flex:2 1 480px; min-width:340px; }
+  .pane-title { font-size:.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:.6rem; }
+  svg { width:100%; height:auto; display:block; }
+  .axis-label { font-size:10px; fill:#94a3b8; }
+  .gridline { stroke:#eef2f6; stroke-width:1; }
+  .curve-dim { opacity:.28; }
+  /* el grafico de Van Deemter tambien es un control: se arrastra */
+  #vdChart { cursor:ew-resize; touch-action:none; }
+  #vdChart text, #vdChart tspan { user-select:none; -webkit-user-select:none; }
+  .vd-hint { display:flex; align-items:center; gap:.35rem; margin-top:.3rem;
+             font-size:.72rem; color:var(--muted); }
+  .vd-hint svg { width:13px; height:13px; flex-shrink:0; }
+  .vd-credit { display:flex; align-items:center; gap:.6rem; margin-top:1rem;
+               padding-top:.85rem; border-top:1px solid var(--border); }
+  .vd-credit img { height:22px; width:auto; display:block; }
+  .vd-credit span { font-size:.68rem; color:var(--muted); }
+  .curve-marker { fill:#0f172a; }
+
+  .peak-label { font-size:9.5px; fill:#334155; text-anchor:middle; }
+  .peak-label.crit { fill:#b45309; font-weight:700; }
+  .baseline { stroke:#cbd5e1; stroke-width:1; }
+
+  .pane-title.sub { margin-top:1.1rem; }
+  .zoom-grid { display:flex; gap:.75rem; flex-wrap:wrap; }
+  .zoom-box { flex:1 1 150px; min-width:150px; text-align:center; background:#fbfcfe; border:1px solid var(--border); border-radius:10px; padding:.6rem .5rem .5rem; }
+  .zoom-r { font-size:1.35rem; font-weight:800; color:#0f172a; font-variant-numeric:tabular-nums; }
+  .zoom-r.bad { color:#b91c1c; } .zoom-r.warn { color:#b45309; } .zoom-r.good { color:#15803d; }
+  .zoom-name { font-size:.68rem; color:var(--muted); margin-top:.3rem; }
+
+  .ramp-picker { display:flex; align-items:center; gap:.65rem; flex-wrap:wrap; margin-top:1rem; }
+  .ramp-picker-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .ramp-btns { display:flex; gap:.4rem; }
+  .ramp-btn { font-family:inherit; font-size:.78rem; font-weight:600; padding:.4rem .8rem;
+              border-radius:8px; border:1.5px solid var(--border); background:#fff;
+              color:var(--muted); cursor:pointer; transition:all .15s; }
+  .ramp-btn:hover { border-color:#cbd5e1; color:var(--text); }
+  .ramp-btn.active { border-color:var(--primary); background:var(--primary); color:#fff; }
+
+  .ramp-box { margin-top:.6rem; padding:.75rem .9rem; border-radius:10px;
+              font-size:.8rem; line-height:1.55; transition:background .15s, border-color .15s; }
+  .ramp-box.slow { background:#f0fdf4; border:1px solid #bbf7d0; color:#14532d; }
+  .ramp-box.fast { background:#fef2f2; border:1px solid #fecaca; color:#7f1d1d; }
+  .ramp-box.slower { background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a5f; }
+  .ramp-box-txt b { color:inherit; }
+
+  .metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; margin-top:1.25rem; padding-top:1.25rem; border-top:1px solid var(--border); }
+  .metric { background:#f8fafc; border-radius:10px; padding:.65rem .8rem; }
+  .metric .ml { font-size:.65rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:.2rem; }
+  .metric .mv { font-size:1.05rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .metric.warn .mv { color:#b45309; }
+  .metric.bad .mv { color:#b91c1c; }
+  .metric.good .mv { color:#15803d; }
+
+  .disclaimer { margin-top:1.5rem; font-size:.75rem; color:var(--muted); line-height:1.65; background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:.9rem 1rem; }
+  .disclaimer b { color:var(--text); }
+
+  .vd-explain { margin-top:1rem; background:var(--primary-light); border:1px solid #bfdbfe;
+                border-radius:12px; padding:1rem 1.25rem; display:flex; gap:.9rem; align-items:flex-start; }
+  .vd-explain svg { width:20px; height:20px; flex-shrink:0; margin-top:.15rem; color:var(--primary); }
+  .vd-explain-body { font-size:.84rem; line-height:1.62; color:#1e3a5f; }
+  .vd-explain-body b { color:var(--primary); }
+  .vd-explain-title { font-weight:700; color:var(--text); margin-bottom:.3rem; display:block; }
+  .vd-formula { margin:.5rem 0 .7rem; padding:.6rem .8rem; background:#fff; border:1px solid #bfdbfe;
+                border-radius:8px; font-family:ui-monospace,'Cascadia Mono','SF Mono',Consolas,monospace;
+                font-size:.78rem; color:#0f172a; }
+  .vd-formula-line + .vd-formula-line { margin-top:.35rem; }
+  .vd-formula-line b { font-family:inherit; color:var(--primary); }
+  .vd-terms { margin:0 0 .7rem; padding-left:1.1rem; }
+  .vd-terms li { margin-bottom:.35rem; }
+  .vd-terms li:last-child { margin-bottom:0; }
+  .vd-terms b { font-family:ui-monospace,'Cascadia Mono','SF Mono',Consolas,monospace; }
+
+  footer { background:#0d1b35; color:#94a3b8; padding:2.5rem 2rem; font-size:.78rem; line-height:1.7; }
+  .footer-inner { max-width:1200px; margin:0 auto; display:flex; flex-direction:column; gap:1.25rem; }
+  .footer-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; padding-bottom:1.25rem; border-bottom:1px solid rgba(255,255,255,.08); }
+  .footer-brand { font-size:1rem; font-weight:700; color:#fff; letter-spacing:-.01em; }
+  .footer-brand span { color:#60a5fa; }
+  .footer-links { display:flex; gap:1.25rem; flex-wrap:wrap; }
+  .footer-links a { color:#94a3b8; text-decoration:none; transition:color .15s; }
+  .footer-links a:hover { color:#fff; }
+  .footer-disclaimer { color:#64748b; font-size:.73rem; line-height:1.6; }
+  .footer-disclaimer p + p { margin-top:.75rem; }
+  .footer-copy { color:#475569; font-size:.72rem; border-top:1px solid rgba(255,255,255,.06); padding-top:1rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">Cromatograf<span class="logo-ia">IA</span>.com.ar</a>
+    <span class="header-tagline">Un proyecto de <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a></span>
+    <nav>
+      <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a>
+      <a href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Soporte técnico</a>
+      <a href="https://www.viales.com.ar" target="_blank" rel="noopener">viales.com.ar</a>
+    </nav>
+  </div>
+</header>
+
+<div class="breadcrumb"><a href="/">cromatografia.com.ar</a> / Van Deemter y resolución en GC</div>
+
+<main>
+  <div class="container">
+
+    <div class="tool-header">
+      <div class="tool-meta">
+        <div class="tool-title">Van Deemter y resolución en GC</div>
+        <div class="tool-desc">Elegí el carrier gas y movés la velocidad lineal &mdash; con el slider o arrastrando directamente sobre la curva. A la izquierda, la curva de Van Deemter/Golay de cada gas (la que estás usando, resaltada). A la derecha, un cromatograma de plaguicidas organoclorados en una columna de 5&nbsp;% fenil que se recalcula en vivo: mirá cómo los picos se mueven y se resuelven mejor o peor según la velocidad.</div>
+      </div>
+
+      <div class="vd-explain">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2"></circle><path d="M12 8v4.5l2.8 1.7"></path>
+        </svg>
+        <div class="vd-explain-body">
+          <span class="vd-explain-title">Por qué existe una velocidad óptima</span>
+          <div class="vd-formula">
+            <div class="vd-formula-line"><b>Van Deemter</b> (columnas empacadas): H&nbsp;=&nbsp;A&nbsp;+&nbsp;B/u&nbsp;+&nbsp;C&middot;u</div>
+            <div class="vd-formula-line"><b>Golay</b> (columnas capilares, como esta): H&nbsp;=&nbsp;B/u&nbsp;+&nbsp;C&middot;u &mdash; el término A se anula (A&nbsp;=&nbsp;0) porque no hay relleno que genere caminos distintos para el gas.</div>
+          </div>
+          <ul class="vd-terms">
+            <li><b>A</b> &mdash; difusión turbulenta (o de remolino): en una columna empacada, cada molécula recorre un camino algo distinto entre las partículas del relleno; en una columna capilar no hay relleno, así que este término no existe.</li>
+            <li><b>B/u</b> &mdash; difusión molecular longitudinal: domina a velocidad <b>baja</b>, cuando el analito pasa más tiempo en la columna y la difusión a lo largo del flujo alcanza a desparramar la banda.</li>
+            <li><b>C&middot;u</b> &mdash; resistencia a la transferencia de masa: domina a velocidad <b>alta</b>, cuando el gas avanza tan rápido que el analito no llega a equilibrarse entre la fase móvil y la estacionaria.</li>
+          </ul>
+          Como un efecto crece cuando el otro cae, hay una velocidad intermedia (<b>u<sub>opt</sub></b>) donde ambos se compensan al mínimo: ahí la columna es más eficiente, los picos son más angostos y, para una separación dada, la resolución es la mejor alcanzable.
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-card">
+      <div class="wrap">
+
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <span class="ctrl-label">Carrier gas</span>
+            <div class="gas-btns">
+              <button class="gas-btn active" data-gas="he">Helio</button>
+              <button class="gas-btn" data-gas="h2">Hidrógeno</button>
+              <button class="gas-btn" data-gas="n2">Nitrógeno</button>
+            </div>
+          </div>
+          <div class="ctrl-group vel-group">
+            <span class="ctrl-label">Velocidad lineal u (cm/s)</span>
+            <div class="vel-slider-row">
+              <div class="vel-slider-wrap">
+                <input type="range" id="velSlider" min="2" max="120" step="1" value="35">
+                <div class="vel-zone-ticks">
+                  <span class="vel-tick" id="velTickL"></span>
+                  <span class="vel-tick" id="velTickR"></span>
+                  <span class="vel-zone-label" id="velZoneLabel"></span>
+                </div>
+              </div>
+              <div class="vel-readout">
+                <div class="vel-readout-item">
+                  <span class="vel-readout-label">Velocidad lineal promedio</span>
+                  <span><b id="velVal">35</b> cm/s</span>
+                </div>
+                <div class="vel-readout-item">
+                  <span class="vel-readout-label">Flujo de carrier</span>
+                  <span><b id="flowVal">0.82</b> mL/min</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ctrl-group">
+            <span class="ctrl-label">Columna</span>
+            <div class="col-info"><b>DB-5 / HP-5 / Rtx-5 o equivalente</b> (5&nbsp;% fenil), 30 m &times; 0,25 mm ID &times; 0,25 µm &middot; FID &middot; rampa 100&deg;C&rarr;280&deg;C @ <span id="rampInfoVal">20</span>&deg;C/min</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="vd-pane">
+            <div class="pane-title">Curva de Van Deemter / Golay</div>
+            <svg id="vdChart" viewBox="0 0 360 260" role="img" aria-label="Curva de Van Deemter: arrastr&aacute; para cambiar la velocidad lineal"></svg>
+            <div class="vd-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M7 9l-3 3 3 3"></path><path d="M17 9l3 3-3 3"></path><path d="M4.5 12h15"></path>
+              </svg>
+              <span>Arrastr&aacute; sobre el gr&aacute;fico para cambiar la velocidad, o us&aacute; el slider.</span>
+            </div>
+            <div class="vd-credit">
+              <img src="/logo-ags.png" alt="AGS Analítica">
+              <span>Herramienta diseñada por AGS Analítica S.A.&reg;</span>
+            </div>
+          </div>
+          <div class="chrom-pane">
+            <div class="pane-title">Vista general (6 picos, EPA 8081)</div>
+            <svg id="miniChart" viewBox="0 0 720 90"></svg>
+
+            <div class="pane-title sub">Zoom por par crítico</div>
+            <div class="zoom-grid">
+              <div class="zoom-box">
+                <div class="zoom-r" id="rTxt0">R = 0,00</div>
+                <svg class="zoomSvg" data-pair="0" viewBox="0 0 220 140"></svg>
+                <div class="zoom-name">α-BHC / Hexaclorobenceno</div>
+              </div>
+              <div class="zoom-box">
+                <div class="zoom-r" id="rTxt1">R = 0,00</div>
+                <svg class="zoomSvg" data-pair="1" viewBox="0 0 220 140"></svg>
+                <div class="zoom-name">β-BHC / γ-BHC</div>
+              </div>
+              <div class="zoom-box">
+                <div class="zoom-r" id="rTxt2">R = 0,00</div>
+                <svg class="zoomSvg" data-pair="2" viewBox="0 0 220 140"></svg>
+                <div class="zoom-name">δ-BHC / Clorotalonil</div>
+              </div>
+            </div>
+
+            <div class="ramp-picker">
+              <span class="ramp-picker-label">Rampa de temperatura</span>
+              <div class="ramp-btns">
+                <button type="button" class="ramp-btn active" data-ramp="r20">20&nbsp;°C/min</button>
+                <button type="button" class="ramp-btn" data-ramp="r15">15&nbsp;°C/min</button>
+                <button type="button" class="ramp-btn" data-ramp="r10">10&nbsp;°C/min</button>
+              </div>
+            </div>
+            <div class="ramp-box" id="rampBox">
+              <div class="ramp-box-txt" id="rampBoxTxt"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics" id="metrics"></div>
+
+        <div class="disclaimer">
+          <p><b>Sobre los datos.</b> El cromatograma y la curva de Van Deemter están simulados a partir de cálculos teóricos (ecuación de Golay para columnas capilares) para esta columna (fase de 5&nbsp;% fenil tipo DB-5 / HP-5 / Rtx-5, 30&times;0,25&times;0,25) y esta rampa de temperatura, con tiempos de retención y anchos de pico calculados en Helio y reescalados a Hidrógeno y Nitrógeno según la velocidad óptima teórica de cada gas — es el concepto de <i>velocidad reducida</i> de la teoría de platos, no un ajuste arbitrario. El modelo asume que la velocidad lineal (y el caudal) se mantienen constantes durante toda la rampa, como lo haría el control electrónico de flujo (EPC) de un equipo moderno en modo caudal constante: no representa el aumento de viscosidad del gas carrier con la temperatura, que en un inlet sin EPC (a presión constante) haría caer el caudal real a medida que sube el horno. Las opciones de rampa 15 y 10&nbsp;&deg;C/min son igual de ilustrativas: separan un poco más los tiempos de retención de cada par (como haría una rampa más lenta en la realidad), pero no recalculan el ancho de los picos para esas rampas. La de 10&nbsp;&deg;C/min es además una extrapolación de la de 15 (no una calibración propia), por lo que los valores estimados contienen un error mayor. Es una herramienta de referencia para entender el fenómeno; verificá siempre experimentalmente.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tool-comments" data-tool="Van Deemter y resolución en GC"></div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <span class="footer-brand">cromatografia<span>.com.ar</span></span>
+      <div class="footer-links">
+        <a href="https://www.agsanalitica.com" target="_blank" rel="noopener">AGS Analítica</a>
+        <a href="https://www.agsanalitica.com/es/soporte-tecnico" target="_blank" rel="noopener">Soporte técnico</a>
+        <a href="https://www.viales.com.ar" target="_blank" rel="noopener">viales.com.ar</a>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      <p>Las herramientas disponibles en cromatografia.com.ar son de carácter informativo y de referencia. Los resultados obtenidos deben ser verificados por el usuario contra las fuentes regulatorias oficiales vigentes antes de ser utilizados en decisiones técnicas, analíticas o regulatorias. AGS ANALÍTICA S.A. no asume responsabilidad alguna por el uso de la información proporcionada sin la correspondiente verificación.</p>
+      <p>AGS ANALÍTICA S.A. cumple con la Ley Nacional de Protección de Datos Personales N° 25.326.</p>
+    </div>
+    <div class="footer-copy">&copy; 2026 AGS ANALÍTICA S.A. &mdash; Un proyecto de <a href="https://www.agsanalitica.com" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:none;">AGS Analítica</a></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== 1. Columna fija ===== */
+  var COL_R_CM = 0.0125;           // 0.25 mm ID -> radio en cm
+  var COL_AREA = Math.PI * COL_R_CM * COL_R_CM; // cm^2
+  var COL_LEN_MM = 30000;          // 30 m, para N = L/H
+
+  function flowMlMin(uCmS){ return uCmS * COL_AREA * 60; }
+
+  /* ===== 2. u_optimo teorico por gas (relacion de coeficientes de difusion He/H2/N2) =====
+     He=30.87  H2=42.88  N2=11.67 -> ratios aplicados sobre el u_opt de ESTE sistema (He=34.88) */
+  var U_OPT_HE = 34.88;
+  var RATIO_H2 = 42.88/30.87;
+  var RATIO_N2 = 11.67/30.87;
+  var U_OPT = { he: U_OPT_HE, h2: U_OPT_HE*RATIO_H2, n2: U_OPT_HE*RATIO_N2 };
+
+  /* ===== 3. Datos simulados (He) — columna 5% fenil (DB-5/HP-5/Rtx-5) 30x0.25x0.25,
+     rampa 100->280@20C/min =====
+     anclas de velocidad: 20, 34.88 (optimo), 80, 120 cm/s. [tR_min, width_min] */
+  var U_ANCHORS = [20, 34.88, 80, 120];
+  // heSlow (15 C/min) y heSlower (10 C/min): tiempos de retencion con una rampa
+  // mas lenta que la de referencia (100->280@20C/min). Los anchos (segundo valor
+  // de cada par en 'he') NO se modelan de nuevo para ninguna rampa -- se reusan
+  // los mismos, una simplificacion conservadora (una rampa mas lenta tiende a
+  // angostar un poco los picos, asi que si algo esto subestima la mejora real).
+  // Solo cambia el tR de cada analito: una rampa mas lenta le da mas tiempo a la
+  // columna en la zona de temperatura donde eluyen estos pares, separandolos mas.
+  // heSlow esta calibrado (factor de ensanchamiento del par ~1,33) para que la
+  // resolucion del par critico llegue justo a Rs=1,6 con H2 en su optimo -- es
+  // una estimacion, no un dato de una corrida real, pero razonable. heSlower
+  // (10C/min) es una EXTRAPOLACION de esa misma calibracion (factor ~2,0,
+  // asumiendo que el tiempo extra en la ventana de elucion escala ~1/velocidad
+  // de rampa): tiene mas incertidumbre que heSlow, no lo tomes como un numero
+  // firme -- ilustra la tendencia, no un valor a citar.
+  // OJO al tocar esto: los 3 pares se ensanchan a favor de la rampa lenta, pero
+  // el par 0 (alfa-BHC/Hexaclorobenceno) se ensancha corriendo AL PRIMERO ("a",
+  // alfa-BHC) mas TEMPRANO en vez de correr al segundo ("b", Hexaclorobenceno)
+  // mas tarde. Alfa-BHC es el primer pico de todos -- no tiene vecino antes, asi
+  // que no hay riesgo de choque. Si en cambio se corre Hexaclorobenceno mas
+  // tarde (como se hace con los otros dos pares), se acerca demasiado a
+  // beta-BHC (un pico de OTRO par, sin relacion) y en la rampa de 10 C/min
+  // llegan a cruzarse al extrapolar por debajo del ancla de 20 cm/s -- la vista
+  // general mostraba 5 picos en vez de 6. Antes de ensanchar un pico corriendo
+  // al vecino, verificar que no le coma el hueco al SIGUIENTE pico de la fila.
+  var PEAKS = [
+    { name:'α-BHC',            he:[[7.54,0.035],[6.22,0.024],[4.69,0.030],[4.06,0.041]],
+      heSlow:[7.50,6.19,4.66,4.04], heSlower:[7.43,6.12,4.61,3.99] },
+    { name:'Hexaclorobenceno', he:[[7.65,0.035],[6.32,0.024],[4.77,0.031],[4.13,0.041]],
+      heSlow:[7.65,6.32,4.77,4.13], heSlower:[7.65,6.32,4.77,4.13] },
+    { name:'β-BHC',            he:[[7.79,0.034],[6.49,0.024],[4.98,0.030],[4.35,0.041]],
+      heSlow:[7.79,6.49,4.98,4.35], heSlower:[7.79,6.49,4.98,4.35] },
+    { name:'γ-BHC',            he:[[7.88,0.035],[6.57,0.024],[5.03,0.031],[4.40,0.042]],
+      heSlow:[7.91,6.59,5.05,4.42], heSlower:[7.97,6.65,5.08,4.45] },
+    { name:'δ-BHC',            he:[[8.09,0.034],[6.79,0.024],[5.28,0.031],[4.65,0.042]],
+      heSlow:[8.09,6.79,5.28,4.65], heSlower:[8.09,6.79,5.28,4.65] },
+    { name:'Clorotalonil',     he:[[8.15,0.034],[6.85,0.024],[5.33,0.031],[4.70,0.042]],
+      heSlow:[8.17,6.87,5.35,4.72], heSlower:[8.21,6.91,5.38,4.75] }
+  ];
+  var PAIRS = [
+    { a:'α-BHC', b:'Hexaclorobenceno' },
+    { a:'β-BHC', b:'γ-BHC' },
+    { a:'δ-BHC', b:'Clorotalonil' }
+  ];
+  var PEAK_BY_NAME = {}; PEAKS.forEach(function(p){ PEAK_BY_NAME[p.name]=p; });
+
+  function interpLinear(u, xs, ys, extrapolate){
+    var n = xs.length;
+    if(u < xs[0]){
+      if(!extrapolate) return ys[0];
+      var s0 = (ys[1]-ys[0])/(xs[1]-xs[0]);
+      return Math.max(0, ys[0] + s0*(u-xs[0]));
+    }
+    if(u > xs[n-1]){
+      if(!extrapolate) return ys[n-1];
+      var s1 = (ys[n-1]-ys[n-2])/(xs[n-1]-xs[n-2]);
+      return Math.max(0, ys[n-1] + s1*(u-xs[n-1]));
+    }
+    for(var i=0;i<n-1;i++){
+      if(u>=xs[i] && u<=xs[i+1]){
+        var t=(u-xs[i])/(xs[i+1]-xs[i]);
+        return ys[i] + t*(ys[i+1]-ys[i]);
+      }
+    }
+    return ys[n-1];
+  }
+
+  // tR: igual para los 3 gases (depende de la rampa/velocidad, no del gas, en 1a
+  // aproximacion); si depende de la rampa elegida (ver heSlow/heSlower arriba).
+  function peakTr(peak, u, ramp){
+    var ys = ramp==='r15' ? peak.heSlow : ramp==='r10' ? peak.heSlower :
+      peak.he.map(function(p){return p[0];});
+    return interpLinear(u, U_ANCHORS, ys, true);
+  }
+  // ancho: interpolado en "velocidad reducida" segun el gas (rescala por u_opt real)
+  function peakWidth(peak, u, gas){
+    var uEff = u * (U_OPT_HE / U_OPT[gas]);
+    var xs = U_ANCHORS, ys = peak.he.map(function(p){return p[1];});
+    return interpLinear(uEff, xs, ys, true);
+  }
+
+  function computeAll(u, gas, ramp){
+    return PEAKS.map(function(p){
+      return { name:p.name, tr:peakTr(p,u,ramp), w:peakWidth(p,u,gas) };
+    });
+  }
+  function computeOne(name, u, gas, ramp){
+    var p = PEAK_BY_NAME[name];
+    return { name:name, tr:peakTr(p,u,ramp), w:peakWidth(p,u,gas) };
+  }
+
+  // Rs = deltaTr/(wA+wB). OJO: la formula de libro es Rs=2*deltaTr/(WbA+WbB) con
+  // Wb = ancho DE BASE (4*sigma) de cada pico. Pero en este modelo 'w' no es el
+  // ancho de base: la gaussiana se dibuja con sigma=w/2 (ver gaussiansFor), o sea
+  // w=2*sigma, la mitad del ancho de base. Sustituyendo Wb=2w en la formula de
+  // libro: Rs=2*deltaTr/(2wA+2wB)=deltaTr/(wA+wB) -- sin el 2 extra. Usar la
+  // formula de libro tal cual con este 'w' duplica la resolucion reportada
+  // respecto de lo que muestra el grafico (los picos se ven mucho menos
+  // separados de lo que decia el numero).
+  function resolution(pA, pB){
+    return Math.abs(pB.tr - pA.tr) / (pA.w + pB.w);
+  }
+
+  var SLIDER_MIN = 2, SLIDER_MAX = 120; // debe coincidir con min/max de #velSlider:
+  // fija cuanto barren fixedWindow/fixedSpan al calcular las ventanas de los graficos
+
+  // Ancho de ventana FIJO (misma escala de minutos siempre, no se "achica" ni
+  // "agranda" al mover el slider), calculado una sola vez como el peor caso
+  // (mayor separacion + ancho de pico) en todo el rango de velocidad y los 3
+  // gases. La ventana despues se RECENTRA en cada render sobre la posicion
+  // actual del/los pico/s, porque el tR real se mueve mucho con la velocidad
+  // (de ~3 a ~10 min) y una ventana con extremos fijos dejaria los picos
+  // amontonados en un extremo la mayor parte del tiempo.
+  function fixedSpan(names){
+    var maxSpan = 0;
+    ['r20','r15','r10'].forEach(function(ramp){
+      ['he','h2','n2'].forEach(function(gas){
+        for(var u=SLIDER_MIN; u<=SLIDER_MAX; u+=2){
+          var lo=Infinity, hi=-Infinity;
+          names.forEach(function(n){
+            var pk = computeOne(n,u,gas,ramp);
+            lo = Math.min(lo, pk.tr - 2.4*pk.w);
+            hi = Math.max(hi, pk.tr + 2.4*pk.w);
+          });
+          maxSpan = Math.max(maxSpan, hi-lo);
+        }
+      });
+    });
+    return maxSpan * 1.08;
+  }
+
+  var PAIR_SPANS = PAIRS.map(function(pr){ return fixedSpan([pr.a, pr.b]); });
+
+  // Vista general: ventana de tiempo FIJA de verdad (extremos fijos, no se recentra).
+  // Los picos se desplazan libremente dentro de esa escala al cambiar la velocidad,
+  // que es justamente lo que queremos mostrar aca (a diferencia del zoom por par,
+  // que si se recentra en el promedio).
+  function fixedWindow(names){
+    var lo=Infinity, hi=-Infinity;
+    ['r20','r15','r10'].forEach(function(ramp){
+      ['he','h2','n2'].forEach(function(gas){
+        for(var u=SLIDER_MIN; u<=SLIDER_MAX; u+=2){
+          names.forEach(function(n){
+            var pk = computeOne(n,u,gas,ramp);
+            lo = Math.min(lo, pk.tr - 2.4*pk.w);
+            hi = Math.max(hi, pk.tr + 2.4*pk.w);
+          });
+        }
+      });
+    });
+    var pad = (hi-lo)*0.04;
+    return { min: lo-pad, max: hi+pad };
+  }
+  var MINI_WINDOW = fixedWindow(PEAKS.map(function(p){return p.name;}));
+
+  /* ===== 4. Curva Van Deemter ilustrativa (H vs u), anclada al u_opt real de cada gas ===== */
+  // H_min (mm) calculado con la ecuacion de Golay real (coef. de difusion via
+  // Fuller-Schettler-Giddings, r=0.0125cm, df=0.25um, k~4) para esta misma
+  // columna -- no son valores sueltos de tabla, salen del mismo calculo que
+  // valida el orden N2 < He < H2 conocido en la practica.
+  var HMIN = { he:0.463, h2:0.503, n2:0.304 };
+  function golayH(u, gas){
+    var uopt = U_OPT[gas], hmin = HMIN[gas];
+    var B = hmin*uopt/2, C = hmin/(2*uopt);
+    return B/u + C*u;
+  }
+
+  /* ===== 5. Render ===== */
+  var state = { gas:'he', u:35, ramp:'r20' };
+  var RAMP_RATE = { r20:'20', r15:'15', r10:'10' };
+  var VD_GEOM = null;   // geometria del eje X del grafico, para poder invertirlo
+  var GAS_COLOR = { he:'#ea580c', h2:'#dc2626', n2:'#16a34a' };
+  var AGILENT_BLUE = '#1554d8';   // color fijo del cromatograma, como en el software Agilent
+  var GAS_LABEL = { he:'Helio', h2:'Hidrógeno', n2:'Nitrógeno' };
+  // Zona de velocidad lineal optima habitual en la practica (guias de Agilent/
+  // Restek, no calculada por este modelo): rangos redondeados con los que se
+  // suele trabajar, mas anchos que el u_opt teorico puntual porque en una
+  // corrida real conviene margen. El u_opt que calcula el modelo (34.9 / 48.5 /
+  // 13.2) cae DENTRO de cada rango -- por construccion (u_opt=raiz(B/C) en
+  // golayH). H2 y N2 se ensancharon (35-50->35-60, 8-14->8-16) para que el
+  // u_opt quede centrado y no pegado al borde superior del rango.
+  var GAS_OPT_RANGE = { he:[20,40], h2:[35,60], n2:[8,16] };
+
+  function svgEl(tag, attrs){
+    var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for(var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function fmtPlates(n){
+    if(n >= 1000) return Math.round(n/1000).toLocaleString('es-AR')+'k';
+    return Math.round(n).toString();
+  }
+
+  function renderVD(){
+    var svg = document.getElementById('vdChart');
+    svg.innerHTML = '';
+    var W=360,H=260, padL=34,padR=36,padT=24,padB=32;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+    var uMin=0, uMax=120;
+    var hMax = 1.15; // mm, techo del eje Y para que entren las 3 curvas
+    VD_GEOM = { padL:padL, plotW:plotW, uMin:uMin, uMax:uMax, vbW:W };
+    function xPix(u){ return padL + (u-uMin)/(uMax-uMin)*plotW; }
+    function yPix(h){ return padT + (1 - h/hMax)*plotH; }
+
+    // ejes
+    svg.appendChild(svgEl('line', {x1:padL,y1:padT,x2:padL,y2:padT+plotH,class:'baseline'}));
+    svg.appendChild(svgEl('line', {x1:padL,y1:padT+plotH,x2:padL+plotW,y2:padT+plotH,class:'baseline'}));
+
+    // eje X: velocidad lineal, cada 20 cm/s
+    for(var xu=0; xu<=uMax; xu+=20){
+      var xg = xPix(xu);
+      if(xu>0) svg.appendChild(svgEl('line',{x1:xg,y1:padT,x2:xg,y2:padT+plotH,class:'gridline'}));
+      var xt = svgEl('text',{x:xg,y:padT+plotH+11,class:'axis-label','text-anchor':'middle'});
+      xt.textContent = xu; svg.appendChild(xt);
+    }
+    var xlab = svgEl('text',{x:padL+plotW/2,y:H-4,class:'axis-label','text-anchor':'middle'});
+    xlab.textContent = 'Velocidad lineal u (cm/s)'; svg.appendChild(xlab);
+
+    // eje Y doble: HETP (H, mm) a la izquierda -- lo que realmente calcula la
+    // ecuacion de Golay -- y, a la MISMA altura de cada linea, N = L/H (L=30 m,
+    // platos teoricos de ESTA columna) a la derecha. H crece hacia abajo (peor),
+    // asi que N crece hacia arriba (mejor) del lado derecho.
+    [0.2,0.4,0.6,0.8,1.0].forEach(function(hg){
+      var yg = yPix(hg);
+      svg.appendChild(svgEl('line',{x1:padL,y1:yg,x2:padL+plotW,y2:yg,class:'gridline'}));
+      var yl = svgEl('text',{x:padL-6,y:yg+3,class:'axis-label','text-anchor':'end'});
+      yl.textContent = hg.toFixed(1).replace('.',','); svg.appendChild(yl);
+      var yr = svgEl('text',{x:padL+plotW+6,y:yg+3,class:'axis-label','text-anchor':'start'});
+      yr.textContent = fmtPlates(COL_LEN_MM/hg); svg.appendChild(yr);
+    });
+    var ylabL = svgEl('text',{x:9,y:padT+plotH/2,class:'axis-label','text-anchor':'middle',transform:'rotate(-90 9 '+(padT+plotH/2)+')'});
+    ylabL.textContent = 'HETP (mm)'; svg.appendChild(ylabL);
+    var ylabR = svgEl('text',{x:W-9,y:padT+plotH/2,class:'axis-label','text-anchor':'middle',transform:'rotate(-90 '+(W-9)+' '+(padT+plotH/2)+')'});
+    ylabR.textContent = 'N (platos teóricos)'; svg.appendChild(ylabR);
+
+    // Zona de velocidad optima: una franja vertical detras de las curvas, solo
+    // del gas activo (cambia de color y posicion al cambiar de gas).
+    (function(){
+      var gas = state.gas, r = GAS_OPT_RANGE[gas];
+      var x0 = xPix(r[0]), x1 = xPix(r[1]);
+      svg.appendChild(svgEl('rect',{x:x0,y:padT,width:x1-x0,height:plotH,
+        fill:GAS_COLOR[gas],opacity:0.16}));
+      var zt = svgEl('text',{x:(x0+x1)/2,y:padT-7,class:'axis-label','text-anchor':'middle',
+        fill:GAS_COLOR[gas],'font-weight':700});
+      zt.textContent = r[0]+'–'+r[1]+' cm/s óptimo';
+      svg.appendChild(zt);
+    })();
+
+    ['he','h2','n2'].forEach(function(gas){
+      var d = '';
+      // u=0 es asintota vertical (B/u -> infinito), y a velocidad alta el
+      // termino C*u tambien puede superar el techo (le pasa al N2, que tiene
+      // u_opt muy bajo). Se salta el tramo fuera de rango sin conectarlo, pero
+      // SIN pisar los segmentos validos ya dibujados a los costados: por eso
+      // se usa un flag de "recien retomo" en vez de reiniciar d por completo.
+      var needMove = true;
+      for(var u=0.2; u<=uMax; u+=0.5){
+        var h = golayH(u,gas);
+        if(h > hMax){ needMove = true; continue; } // fuera de rango: no conectar
+        var x = xPix(u), y = yPix(h);
+        d += (needMove?'M':'L') + x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+        needMove = false;
+      }
+      var path = svgEl('path', {d:d, fill:'none', stroke:GAS_COLOR[gas], 'stroke-width': gas===state.gas?2.75:1.75});
+      if(gas!==state.gas) path.setAttribute('class','curve-dim');
+      svg.appendChild(path);
+
+      // marcador de u_opt
+      var uo = U_OPT[gas];
+      var cx = xPix(uo), cy = yPix(Math.min(golayH(uo,gas),hMax));
+      var dot = svgEl('circle',{cx:cx,cy:cy,r: gas===state.gas?3.5:2, fill:GAS_COLOR[gas]});
+      if(gas!==state.gas) dot.setAttribute('opacity','0.35');
+      svg.appendChild(dot);
+    });
+
+    // marcador de u actual: ademas de indicar, es la manija de arrastre
+    var ux = xPix(state.u);
+    svg.appendChild(svgEl('line',{x1:ux,y1:padT,x2:ux,y2:padT+plotH,stroke:'#0f172a',
+      'stroke-width':1.4,'stroke-dasharray':'3 3'}));
+    var hCur = golayH(state.u, state.gas);
+    if(hCur <= hMax){
+      svg.appendChild(svgEl('circle',{cx:ux, cy:yPix(hCur), r:5, fill:'#fff',
+        stroke:GAS_COLOR[state.gas], 'stroke-width':2.5}));
+    }
+    var grip = svgEl('g',{});
+    grip.appendChild(svgEl('rect',{x:ux-9, y:padT+plotH+2, width:18, height:11, rx:3.5,
+      fill:'#0f172a'}));
+    [-3,0,3].forEach(function(dx){
+      grip.appendChild(svgEl('line',{x1:ux+dx,y1:padT+plotH+5,x2:ux+dx,y2:padT+plotH+10,
+        stroke:'#fff','stroke-width':1}));
+    });
+    svg.appendChild(grip);
+
+    // leyenda
+    var ly = padT+2;
+    ['he','h2','n2'].forEach(function(gas,i){
+      var gx = padL + 6 + i*80;
+      var gLeg = svgEl('g',{style:'cursor:pointer'});
+      gLeg.appendChild(svgEl('rect',{x:gx-3,y:ly-3,width:76,height:15,fill:'transparent'}));
+      gLeg.appendChild(svgEl('rect',{x:gx,y:ly,width:9,height:9,rx:2,fill:GAS_COLOR[gas],
+        opacity: gas===state.gas?1:0.35}));
+      var t = svgEl('text',{x:gx+13,y:ly+8,'font-size':10,'font-weight': gas===state.gas?700:400,
+        fill: gas===state.gas?GAS_COLOR[gas]:'#94a3b8'});
+      t.textContent = GAS_LABEL[gas];
+      gLeg.appendChild(t);
+      gLeg.addEventListener('pointerdown', function(ev){ ev.stopPropagation(); setGas(gas); });
+      svg.appendChild(gLeg);
+    });
+  }
+
+  // Traza UNA sola curva sumando la senal de todos los picos del panel (como haria
+  // un detector real): si dos picos se superponen, el valle entre ellos no vuelve
+  // a tocar la linea de base -- queda "montado" segun cuanto se solapen las colas.
+  function drawSumTrace(svg, padL, plotW, xMin, xMax, baseY, amp, peaksForPanel, color, strokeW){
+    var gaussians = peaksForPanel.map(function(p){
+      var cx = padL + (p.tr-xMin)/(xMax-xMin)*plotW;
+      var sigmaPx = ((p.w/2)/(xMax-xMin))*plotW;
+      return { cx:cx, sigma:sigmaPx };
+    });
+    // muestreo adaptativo: cuando la ventana es mucho mas ancha que los picos
+    // (caso del overview general), hacen falta muchos mas puntos para que cada
+    // gaussiana angosta no salga dentada/asimetrica.
+    var minSigma = Math.min.apply(null, gaussians.map(function(g){return g.sigma;}));
+    var steps = Math.min(1400, Math.max(200, Math.round(plotW/minSigma*10)));
+    var d = '';
+    for(var i=0;i<=steps;i++){
+      var xx = padL + i*(plotW/steps);
+      var sum = 0;
+      gaussians.forEach(function(g){
+        sum += Math.exp(-Math.pow(xx-g.cx,2)/(2*g.sigma*g.sigma));
+      });
+      var yy = baseY - amp*Math.min(sum,1.35); // 1.35: dejar algo de margen si dos picos casi coinciden
+      d += (i===0?'M':'L') + xx.toFixed(1) + ',' + yy.toFixed(1) + ' ';
+    }
+    svg.appendChild(svgEl('path',{d:d, fill:'none', stroke:color, 'stroke-width':strokeW, 'stroke-linejoin':'round'}));
+  }
+
+  // Gaussianas de un panel (mismo calculo que usa drawSumTrace) expuestas aparte
+  // para poder consultar la altura de la traza sumada en un punto cualquiera --
+  // es lo que necesita la linea de valle para no superar al pico.
+  function gaussiansFor(peaksForPanel, padL, plotW, xMin, xMax){
+    return peaksForPanel.map(function(p){
+      var cx = padL + (p.tr-xMin)/(xMax-xMin)*plotW;
+      var sigmaPx = ((p.w/2)/(xMax-xMin))*plotW;
+      return { cx:cx, sigma:sigmaPx };
+    });
+  }
+  function curveY(gaussians, amp, baseY, xx){
+    var sum = 0;
+    gaussians.forEach(function(g){ sum += Math.exp(-Math.pow(xx-g.cx,2)/(2*g.sigma*g.sigma)); });
+    return baseY - amp*Math.min(sum,1.35);
+  }
+  function findPeak(peaks, name){
+    for(var i=0;i<peaks.length;i++) if(peaks[i].name===name) return peaks[i];
+    return null;
+  }
+
+  // Integracion tipo "valley-to-valley" de un integrador real: base a lo largo de
+  // todo el grupo, un tick corto en el arranque del primer pico y en el cierre del
+  // ultimo, y una linea vertical solida en cada valle indicado -- ahi es donde el
+  // integrador corta entre dos picos que coeluyen. La linea llega justo hasta la
+  // traza sumada en ese punto (nunca por encima del pico): si los picos estan bien
+  // resueltos, la traza ya esta casi en la base ahi y la linea queda corta.
+  // peaksForPanel viene ordenado por tR (para el arranque/cierre del grupo);
+  // valleyTimes son los tiempos donde SI se quiere marcar el corte (no todos los
+  // huecos entre picos consecutivos son un par critico).
+  function drawIntegration(svg, padL, plotW, xMin, xMax, baseY, peaksForPanel, valleyTimes, gaussians, amp){
+    var xPix = function(t){ return padL + (t-xMin)/(xMax-xMin)*plotW; };
+    var n = peaksForPanel.length;
+    var start = peaksForPanel[0].tr - 2.6*(peaksForPanel[0].w/2);
+    var end   = peaksForPanel[n-1].tr + 2.6*(peaksForPanel[n-1].w/2);
+
+    var x0 = Math.max(xMin, start), x1 = Math.min(xMax, end);
+    if(x1 <= x0) return;
+    var FUCHSIA = '#e0218a';
+    var g = svgEl('g',{stroke:FUCHSIA,'stroke-width':1.1,fill:'none'});
+    g.appendChild(svgEl('line',{x1:xPix(x0),y1:baseY,x2:xPix(x1),y2:baseY}));
+    [start, end].forEach(function(t){
+      if(t < xMin || t > xMax) return;
+      var xx = xPix(t);
+      g.appendChild(svgEl('line',{x1:xx,y1:baseY-4,x2:xx,y2:baseY+4}));
+    });
+    svg.appendChild(g);
+    valleyTimes.forEach(function(t){
+      if(t < xMin || t > xMax) return;
+      var xx = xPix(t);
+      var topY = curveY(gaussians, amp, baseY, xx);
+      svg.appendChild(svgEl('line',{x1:xx,y1:baseY,x2:xx,y2:topY,
+        stroke:FUCHSIA,'stroke-width':1.2,opacity:0.85}));
+    });
+  }
+
+  function drawAxis(svg, padL, padT, plotW, plotH, xMin, xMax, H, step, decimals){
+    step = step || 1; decimals = decimals || 0;
+    var baseY = padT+plotH;
+    svg.appendChild(svgEl('line',{x1:padL,y1:baseY,x2:padL+plotW,y2:baseY,class:'baseline'}));
+    var first = Math.ceil(xMin/step)*step;
+    for(var t=first; t<=xMax+1e-9; t+=step){
+      var xg = padL + (t-xMin)/(xMax-xMin)*plotW;
+      svg.appendChild(svgEl('line',{x1:xg,y1:padT,x2:xg,y2:baseY,class:'gridline'}));
+      var tl = svgEl('text',{x:xg,y:H-6,class:'axis-label','text-anchor':'middle'});
+      tl.textContent = t.toFixed(decimals).replace('.',',')+' min'; svg.appendChild(tl);
+    }
+    return baseY;
+  }
+
+  function renderMini(){
+    var svg = document.getElementById('miniChart');
+    svg.innerHTML = '';
+    var W=720,H=90, padL=14,padR=14,padT=12,padB=24;
+    var plotW=W-padL-padR, plotH=H-padT-padB;
+    var peaks = computeAll(state.u, state.gas, state.ramp);
+    var xMin=MINI_WINDOW.min, xMax=MINI_WINDOW.max; // fija: no se recentra
+    var baseY = drawAxis(svg, padL, padT, plotW, plotH, xMin, xMax, H);
+    var maxH = plotH*0.85;
+    var gaussians = gaussiansFor(peaks, padL, plotW, xMin, xMax);
+    // solo se marca el valle DENTRO de cada par critico -- no entre pares distintos
+    // (p.ej. entre Hexaclorobenceno y beta-BHC, que son consecutivos pero no un par)
+    var valleyTimes = PAIRS.map(function(pair){
+      var pa = findPeak(peaks, pair.a), pb = findPeak(peaks, pair.b);
+      return (pa.tr+pb.tr)/2;
+    });
+    drawIntegration(svg, padL, plotW, xMin, xMax, baseY, peaks, valleyTimes, gaussians, maxH);
+    drawSumTrace(svg, padL, plotW, xMin, xMax, baseY, maxH, peaks, AGILENT_BLUE, 1.5);
+  }
+
+  function renderZooms(){
+    PAIRS.forEach(function(pair, idx){
+      var svg = document.querySelector('.zoomSvg[data-pair="'+idx+'"]');
+      svg.innerHTML = '';
+      var W=220,H=140, padL=14,padR=14,padT=10,padB=22;
+      var plotW=W-padL-padR, plotH=H-padT-padB;
+      var pA = computeOne(pair.a, state.u, state.gas, state.ramp);
+      var pB = computeOne(pair.b, state.u, state.gas, state.ramp);
+      var center = (pA.tr + pB.tr)/2; // el promedio queda siempre en el centro del grafico
+      var span = PAIR_SPANS[idx];
+      var xMin=center-span/2, xMax=center+span/2;
+      var baseY = drawAxis(svg, padL, padT, plotW, plotH, xMin, xMax, H, 0.2, 1);
+      var maxH = plotH*0.85;
+      var peaksOrdered = pA.tr <= pB.tr ? [pA,pB] : [pB,pA];
+      var gaussians = gaussiansFor(peaksOrdered, padL, plotW, xMin, xMax);
+      drawIntegration(svg, padL, plotW, xMin, xMax, baseY, peaksOrdered, [center], gaussians, maxH);
+      drawSumTrace(svg, padL, plotW, xMin, xMax, baseY, maxH, [pA,pB], AGILENT_BLUE, 1.8);
+      var rs = resolution(pA, pB);
+      var rEl = document.getElementById('rTxt'+idx);
+      rEl.textContent = 'R = ' + rs.toFixed(2).replace('.',',');
+      rEl.className = 'zoom-r ' + (rs<1.2?'bad':rs<1.8?'warn':'good');
+    });
+  }
+
+  function renderMetrics(){
+    var peaks = computeAll(state.u, state.gas, state.ramp);
+    var byName = {}; peaks.forEach(function(p){ byName[p.name]=p; });
+    var betaGamma = resolution(byName['β-BHC'], byName['γ-BHC']);
+    var deltaChloro = resolution(byName['δ-BHC'], byName['Clorotalonil']);
+    var worst = Math.min(betaGamma, deltaChloro);
+
+    var m = document.getElementById('metrics');
+    function cls(rs){ return rs<1.2 ? 'bad' : rs<1.8 ? 'warn' : 'good'; }
+    m.innerHTML =
+      '<div class="metric"><div class="ml">Velocidad</div><div class="mv">'+state.u.toFixed(0)+' cm/s</div></div>' +
+      '<div class="metric"><div class="ml">Caudal (30&times;0,25)</div><div class="mv">'+flowMlMin(state.u).toFixed(2)+' mL/min</div></div>' +
+      '<div class="metric '+cls(betaGamma)+'"><div class="ml">Rs &beta;-BHC / &gamma;-BHC</div><div class="mv">'+betaGamma.toFixed(2)+'</div></div>' +
+      '<div class="metric '+cls(deltaChloro)+'"><div class="ml">Rs &delta;-BHC / Clorotalonil</div><div class="mv">'+deltaChloro.toFixed(2)+'</div></div>' +
+      '<div class="metric '+cls(worst)+'"><div class="ml">Par más crítico</div><div class="mv">'+(worst<1.2?'Fusionado':worst<1.8?'Marginal':'Resuelto')+'</div></div>';
+  }
+
+  var RAMP_COPY = {
+    r20: {
+      cls: 'fast',
+      txt: '<b>Esta rampa (20&nbsp;&deg;C/min)</b> tiene un techo: el par &delta;-BHC / Clorotalonil no supera Rs&thinsp;&asymp;&thinsp;1,25 con ning&uacute;n gas ni velocidad &mdash; est&aacute;n demasiado cerca en tiempo de retenci&oacute;n para esta velocidad de calentamiento. Prob&aacute; una rampa m&aacute;s lenta &rarr;'
+    },
+    r15: {
+      cls: 'slow',
+      txt: '<b>Con una rampa m&aacute;s lenta (15&nbsp;&deg;C/min)</b>, &delta;-BHC y Clorotalonil se separan m&aacute;s: la columna pasa m&aacute;s tiempo en la ventana de temperatura donde eluyen, y esos segundos de m&aacute;s alcanzan para llevar el par por encima de Rs&nbsp;=&nbsp;1,5 (con el gas y la velocidad adecuados). Esta estimaci&oacute;n est&aacute; calibrada con cuidado.'
+    },
+    r10: {
+      cls: 'slower',
+      txt: '<b>Extrapolando el mismo criterio a 10&nbsp;&deg;C/min</b>, el par cr&iacute;tico rondar&iacute;a Rs&thinsp;&asymp;&thinsp;2,4 con H&#8322; en su &oacute;ptimo &mdash; casi el doble que a 20&nbsp;&deg;C/min. Tener en cuenta que esta es una <b>extrapolaci&oacute;n de una extrapolaci&oacute;n</b>, con bastante m&aacute;s incertidumbre que el caso de 15&nbsp;&deg;C/min; sirve para ver la tendencia, pero no hay que tomar estos n&uacute;meros como exactos ya que surgen de un c&aacute;lculo aproximado.'
+    }
+  };
+
+  // Marca la zona optima DEBAJO del slider (el track queda parejo, igual
+  // estetica que split-gc): dos tics finos, uno en cada extremo del rango, mas
+  // el rotulo en el medio -- el mismo lenguaje visual que el tic de
+  // "50:1 optimo" de split, con dos puntas porque aca es un rango. El % de
+  // cada limite compensa el ancho del thumb (16px) para que los tics coincidan
+  // con la posicion real del thumb sobre la pista.
+  function updateVelZone(){
+    var r = GAS_OPT_RANGE[state.gas];
+    var color = GAS_COLOR[state.gas];
+    var thumb = 16, w = velSlider.clientWidth || 300;
+    var usable = Math.max(1, w - thumb);
+    function pct(u){
+      var f = (u-U_MIN)/(U_MAX-U_MIN);
+      return ((thumb/2 + f*usable) / w) * 100;
+    }
+    var pctL = pct(r[0]), pctR = pct(r[1]);
+    var tickL = document.getElementById('velTickL');
+    var tickR = document.getElementById('velTickR');
+    tickL.style.left = pctL+'%'; tickL.style.background = color;
+    tickR.style.left = pctR+'%'; tickR.style.background = color;
+    var lab = document.getElementById('velZoneLabel');
+    lab.style.left = ((pctL+pctR)/2)+'%';
+    lab.style.color = color;
+    lab.textContent = r[0]+'–'+r[1]+' cm/s óptimo';
+  }
+
+  function renderAll(){
+    document.getElementById('velVal').textContent = state.u.toFixed(0);
+    document.getElementById('flowVal').textContent = flowMlMin(state.u).toFixed(2);
+    updateVelZone();
+    document.getElementById('rampInfoVal').textContent = RAMP_RATE[state.ramp];
+    var rc = RAMP_COPY[state.ramp];
+    var rampBox = document.getElementById('rampBox');
+    rampBox.className = 'ramp-box ' + rc.cls;
+    document.getElementById('rampBoxTxt').innerHTML = rc.txt;
+    document.querySelectorAll('.ramp-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-ramp') === state.ramp);
+    });
+    renderVD();
+    renderMini();
+    renderZooms();
+    renderMetrics();
+  }
+
+  var velSlider = document.getElementById('velSlider');
+  var U_MIN = parseFloat(velSlider.min), U_MAX = parseFloat(velSlider.max);
+
+  function setGas(gas){
+    if(state.gas === gas) return;
+    state.gas = gas;
+    document.querySelectorAll('.gas-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-gas') === gas);
+    });
+    renderAll();
+  }
+  function setU(u){
+    u = Math.max(U_MIN, Math.min(U_MAX, Math.round(u)));
+    if(u === state.u) return;
+    state.u = u;
+    velSlider.value = u;
+    renderAll();
+  }
+
+  document.querySelectorAll('.gas-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ setGas(btn.getAttribute('data-gas')); });
+  });
+  velSlider.addEventListener('input', function(e){ setU(parseFloat(e.target.value)); });
+
+  document.querySelectorAll('.ramp-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ramp = btn.getAttribute('data-ramp');
+      if(state.ramp === ramp) return;
+      state.ramp = ramp;
+      renderAll();
+    });
+  });
+
+  /* El grafico de Van Deemter es un control: arrastrar (o tocar) sobre el
+     recorre el eje de velocidad lineal igual que el slider. */
+  var vdSvg = document.getElementById('vdChart');
+  function uFromPointer(ev){
+    if(!VD_GEOM) return state.u;
+    var r = vdSvg.getBoundingClientRect();
+    if(!r.width) return state.u;
+    var x = (ev.clientX - r.left) * (VD_GEOM.vbW / r.width);
+    var f = (x - VD_GEOM.padL) / VD_GEOM.plotW;
+    return VD_GEOM.uMin + f*(VD_GEOM.uMax - VD_GEOM.uMin);
+  }
+  var vdDragging = false;
+  vdSvg.addEventListener('pointerdown', function(ev){
+    vdDragging = true;
+    setU(uFromPointer(ev));
+    // la captura es una mejora (seguir el dedo/mouse fuera del svg), no un
+    // requisito: si el navegador la rechaza, el arrastre igual tiene que andar
+    try { if(vdSvg.setPointerCapture) vdSvg.setPointerCapture(ev.pointerId); } catch(e){}
+    ev.preventDefault();
+  });
+  vdSvg.addEventListener('pointermove', function(ev){
+    if(!vdDragging) return;
+    setU(uFromPointer(ev));
+    ev.preventDefault();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(evt){
+    vdSvg.addEventListener(evt, function(){ vdDragging = false; });
+  });
+
+  renderAll();
+})();
+</script>
+<script src="/comments.js" defer></script>
+</body>
+</html>
