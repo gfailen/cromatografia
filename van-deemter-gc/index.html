@@ -231,6 +231,21 @@
   .footer-disclaimer { color:#64748b; font-size:.73rem; line-height:1.6; }
   .footer-disclaimer p + p { margin-top:.75rem; }
   .footer-copy { color:#475569; font-size:.72rem; border-top:1px solid rgba(255,255,255,.06); padding-top:1rem; }
+
+  /* Mobile: los min-width fijos de arriba (pensados para desktop) hacen que
+     .ctrl-row y .panel no puedan angostarse lo suficiente y el contenido se
+     corta a la derecha en vez de apilarse. Va al final del bloque para ganar
+     la cascada frente a las reglas sin media query definidas mas abajo. */
+  @media (max-width:640px){
+    main { padding:1.1rem 1rem 1.5rem; }
+    .wrap { padding:1.25rem 1.1rem 1.5rem; }
+    .tool-header-txt { min-width:0; }
+    .ctrl-row { gap:1rem; }
+    .vel-group { min-width:0; flex-basis:100%; }
+    .vel-slider-row { flex-wrap:wrap; row-gap:.6rem; }
+    .vel-readout { white-space:normal; flex-wrap:wrap; row-gap:.4rem; }
+    .vd-pane, .chrom-pane { min-width:0; flex-basis:100%; }
+  }
 </style>
 </head>
 <body>
