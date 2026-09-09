@@ -235,7 +235,7 @@
     }
     /* card de herramienta: la vista previa va a sangre arriba, sin padding propio */
     .card-tool { padding: 0; }
-    .card-tool .card-body { padding: 1.1rem 1.35rem 1.35rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
+    .card-tool .card-body { padding: 1.25rem 1.4rem 1.4rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
     .card:not(.coming-soon):hover {
       border-color: var(--accent);
       box-shadow: 0 4px 20px rgba(14,165,233,.15);
@@ -263,8 +263,8 @@
     .tag-soon { background: #f1f5f9; color: #64748b; }
     .tag-link { background: #eff6ff; color: #1d4ed8; }
 
-    .card-title { font-size: .95rem; font-weight: 700; }
-    .card-desc  { font-size: .825rem; color: var(--muted); line-height: 1.5; flex: 1; }
+    .card-title { font-size: 1.05rem; font-weight: 800; }
+    .card-desc  { font-size: .85rem; color: var(--muted); line-height: 1.55; flex: 1; }
     .card-footer { font-size: .78rem; font-weight: 600; color: var(--primary); }
     .card.external .card-footer { color: var(--accent); }
 
@@ -476,7 +476,7 @@
     .card-media {
       display: block;
       width: 100%;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 3 / 2;
       object-fit: cover;
     }
     video.card-media { pointer-events: none; }
@@ -884,32 +884,10 @@
       card.addEventListener('focus', function () { start(card); });
       card.addEventListener('blur', function () { stop(card); });
     });
-  } else {
-    // Tactil: solo la card mas cercana al centro del viewport reproduce; el
-    // resto queda pausada. Se recalcula en cada scroll (throttleado a rAF).
-    var active = null;
-    function pickClosest() {
-      var vh = window.innerHeight, centro = vh / 2, mejor = null, mejorDist = Infinity;
-      cards.forEach(function (card) {
-        var r = card.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > vh) return;
-        var dist = Math.abs((r.top + r.height / 2) - centro);
-        if (dist < mejorDist) { mejorDist = dist; mejor = card; }
-      });
-      if (mejor !== active) {
-        if (active) stop(active);
-        active = mejor;
-        if (active) start(active);
-      }
-    }
-    var ticking = false;
-    function onScrollTouch() {
-      if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; pickClosest(); }); }
-    }
-    window.addEventListener('scroll', onScrollTouch, { passive: true });
-    window.addEventListener('resize', onScrollTouch, { passive: true });
-    pickClosest();
   }
+  // Tactil: sin hover no hay forma de "pasar sin querer" sobre una card, asi
+  // que reproducir algo por posicion en pantalla se siente como autoplay
+  // permanente. En mobile las cards se quedan quietas en el poster.
 })();
 </script>
 </body>
