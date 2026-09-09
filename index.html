@@ -219,7 +219,7 @@
     }
     .card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid #d8dfe8;
       border-radius: 12px;
       padding: 1.25rem 1.5rem;
       text-decoration: none;
@@ -228,6 +228,9 @@
       flex-direction: column;
       gap: .6rem;
       overflow: hidden;
+      /* elevacion minima y fija (sin blur pesado) solo para separar la card del
+         fondo gris-azulado; el hover suma un segundo nivel, mas visible */
+      box-shadow: 0 1px 2px rgba(15,23,42,.05);
       transition: box-shadow .15s, border-color .15s, transform .15s;
     }
     /* card de herramienta: la vista previa va a sangre arriba, sin padding propio */
@@ -511,7 +514,22 @@
       document.addEventListener('DOMContentLoaded', function () {
         var targets = document.querySelectorAll('.card');
         targets.forEach(function (el, i) {
-          el.style.transitionDelay = (i % 3) * 200 + 'ms';
+          el.style.transitionDelay = (i % 3) * 120 + 'ms';
+        });
+        // Las cards que ya estan dentro del viewport al cargar (la primera
+        // fila en desktop, la primera card en mobile) se muestran de una,
+        // sin esperar al observer: con el rootMargin negativo de abajo,
+        // una fila que cae justo cerca del borde inferior podia quedar sin
+        // disparar el intersection hasta el primer scroll, dejando la home
+        // "vacia" arriba de la foto en algunos altos de pantalla.
+        var vh = window.innerHeight;
+        var toObserve = [];
+        targets.forEach(function (el) {
+          if (el.getBoundingClientRect().top < vh) {
+            el.classList.add('is-visible');
+          } else {
+            toObserve.push(el);
+          }
         });
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
@@ -520,17 +538,17 @@
               io.unobserve(e.target);
             }
           });
-        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-        targets.forEach(function (el) { io.observe(el); });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        toObserve.forEach(function (el) { io.observe(el); });
       });
     }
   </script>
  <style>
 .anim-on .card {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 1s cubic-bezier(.22,.61,.36,1),
-              transform 1s cubic-bezier(.22,.61,.36,1);
+  transform: translateY(16px);
+  transition: opacity .5s cubic-bezier(.22,.61,.36,1),
+              transform .5s cubic-bezier(.22,.61,.36,1);
 }
     .anim-on .card.is-visible { opacity: 1; transform: none; }
 
