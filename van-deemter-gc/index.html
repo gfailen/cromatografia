@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Van Deemter y resolución en GC — cromatografia.com.ar</title>
+<title>Simulador: Van Deemter y resolución en cromatografía gaseosa — cromatografia.com.ar</title>
 <meta name="description" content="Elegí el carrier gas y movés la velocidad lineal: mirá en vivo cómo cambia la curva de Van Deemter y cómo se resuelven (o no) los picos de un cromatograma real de GC." />
 <link rel="icon" href="/favicon.ico" />
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-JDNY6YDF3N"></script>
@@ -41,10 +41,52 @@
   main { flex:1; padding:2rem; }
   .container { max-width:1200px; margin:0 auto; }
 
-  .tool-header { margin-bottom:1.5rem; }
+  .tool-header { margin-bottom:1.5rem; display:flex; align-items:flex-start; justify-content:space-between; gap:1.25rem; flex-wrap:wrap; }
+  .tool-header-txt { flex:1 1 480px; min-width:280px; }
   .tool-meta { display:flex; flex-direction:column; gap:.45rem; }
   .tool-title { font-size:1.4rem; font-weight:800; letter-spacing:-.02em; }
   .tool-desc { font-size:.875rem; color:var(--muted); line-height:1.6; }
+  .training-note { display:inline-flex; align-items:center; gap:.4rem; margin-top:.15rem; font-size:.72rem; color:var(--muted); }
+  .training-note svg { width:14px; height:14px; flex-shrink:0; color:var(--primary); }
+
+  /* ===== Guia paso a paso (misma estetica que split-gc) =====
+     Boton FIJO en la esquina: se puede mostrar/ocultar la guia sin tener que
+     scrollear para volver a encontrarlo. */
+  .guide-bar { position:fixed; right:1.25rem; bottom:1.25rem; z-index:40;
+               display:flex; align-items:flex-end; gap:.4rem; flex-direction:column; }
+  @media (max-width:820px){ .guide-bar { right:.75rem; bottom:.75rem; } }
+  .guide-btn { display:inline-flex; align-items:center; gap:.5rem; font-family:inherit; cursor:pointer;
+               font-size:.82rem; font-weight:700; padding:.6rem 1.1rem; border-radius:999px;
+               border:1.5px solid #15803d; background:#15803d; color:#fff;
+               box-shadow:0 4px 16px rgba(15,23,42,.22);
+               transition:background .15s, color .15s, border-color .15s, box-shadow .15s; }
+  .guide-btn:hover { background:#166534; border-color:#166534; box-shadow:0 6px 20px rgba(15,23,42,.28); }
+  .guide-btn svg { width:15px; height:15px; flex-shrink:0; }
+  .guide-btn.first-visit { animation:guideBtnPulse 2.2s ease-in-out infinite; }
+  @keyframes guideBtnPulse {
+    0%, 100% { box-shadow:0 4px 16px rgba(15,23,42,.22), 0 0 0 0 rgba(21,128,61,.5); }
+    50%      { box-shadow:0 4px 16px rgba(15,23,42,.22), 0 0 0 9px rgba(21,128,61,0); }
+  }
+  @media (prefers-reduced-motion: reduce){ .guide-btn.first-visit { animation:none; } }
+
+  body:not(.guide-on) .guide-el { display:none !important; }
+
+  .guide-badge { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+                 border-radius:50%; background:var(--primary); color:#fff; font-size:.76rem; font-weight:800;
+                 flex-shrink:0; line-height:1; }
+  .step-head { display:flex; align-items:center; gap:.5rem; margin-bottom:.6rem; flex-wrap:wrap; }
+  .step-head .st { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.05em;
+                    color:var(--primary); }
+  .vel-top { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.15rem; }
+  .vel-hint { font-size:.66rem; color:#3b82f6; font-weight:600; }
+
+  .pulse { animation:guidePulse 2s ease-out infinite; }
+  @keyframes guidePulse {
+    0%   { box-shadow:0 0 0 0 rgba(29,78,216,.34); }
+    70%  { box-shadow:0 0 0 13px rgba(29,78,216,0); }
+    100% { box-shadow:0 0 0 0 rgba(29,78,216,0); }
+  }
+  @media (prefers-reduced-motion: reduce){ .pulse{animation:none} }
 
   .tool-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
   .wrap { padding:1.75rem 1.75rem 2rem; }
@@ -117,10 +159,11 @@
   .vd-hint { display:flex; align-items:center; gap:.35rem; margin-top:.3rem;
              font-size:.72rem; color:var(--muted); }
   .vd-hint svg { width:13px; height:13px; flex-shrink:0; }
-  .vd-credit { display:flex; align-items:center; gap:.6rem; margin-top:1rem;
+  .vd-credit { display:flex; align-items:flex-end; gap:.6rem; margin-top:1rem;
                padding-top:.85rem; border-top:1px solid var(--border); }
   .vd-credit img { height:44px; width:auto; display:block; }
   .vd-credit span { font-size:.68rem; color:var(--muted); }
+  .vd-credit-lines { display:flex; flex-direction:column; gap:.15rem; }
   .curve-marker { fill:#0f172a; }
 
   .peak-label { font-size:9.5px; fill:#334155; text-anchor:middle; }
@@ -161,7 +204,7 @@
   .disclaimer { margin-top:1.5rem; font-size:.75rem; color:var(--muted); line-height:1.65; background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:.9rem 1rem; }
   .disclaimer b { color:var(--text); }
 
-  .vd-explain { margin-top:1rem; background:var(--primary-light); border:1px solid #bfdbfe;
+  .vd-explain { flex:1 1 100%; margin-top:1rem; background:var(--primary-light); border:1px solid #bfdbfe;
                 border-radius:12px; padding:1rem 1.25rem; display:flex; gap:.9rem; align-items:flex-start; }
   .vd-explain svg { width:20px; height:20px; flex-shrink:0; margin-top:.15rem; color:var(--primary); }
   .vd-explain-body { font-size:.84rem; line-height:1.62; color:#1e3a5f; }
@@ -210,28 +253,28 @@
   <div class="container">
 
     <div class="tool-header">
-      <div class="tool-meta">
-        <div class="tool-title">Van Deemter y resolución en GC</div>
-        <div class="tool-desc">Elegí el carrier gas y movés la velocidad lineal &mdash; con el slider o arrastrando directamente sobre la curva. A la izquierda, la curva de Van Deemter/Golay de cada gas (la que estás usando, resaltada). A la derecha, un cromatograma de plaguicidas organoclorados en una columna de 5&nbsp;% fenil que se recalcula en vivo: mirá cómo los picos se mueven y se resuelven mejor o peor según la velocidad.</div>
+      <div class="tool-header-txt">
+        <div class="tool-meta">
+          <div class="tool-title">Simulador: Van Deemter y resolución en cromatografía gaseosa</div>
+          <div class="tool-desc">Elegí el carrier gas y movés la velocidad lineal &mdash; con el slider o arrastrando directamente sobre la curva. A la izquierda, la curva de Van Deemter/Golay de cada gas (la que estás usando, resaltada). A la derecha, un cromatograma de plaguicidas organoclorados en una columna de 5&nbsp;% fenil que se recalcula en vivo: mirá cómo los picos se mueven y se resuelven mejor o peor según la velocidad.</div>
+          <div class="training-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3 2 8l10 5 10-5-10-5z"></path><path d="M6 10.5V16c0 1.2 2.7 3 6 3s6-1.8 6-3v-5.5"></path>
+            </svg>
+            <span>Es una de las herramientas que usamos en nuestras propias capacitaciones t&eacute;cnicas.</span>
+          </div>
+        </div>
       </div>
 
-      <div class="vd-explain">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9.2"></circle><path d="M12 8v4.5l2.8 1.7"></path>
-        </svg>
-        <div class="vd-explain-body">
-          <span class="vd-explain-title">Por qué existe una velocidad óptima</span>
-          <div class="vd-formula">
-            <div class="vd-formula-line"><b>Van Deemter</b> (columnas empacadas): H&nbsp;=&nbsp;A&nbsp;+&nbsp;B/u&nbsp;+&nbsp;C&middot;u</div>
-            <div class="vd-formula-line"><b>Golay</b> (columnas capilares, como esta): H&nbsp;=&nbsp;B/u&nbsp;+&nbsp;C&middot;u &mdash; el término A se anula (A&nbsp;=&nbsp;0) porque no hay relleno que genere caminos distintos para el gas.</div>
-          </div>
-          <ul class="vd-terms">
-            <li><b>A</b> &mdash; difusión turbulenta (o de remolino): en una columna empacada, cada molécula recorre un camino algo distinto entre las partículas del relleno; en una columna capilar no hay relleno, así que este término no existe.</li>
-            <li><b>B/u</b> &mdash; difusión molecular longitudinal: domina a velocidad <b>baja</b>, cuando el analito pasa más tiempo en la columna y la difusión a lo largo del flujo alcanza a desparramar la banda.</li>
-            <li><b>C&middot;u</b> &mdash; resistencia a la transferencia de masa: domina a velocidad <b>alta</b>, cuando el gas avanza tan rápido que el analito no llega a equilibrarse entre la fase móvil y la estacionaria.</li>
-          </ul>
-          Como un efecto crece cuando el otro cae, hay una velocidad intermedia (<b>u<sub>opt</sub></b>) donde ambos se compensan al mínimo: ahí la columna es más eficiente, los picos son más angostos y, para una separación dada, la resolución es la mejor alcanzable.
-        </div>
+      <div class="guide-bar">
+        <button type="button" id="guideBtn" class="guide-btn" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 18h6"></path><path d="M10 21.5h4"></path>
+            <path d="M12 2.5a6 6 0 0 0-3.6 10.8c.6.45.9 1.1.9 1.8v.4h5.4v-.4c0-.7.3-1.35.9-1.8A6 6 0 0 0 12 2.5z"></path>
+          </svg>
+          <span id="guideBtnTxt">Mostrar la gu&iacute;a</span>
+        </button>
       </div>
     </div>
 
@@ -247,8 +290,12 @@
               <button class="gas-btn" data-gas="n2">Nitrógeno</button>
             </div>
           </div>
-          <div class="ctrl-group vel-group">
-            <span class="ctrl-label">Velocidad lineal u (cm/s)</span>
+          <div class="ctrl-group vel-group" id="velGroup">
+            <div class="vel-top">
+              <span class="guide-badge guide-el">1</span>
+              <span class="ctrl-label">Velocidad lineal u (cm/s)</span>
+              <span class="vel-hint guide-el">&mdash; empez&aacute; por ac&aacute;: cambi&aacute; la velocidad lineal &rarr;</span>
+            </div>
             <div class="vel-slider-row">
               <div class="vel-slider-wrap">
                 <input type="range" id="velSlider" min="2" max="120" step="1" value="35">
@@ -288,10 +335,17 @@
             </div>
             <div class="vd-credit">
               <img src="/logo-ags.png" alt="AGS Analítica">
-              <span>Herramienta diseñada por AGS Analítica S.A.&reg;</span>
+              <div class="vd-credit-lines">
+                <span>Diseño: AGS Analítica S.A.&reg;</span>
+                <span>Revisado técnicamente &middot; Última actualización: sep. 2026</span>
+              </div>
             </div>
           </div>
           <div class="chrom-pane">
+            <div class="step-head guide-el">
+              <span class="guide-badge">2</span>
+              <span class="st">Mir&aacute; c&oacute;mo cambian los tiempos de retenci&oacute;n y, sobre todo, la resoluci&oacute;n entre los picos cr&iacute;ticos</span>
+            </div>
             <div class="pane-title">Vista general (6 picos, EPA 8081)</div>
             <svg id="miniChart" viewBox="0 0 720 90"></svg>
 
@@ -314,6 +368,10 @@
               </div>
             </div>
 
+            <div class="step-head guide-el">
+              <span class="guide-badge">3</span>
+              <span class="st">Cambi&aacute; la rampa de temperatura del horno para ver el efecto sobre la resoluci&oacute;n entre picos</span>
+            </div>
             <div class="ramp-picker">
               <span class="ramp-picker-label">Rampa de temperatura</span>
               <div class="ramp-btns">
@@ -329,6 +387,25 @@
         </div>
 
         <div class="metrics" id="metrics"></div>
+
+        <div class="vd-explain guide-el">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9.2"></circle><path d="M12 8v4.5l2.8 1.7"></path>
+          </svg>
+          <div class="vd-explain-body">
+            <span class="vd-explain-title">Por qué existe una velocidad óptima</span>
+            <div class="vd-formula">
+              <div class="vd-formula-line"><b>Van Deemter</b> (columnas empacadas): H&nbsp;=&nbsp;A&nbsp;+&nbsp;B/u&nbsp;+&nbsp;C&middot;u</div>
+              <div class="vd-formula-line"><b>Golay</b> (columnas capilares, como esta): H&nbsp;=&nbsp;B/u&nbsp;+&nbsp;C&middot;u &mdash; el término A se anula (A&nbsp;=&nbsp;0) porque no hay relleno que genere caminos distintos para el gas.</div>
+            </div>
+            <ul class="vd-terms">
+              <li><b>A</b> &mdash; difusión turbulenta (o de remolino): en una columna empacada, cada molécula recorre un camino algo distinto entre las partículas del relleno; en una columna capilar no hay relleno, así que este término no existe.</li>
+              <li><b>B/u</b> &mdash; difusión molecular longitudinal: domina a velocidad <b>baja</b>, cuando el analito pasa más tiempo en la columna y la difusión a lo largo del flujo alcanza a desparramar la banda.</li>
+              <li><b>C&middot;u</b> &mdash; resistencia a la transferencia de masa: domina a velocidad <b>alta</b>, cuando el gas avanza tan rápido que el analito no llega a equilibrarse entre la fase móvil y la estacionaria.</li>
+            </ul>
+            Como un efecto crece cuando el otro cae, hay una velocidad intermedia (<b>u<sub>opt</sub></b>) donde ambos se compensan al mínimo: ahí la columna es más eficiente, los picos son más angostos y, para una separación dada, la resolución es la mejor alcanzable.
+          </div>
+        </div>
 
         <div class="disclaimer">
           <p><b>Sobre los datos.</b> El cromatograma y la curva de Van Deemter están simulados a partir de cálculos teóricos (ecuación de Golay para columnas capilares) para esta columna (fase de 5&nbsp;% fenil tipo DB-5 / HP-5 / Rtx-5, 30&times;0,25&times;0,25) y esta rampa de temperatura, con tiempos de retención y anchos de pico calculados en Helio y reescalados a Hidrógeno y Nitrógeno según la velocidad óptima teórica de cada gas — es el concepto de <i>velocidad reducida</i> de la teoría de platos, no un ajuste arbitrario. El modelo asume que la velocidad lineal (y el caudal) se mantienen constantes durante toda la rampa, como lo haría el control electrónico de flujo (EPC) de un equipo moderno en modo caudal constante: no representa el aumento de viscosidad del gas carrier con la temperatura, que en un inlet sin EPC (a presión constante) haría caer el caudal real a medida que sube el horno. Las opciones de rampa 15 y 10&nbsp;&deg;C/min son igual de ilustrativas: separan un poco más los tiempos de retención de cada par (como haría una rampa más lenta en la realidad), pero no recalculan el ancho de los picos para esas rampas. La de 10&nbsp;&deg;C/min es además una extrapolación de la de 15 (no una calibración propia), por lo que los valores estimados contienen un error mayor. Es una herramienta de referencia para entender el fenómeno; verificá siempre experimentalmente.</p>
@@ -927,10 +1004,37 @@
     renderAll();
   }
 
+  /* boton de la guia (misma logica que split-gc, arranca OFF: hay mucho
+     texto arriba y no queremos que sea lo primero que vea el visitante). */
+  var velGroup = document.getElementById('velGroup');
+  var guideBtn = document.getElementById('guideBtn');
+  var guideBtnTxt = document.getElementById('guideBtnTxt');
+  var guideOn = false;
+  try { guideOn = (localStorage.getItem('vdGuide') === 'on'); } catch(e){}
+  var touched = false;
+  var guideBtnSeen = false;
+  try { guideBtnSeen = (localStorage.getItem('vdGuide') !== null); } catch(e){}
+  function applyGuide(){
+    document.body.classList.toggle('guide-on', guideOn);
+    guideBtn.setAttribute('aria-pressed', guideOn ? 'true' : 'false');
+    guideBtnTxt.innerHTML = guideOn ? 'Ocultar la gu&iacute;a' : 'Mostrar la gu&iacute;a';
+    guideBtn.classList.toggle('first-visit', !guideBtnSeen);
+    velGroup.classList.toggle('pulse', guideOn && !touched);
+  }
+  guideBtn.addEventListener('click', function(){
+    guideBtnSeen = true;
+    guideOn = !guideOn;
+    try { localStorage.setItem('vdGuide', guideOn ? 'on' : 'off'); } catch(e){}
+    applyGuide();
+  });
+
   document.querySelectorAll('.gas-btn').forEach(function(btn){
     btn.addEventListener('click', function(){ setGas(btn.getAttribute('data-gas')); });
   });
-  velSlider.addEventListener('input', function(e){ setU(parseFloat(e.target.value)); });
+  velSlider.addEventListener('input', function(e){
+    if(!touched){ touched = true; velGroup.classList.remove('pulse'); }
+    setU(parseFloat(e.target.value));
+  });
 
   document.querySelectorAll('.ramp-btn').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -955,6 +1059,7 @@
   var vdDragging = false;
   vdSvg.addEventListener('pointerdown', function(ev){
     vdDragging = true;
+    if(!touched){ touched = true; velGroup.classList.remove('pulse'); }
     setU(uFromPointer(ev));
     // la captura es una mejora (seguir el dedo/mouse fuera del svg), no un
     // requisito: si el navegador la rechaza, el arrastre igual tiene que andar
@@ -971,6 +1076,7 @@
   });
 
   renderAll();
+  applyGuide();
 })();
 </script>
 <script src="/comments.js" defer></script>
