@@ -233,9 +233,13 @@
       box-shadow: 0 1px 2px rgba(15,23,42,.05);
       transition: box-shadow .15s, border-color .15s, transform .15s;
     }
-    /* card de herramienta: la vista previa va a sangre arriba, sin padding propio */
+    /* card de herramienta: categoria+titulo arriba sobre blanco, despues la
+       vista previa a sangre, despues la descripcion. Asi el nombre de la
+       herramienta es texto real (siempre nitido) y no depende de que parte
+       de la captura de pantalla quede dentro del recorte de la foto. */
     .card-tool { padding: 0; }
-    .card-tool .card-body { padding: 1.25rem 1.4rem 1.4rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
+    .card-tool .card-head { padding: 1.1rem 1.4rem .7rem; display: flex; flex-direction: column; gap: .35rem; }
+    .card-tool .card-body { padding: .8rem 1.4rem 1.4rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
     .card:not(.coming-soon):hover {
       border-color: var(--accent);
       box-shadow: 0 4px 20px rgba(14,165,233,.15);
@@ -476,7 +480,7 @@
     .card-media {
       display: block;
       width: 100%;
-      aspect-ratio: 3 / 2;
+      aspect-ratio: 2 / 1;
       object-fit: cover;
     }
     video.card-media { pointer-events: none; }
@@ -597,80 +601,92 @@
       <div class="cards-grid">
 
         <a class="card card-tool" href="/troubleshooting-hplc/presion/" data-video="loop">
+          <div class="card-head">
+            <span class="card-cat cat-diagnostico">Diagnóstico</span>
+            <div class="card-title">HPLC: Problemas con la presión</div>
+          </div>
           <div class="card-media-wrap">
             <video class="card-media" poster="/card-presion.jpg" data-src="/card-presion.mp4"
                    muted playsinline preload="none" aria-hidden="true"></video>
             <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
           <div class="card-body">
-            <span class="card-cat cat-diagnostico">Diagnóstico</span>
-            <div class="card-title">HPLC: Problemas con la presión</div>
             <div class="card-desc">Encontrá en qué zona del sistema está la restricción antes de empezar a desarmar nada — diagnóstico guiado por maniobras que van descartando causas. Por ahora cubre presión alta y baja (beta).</div>
             <div class="card-footer">Abrir herramienta →</div>
           </div>
         </a>
 
         <a class="card card-tool" href="/troubleshooting-hplc/forma-de-picos/" data-video="loop">
+          <div class="card-head">
+            <span class="card-cat cat-diagnostico">Diagnóstico</span>
+            <div class="card-title">HPLC: Problemas con la forma de los picos</div>
+          </div>
           <div class="card-media-wrap">
             <video class="card-media" poster="/card-forma-de-picos.jpg" data-src="/card-forma-de-picos.mp4"
                    muted playsinline preload="none" aria-hidden="true"></video>
             <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
           <div class="card-body">
-            <span class="card-cat cat-diagnostico">Diagnóstico</span>
-            <div class="card-title">HPLC: Problemas con la forma de los picos</div>
             <div class="card-desc">Identificá la causa más probable de tailing, fronting, picos partidos, anchos, negativos o fantasma — afinada a tu equipo con un panel de contexto.</div>
             <div class="card-footer">Abrir herramienta →</div>
           </div>
         </a>
 
         <a class="card card-tool" href="/usp467/" data-video="once">
+          <div class="card-head">
+            <span class="card-cat cat-calculadora">Calculadora</span>
+            <div class="card-title">Solventes Residuales USP &lt;467&gt;</div>
+          </div>
           <div class="card-media-wrap">
             <video class="card-media" poster="/thumb-usp467.jpg" data-src="/thumb-usp467.mp4"
                    muted playsinline preload="none" aria-hidden="true"></video>
             <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
           <div class="card-body">
-            <span class="card-cat cat-calculadora">Calculadora</span>
-            <div class="card-title">Solventes Residuales USP &lt;467&gt;</div>
             <div class="card-desc">Mirá al instante cómo clasifica USP a un solvente residual: clase, PDE y límite en ppm, sobre 60 solventes con CAS.</div>
             <div class="card-footer">Abrir herramienta →</div>
           </div>
         </a>
 
         <a class="card card-tool" href="/helio-gc/">
-          <img class="card-media" src="/thumb-helio.jpg" alt="" aria-hidden="true">
-          <div class="card-body">
+          <div class="card-head">
             <span class="card-cat cat-calculadora">Calculadora</span>
             <div class="card-title">Consumo de Helio en GC</div>
+          </div>
+          <img class="card-media" src="/thumb-helio.jpg" alt="" aria-hidden="true">
+          <div class="card-body">
             <div class="card-desc">Estimá cuánto Helio consume tu GC hoy y cuánto ahorrarías con Gas Saver o un flujo optimizado.</div>
             <div class="card-footer">Abrir herramienta →</div>
           </div>
         </a>
 
         <a class="card card-tool" href="/videos/" data-video="once">
+          <div class="card-head">
+            <span class="card-cat cat-concepto">Concepto</span>
+            <div class="card-title">¿Cómo funciona un GC?</div>
+          </div>
           <div class="card-media-wrap">
             <video class="card-media" poster="https://img.youtube.com/vi/H_99ORfJ818/sddefault.jpg" data-src="/card-como-funciona-gc.mp4"
                    muted playsinline preload="none" aria-hidden="true"></video>
             <span class="play-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
           </div>
           <div class="card-body">
-            <span class="card-cat cat-concepto">Concepto</span>
-            <div class="card-title">¿Cómo funciona un GC?</div>
             <div class="card-desc">Componentes, principio de separación y detector — explicado desde cero, en 5 minutos.</div>
             <div class="card-footer">Ver video →</div>
           </div>
         </a>
 
         <a class="card card-tool" href="/van-deemter-gc/" data-video="loop">
+          <div class="card-head">
+            <span class="card-cat cat-simulador">Simulador</span>
+            <div class="card-title">Curva de Van Deemter</div>
+          </div>
           <div class="card-media-wrap">
             <video class="card-media" poster="/card-van-deemter.jpg" data-src="/card-van-deemter.mp4"
                    muted playsinline preload="none" aria-hidden="true"></video>
             <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
           <div class="card-body">
-            <span class="card-cat cat-simulador">Simulador</span>
-            <div class="card-title">Curva de Van Deemter</div>
             <div class="card-desc">Visualizá cómo la velocidad lineal afecta la eficiencia, la resolución y la forma de los picos.</div>
             <div class="card-footer">Abrir simulador →</div>
           </div>
