@@ -28,14 +28,18 @@
 
   function init(box) {
     var tool = box.getAttribute('data-tool') || document.title;
+    var title = box.getAttribute('data-title') || '&iquest;Encontraste un error o ten&eacute;s una sugerencia?';
+    var sub = box.getAttribute('data-sub') || 'Nos llega directo al equipo de AGS Anal&iacute;tica. No se publica en la p&aacute;gina.';
+    var placeholder = box.getAttribute('data-placeholder') || 'Cont&aacute;nos qu&eacute; encontraste o qu&eacute; te gustar&iacute;a que agreguemos...';
+    var buttonLabel = box.getAttribute('data-button') || 'Enviar comentario';
     box.innerHTML =
-      '<h3>&iquest;Encontraste un error o ten&eacute;s una sugerencia?</h3>' +
-      '<p class="tc-sub">Nos llega directo al equipo de AGS Anal&iacute;tica. No se publica en la p&aacute;gina.</p>' +
-      '<textarea maxlength="4000" placeholder="Cont&aacute;nos qu&eacute; encontraste o qu&eacute; te gustar&iacute;a que agreguemos..."></textarea>' +
+      '<h3>' + title + '</h3>' +
+      '<p class="tc-sub">' + sub + '</p>' +
+      '<textarea maxlength="4000" placeholder="' + placeholder + '"></textarea>' +
       '<input type="text" class="tc-hp" tabindex="-1" autocomplete="off" aria-hidden="true">' +
       '<div class="tc-row">' +
       '<input type="email" placeholder="Tu email (opcional, por si quer&eacute;s respuesta)">' +
-      '<button type="button" class="tc-btn">Enviar comentario</button>' +
+      '<button type="button" class="tc-btn">' + buttonLabel + '</button>' +
       '</div>' +
       '<div class="tc-msg" style="display:none" role="status"></div>';
 

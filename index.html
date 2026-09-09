@@ -227,8 +227,12 @@
       display: flex;
       flex-direction: column;
       gap: .6rem;
+      overflow: hidden;
       transition: box-shadow .15s, border-color .15s, transform .15s;
     }
+    /* card de herramienta: la vista previa va a sangre arriba, sin padding propio */
+    .card-tool { padding: 0; }
+    .card-tool .card-body { padding: 1.1rem 1.35rem 1.35rem; display: flex; flex-direction: column; gap: .55rem; flex: 1; }
     .card:not(.coming-soon):hover {
       border-color: var(--accent);
       box-shadow: 0 4px 20px rgba(14,165,233,.15);
@@ -260,12 +264,6 @@
     .card-desc  { font-size: .825rem; color: var(--muted); line-height: 1.5; flex: 1; }
     .card-footer { font-size: .78rem; font-weight: 600; color: var(--primary); }
     .card.external .card-footer { color: var(--accent); }
-
-    /* card AGS destacada ("¿Quiénes somos?") */
-    .card-featured { background: #0d1b35; border-color: #0d1b35; color: #fff; }
-    .card-featured .card-desc { color: #cbd5e1; }
-    .card-featured .card-footer { color: #7dd3fc; }
-    .card-featured:hover { border-color: #7dd3fc; box-shadow: 0 4px 20px rgba(14,165,233,.25); }
 
     /* card Soporte técnico: botones de contacto directo */
     .card-support-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .1rem; }
@@ -301,6 +299,28 @@
     }
 
     .divider { margin: 2.5rem 0 2rem; border: none; border-top: 1px solid var(--border); }
+
+    /* ── Respaldo (confianza técnica) ─────────────── */
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .trust-num { font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: -.01em; margin-bottom: .3rem; }
+    .trust-label { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── Franja "Un proyecto de AGS Analítica" ────── */
+    .ags-strip { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
+    .ags-strip-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .ags-strip-inner img { width: 40px; height: 40px; object-fit: contain; border-radius: 6px; flex-shrink: 0; }
+    .ags-strip-title { font-size: .88rem; font-weight: 700; }
+    .ags-strip-desc { font-size: .78rem; color: var(--muted); }
+    .ags-strip-link { margin-left: auto; font-size: .8rem; font-weight: 600; color: var(--primary); text-decoration: none; white-space: nowrap; }
+    .ags-strip-link:hover { text-decoration: underline; }
+    @media (max-width: 600px) { .ags-strip-link { margin-left: 0; } }
 
     /* ── Footer ──────────────────────────────────── */
     footer {
@@ -356,27 +376,6 @@
       font-size: 0.72rem;
       border-top: 1px solid rgba(255,255,255,.06);
       padding-top: 1rem;
-    }
-    .chroma-scroll { position: relative; }
-    .chroma { padding: .5rem 0 1rem; }
-    @media (prefers-reduced-motion: reduce) { .chroma-scroll { height: auto; } }
-    .chroma-svg { display: block; width: 100%; height: auto; overflow: visible; }
-    #chroma-line { stroke: #1f4ed8; stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-    #chroma-base { stroke: #ea2f9a; stroke-width: 1; vector-effect: non-scaling-stroke; }
-    #chroma-pen { fill: #1f4ed8; opacity: 0; transition: opacity .2s; }
-    .chroma-mark { opacity: 0; transition: opacity .25s ease-out; }
-    #chroma-axes { opacity: 0; transition: opacity .3s ease-out; }
-    #chroma-line {
-      stroke: #1d4ed8; stroke-width: 1.6;
-      stroke-linejoin: round; stroke-linecap: round;
-      vector-effect: non-scaling-stroke;
-    }
-    #chroma-pen { fill: #0ea5e9; opacity: 0; transition: opacity .25s; }
-    .chroma-axis { display: flex; justify-content: space-between; margin-top: .45rem; }
-    .chroma-axis span {
-      font-family: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
-      font-size: .62rem; letter-spacing: .08em; color: #94a3b8;
-      font-variant-numeric: tabular-nums;
     }
         /* ── Hero: parallax, asentamiento y deriva de luz ── */
     .hero-media {
@@ -453,32 +452,58 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
-        .card-head {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-    .card-head .card-icon { flex-shrink: 0; }
-
     .card-cat {
+      display: inline-block;
       font-size: .68rem;
       font-weight: 700;
-      letter-spacing: .1em;
+      letter-spacing: .06em;
       text-transform: uppercase;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: .15rem .45rem;
+      border-radius: 5px;
+      padding: .2rem .55rem;
+      align-self: flex-start;
     }
+    /* categorias por tipo de herramienta -- no por tecnica (HPLC/GC) */
+    .cat-diagnostico { background: #fef3c7; color: #b45309; }
+    .cat-calculadora { background: #eff6ff; color: #1d4ed8; }
+    .cat-simulador   { background: #f3e8ff; color: #7c3aed; }
+    .cat-concepto    { background: #ccfbf1; color: #0d9488; }
 
-    .card-thumb {
+    /* vista previa de la herramienta: a sangre, ocupa todo el ancho de la card */
+    .card-media-wrap { position: relative; }
+    .card-media {
       display: block;
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid var(--border);
     }
+    video.card-media { pointer-events: none; }
+    .play-badge {
+      position: absolute; inset: 0; margin: auto;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(13,27,53,.72);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+    }
+    .play-badge svg { width: 18px; height: 18px; }
+
+    /* chip "vista previa": invita a pasar el mouse; se apaga apenas arranca el video */
+    .preview-hint {
+      position: absolute; top: .55rem; left: .55rem;
+      display: flex; align-items: center; gap: .35rem;
+      background: rgba(13,27,53,.72); color: #fff;
+      font-size: .64rem; font-weight: 600; letter-spacing: .02em;
+      padding: .22rem .55rem .22rem .45rem; border-radius: 20px;
+      transition: opacity .2s;
+    }
+    .preview-hint .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; flex-shrink: 0;
+      animation: previewPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes previewPulse {
+      0%, 100% { opacity: .45; transform: scale(.85); }
+      50%      { opacity: 1;   transform: scale(1); }
+    }
+    .card-tool:hover .preview-hint, .card-tool:focus .preview-hint { opacity: 0; }
+    @media (prefers-reduced-motion: reduce) { .preview-hint .dot { animation: none; opacity: .9; } }
   </style>
     <script>
     if ('IntersectionObserver' in window) {
@@ -515,7 +540,6 @@
     }
   </style>
 </head>
-</head>
 <body>
 
   <header>
@@ -551,93 +575,113 @@
 
   <main>
     <div class="container">
-            <div class="chroma-scroll"><div class="chroma" aria-hidden="true">
-        <svg class="chroma-svg" viewBox="0 0 1000 164" role="presentation">
-          <defs>
-            <clipPath id="chroma-clip"><rect id="chroma-wipe" x="0" y="0" width="0" height="164"></rect></clipPath>
-          </defs>
-          <g id="chroma-axes"></g>
-          <g clip-path="url(#chroma-clip)">
-            <line id="chroma-base"></line>
-            <path id="chroma-line" fill="none"></path>
-          </g>
-          <circle id="chroma-pen" r="3.5" cx="0" cy="0"></circle>
-          <g id="chroma-marks"></g>
-        </svg>
-      </div></div>
+      <p class="section-title">Herramientas</p>
       <div class="cards-grid">
 
-        <a class="card" href="/troubleshooting-hplc/presion/">
-          <div class="card-head">
-            <div class="card-icon">🔧</div>
-            <span class="card-cat">HPLC</span>
+        <a class="card card-tool" href="/troubleshooting-hplc/presion/" data-video="loop">
+          <div class="card-media-wrap">
+            <video class="card-media" poster="/card-presion.jpg" data-src="/card-presion.mp4"
+                   muted playsinline preload="none" aria-hidden="true"></video>
+            <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
-          <img class="card-thumb" src="/card-presion.jpg" alt="" aria-hidden="true">
-          <div class="card-title">HPLC: Problemas con la presión</div>
-          <div class="card-desc">Diagnóstico guiado por maniobras que discriminan cada causa. En esta etapa beta cubre los síntomas de cambio de presión en HPLC (alta y baja); se irá ampliando a más síntomas.</div>
-          <div class="card-footer">Abrir herramienta →</div>
+          <div class="card-body">
+            <span class="card-cat cat-diagnostico">Diagnóstico</span>
+            <div class="card-title">HPLC: Problemas con la presión</div>
+            <div class="card-desc">Encontrá en qué zona del sistema está la restricción antes de empezar a desarmar nada — diagnóstico guiado por maniobras que van descartando causas. Por ahora cubre presión alta y baja (beta).</div>
+            <div class="card-footer">Abrir herramienta →</div>
+          </div>
         </a>
 
-        <a class="card" href="/troubleshooting-hplc/forma-de-picos/">
-          <div class="card-head">
-            <div class="card-icon">📈</div>
-            <span class="card-cat">HPLC</span>
+        <a class="card card-tool" href="/troubleshooting-hplc/forma-de-picos/" data-video="loop">
+          <div class="card-media-wrap">
+            <video class="card-media" poster="/card-forma-de-picos.jpg" data-src="/card-forma-de-picos.mp4"
+                   muted playsinline preload="none" aria-hidden="true"></video>
+            <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
-          <img class="card-thumb" src="/card-forma-de-picos.jpg" alt="" aria-hidden="true">
-          <div class="card-title">HPLC: Problemas con la forma de los picos</div>
-          <div class="card-desc">Diagnóstico guiado de problemas de forma de picos: tailing, frente, pico partido, ancho, negativo y fantasma. Con un panel de contexto que afina las causas según tu equipo.</div>
-          <div class="card-footer">Abrir herramienta →</div>
+          <div class="card-body">
+            <span class="card-cat cat-diagnostico">Diagnóstico</span>
+            <div class="card-title">HPLC: Problemas con la forma de los picos</div>
+            <div class="card-desc">Identificá la causa más probable de tailing, fronting, picos partidos, anchos, negativos o fantasma — afinada a tu equipo con un panel de contexto.</div>
+            <div class="card-footer">Abrir herramienta →</div>
+          </div>
         </a>
 
-                <a class="card" href="/usp467/">
-          <div class="card-head">
-            <div class="card-icon" style="background:#E05C35;border-radius:6px;display:flex;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;">
-              <span style="font-size:9px;font-weight:800;color:#fff;text-align:center;line-height:1.2;letter-spacing:.03em;">USP<br>&lt;467&gt;</span>
-            </div>
-            <span class="card-cat">GC</span>
+        <a class="card card-tool" href="/usp467/" data-video="once">
+          <div class="card-media-wrap">
+            <video class="card-media" poster="/thumb-usp467.jpg" data-src="/thumb-usp467.mp4"
+                   muted playsinline preload="none" aria-hidden="true"></video>
+            <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
-          <img class="card-thumb" src="/thumb-usp467.jpg" alt="" aria-hidden="true">
-          <div class="card-title">Solventes Residuales USP &lt;467&gt;</div>
-          <div class="card-desc">60 solventes con clase, PDE, límite en ppm y CAS. Buscá por nombre o filtrá por clase.</div>
-          <div class="card-footer">Abrir herramienta →</div>
+          <div class="card-body">
+            <span class="card-cat cat-calculadora">Calculadora</span>
+            <div class="card-title">Solventes Residuales USP &lt;467&gt;</div>
+            <div class="card-desc">Mirá al instante cómo clasifica USP a un solvente residual: clase, PDE y límite en ppm, sobre 60 solventes con CAS.</div>
+            <div class="card-footer">Abrir herramienta →</div>
+          </div>
         </a>
 
-        <a class="card" href="/helio-gc/">
-          <div class="card-head">
-            <div class="card-icon" style="background:none;padding:0;"><img src="/manometer.jpg" alt="" aria-hidden="true" style="width:40px;height:40px;object-fit:cover;border-radius:8px;"></div>
-            <span class="card-cat">GC</span>
+        <a class="card card-tool" href="/helio-gc/">
+          <img class="card-media" src="/thumb-helio.jpg" alt="" aria-hidden="true">
+          <div class="card-body">
+            <span class="card-cat cat-calculadora">Calculadora</span>
+            <div class="card-title">Consumo de Helio en GC</div>
+            <div class="card-desc">Estimá cuánto Helio consume tu GC hoy y cuánto ahorrarías con Gas Saver o un flujo optimizado.</div>
+            <div class="card-footer">Abrir herramienta →</div>
           </div>
-          <img class="card-thumb" src="/thumb-helio.jpg" alt="" aria-hidden="true">
-          <div class="card-title">Consumo de Helio en GC</div>
-          <div class="card-desc">Calculá si tu laboratorio consume más Helio del que debería. Comparación de escenarios con Gas Saver y flujo optimizado.</div>
-          <div class="card-footer">Abrir herramienta →</div>
         </a>
 
-        <a class="card" href="/videos/">
-          <div class="card-head">
-            <div class="card-icon">🎬</div>
-            <span class="card-cat">GC</span>
+        <a class="card card-tool" href="/van-deemter-gc/" data-video="loop">
+          <div class="card-media-wrap">
+            <video class="card-media" poster="/card-van-deemter.jpg" data-src="/card-van-deemter.mp4"
+                   muted playsinline preload="none" aria-hidden="true"></video>
+            <span class="preview-hint"><span class="dot"></span>Vista previa</span>
           </div>
-          <img class="card-thumb" src="https://img.youtube.com/vi/H_99ORfJ818/sddefault.jpg" alt="" aria-hidden="true">
-          <div class="card-title">¿Cómo funciona un GC?</div>
-          <div class="card-desc">Componentes, principio de separación y detector — explicado desde cero, en 5 minutos.</div>
-          <div class="card-footer">Ver video →</div>
+          <div class="card-body">
+            <span class="card-cat cat-simulador">Simulador</span>
+            <div class="card-title">Curva de Van Deemter</div>
+            <div class="card-desc">Visualizá cómo la velocidad lineal afecta la eficiencia, la resolución y la forma de los picos.</div>
+            <div class="card-footer">Abrir herramienta →</div>
+          </div>
+        </a>
+
+        <a class="card card-tool" href="/videos/" data-video="once">
+          <div class="card-media-wrap">
+            <video class="card-media" poster="https://img.youtube.com/vi/H_99ORfJ818/sddefault.jpg" data-src="/card-como-funciona-gc.mp4"
+                   muted playsinline preload="none" aria-hidden="true"></video>
+            <span class="play-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+          <div class="card-body">
+            <span class="card-cat cat-concepto">Concepto</span>
+            <div class="card-title">¿Cómo funciona un GC?</div>
+            <div class="card-desc">Componentes, principio de separación y detector — explicado desde cero, en 5 minutos.</div>
+            <div class="card-footer">Ver video →</div>
+          </div>
         </a>
         
       </div>
 
       <hr class="divider" />
 
+      <p class="section-title">Respaldo</p>
+      <div class="trust-grid">
+        <div class="trust-item">
+          <div class="trust-num">22 años</div>
+          <div class="trust-label">AGS Analítica trabaja en cromatografía desde hace 22 años.</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-num">+30 años</div>
+          <div class="trust-label">de experiencia práctica de los fundadores en GC, HPLC, GC-MS y LC-MS.</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-num">Problemas reales</div>
+          <div class="trust-label">Las herramientas nacen de situaciones que aparecen habitualmente en el laboratorio, no de un ejercicio teórico.</div>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
       <p class="section-title">Links útiles</p>
       <div class="cards-grid">
-
-        <a class="card external card-featured" href="https://www.agsanalitica.com" target="_blank" rel="noopener">
-          <div class="card-icon" style="background:#fff;padding:6px;"><img src="/AGS_Logo.jpg" alt="AGS Analítica" style="width:32px;height:32px;object-fit:contain;border-radius:6px;" /></div>
-          <span class="card-tag tag-link" style="background:rgba(255,255,255,.14);color:#93c5fd;">AGS Analítica</span>
-          <div class="card-title">¿Quiénes somos?</div>
-          <div class="card-desc">Representantes de Bruker, Knauer, Joint Analytical Systems, Peak Scientific y DataApex en Argentina.</div>
-          <div class="card-footer">agsanalitica.com →</div>
-        </a>
 
         <div class="card card-support">
           <div class="card-icon">🔧</div>
@@ -676,13 +720,28 @@
     </div>
   </main>
 
-  <section style="background:#f1f5f9; padding: 3rem 2rem;">
-    <div style="max-width:700px; margin:0 auto;">
-      <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:1.25rem;">Contacto y sugerencias</p>
-      <script src="https://elfsightcdn.com/platform.js" async></script>
-      <div class="elfsight-app-c42bc41a-406c-498a-9aea-89218cc8af91" data-elfsight-app-lazy></div>
+  <section class="ags-strip">
+    <div class="ags-strip-inner">
+      <img src="/AGS_Logo.jpg" alt="AGS Analítica">
+      <div>
+        <div class="ags-strip-title">Un proyecto de AGS Analítica</div>
+        <div class="ags-strip-desc">Representantes de Bruker, Knauer, Joint Analytical Systems, Peak Scientific y DataApex en Argentina.</div>
+      </div>
+      <a class="ags-strip-link" href="https://www.agsanalitica.com" target="_blank" rel="noopener">agsanalitica.com &rarr;</a>
     </div>
   </section>
+
+  <section style="background:#f1f5f9; padding: 3rem 2rem;">
+    <div style="max-width:700px; margin:0 auto;">
+      <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:1.25rem;">¿No encontraste la herramienta que necesitabas?</p>
+      <div class="tool-comments" data-tool="Sugerencia de herramienta (home)"
+           data-title="Sugerí una herramienta"
+           data-sub="Contanos qué problema de cromatografía te gustaría resolver. Puede convertirse en nuestra próxima herramienta."
+           data-placeholder="Ej: una calculadora para..."
+           data-button="Sugerir una herramienta"></div>
+    </div>
+  </section>
+  <script src="/comments.js" defer></script>
 
   <footer>
     <div class="footer-inner">
@@ -708,131 +767,7 @@
 
     </div>
   </footer>
-  <style>
-<style>
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
-</style>
-<script>
-(function () {
-  var wrap = document.querySelector('.chroma');
-  if (!wrap) return;
-  var NS = 'http://www.w3.org/2000/svg';
-  function el(t, a) { var e = document.createElementNS(NS, t); for (var k in a) e.setAttribute(k, a[k]); return e; }
-
-  var axesG = document.getElementById('chroma-axes');
-  var marksG = document.getElementById('chroma-marks');
-  var line = document.getElementById('chroma-line');
-  var base = document.getElementById('chroma-base');
-  var wipe = document.getElementById('chroma-wipe');
-  var pen  = document.getElementById('chroma-pen');
-
-  var W = 1000, L = 60, R = 945, T = 31, B = 141, maxPA = 175;
-  var ff = 'Arial, Helvetica, sans-serif', ax = '#8a8a8a', axt = '#444', mag = '#ea2f9a';
-  function xAt(t) { return L + (t / 10) * (R - L); }
-  function yAt(pa) { return B - pa / maxPA * (B - T); }
-
-  var peaks = [
-    { rt: 4.985, h: 96, w: .060 },
-    { rt: 6.718, h: 64, w: .055 },
-    { rt: 8.406, h: 54, w: .060 }
-  ];
-  var SA = 1.4, SB = 2.1, SPLAT = 168, SRAMP = .03;
-  function solvent(t) {
-    if (t < SA || t > SB) return 0;
-    if (t < SA + SRAMP) return SPLAT * (t - SA) / SRAMP;
-    if (t > SB - SRAMP) return SPLAT * (SB - t) / SRAMP;
-    return SPLAT;
-  }
-  function sig(t) {
-    var s = solvent(t);
-    for (var i = 0; i < peaks.length; i++) { var p = peaks[i], d = t - p.rt; s += p.h * Math.exp(-(d * d) / (2 * p.w * p.w)); }
-    return s;
-  }
-
-  var t1 = el('text', { x: 14, y: 9, fill: '#1a3fd0', 'font-family': ff, 'font-size': 12 }); t1.textContent = 'FID1 A, (AGS\\AGILENT-FID-01)'; axesG.appendChild(t1);
-  axesG.appendChild(el('line', { x1: L, y1: T, x2: L, y2: B, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
-  axesG.appendChild(el('line', { x1: L, y1: B, x2: R, y2: B, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
-  for (var pa = 0; pa <= 175; pa += 25) {
-    var y = yAt(pa);
-    axesG.appendChild(el('line', { x1: L - 5, y1: y, x2: L, y2: y, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
-    var tk = el('text', { x: L - 9, y: y + 4, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); tk.textContent = pa; axesG.appendChild(tk);
-  }
-  var pal = el('text', { x: 14, y: T - 6, fill: axt, 'font-family': ff, 'font-size': 13 }); pal.textContent = 'pA'; axesG.appendChild(pal);
-  for (var m = 0; m <= 10; m++) {
-    var x = xAt(m);
-    axesG.appendChild(el('line', { x1: x, y1: B, x2: x, y2: B + 5, stroke: ax, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }));
-    if (m % 2 === 0) { var tx = el('text', { x: x, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'middle' }); tx.textContent = m; axesG.appendChild(tx); }
-  }
-  var ml = el('text', { x: 998, y: B + 20, fill: axt, 'font-family': ff, 'font-size': 13, 'text-anchor': 'end' }); ml.textContent = 'min'; axesG.appendChild(ml);
-  axesG.style.opacity = 1;
-  var by = yAt(0);
-  base.setAttribute('x1', L); base.setAttribute('y1', by); base.setAttribute('x2', R); base.setAttribute('y2', by);
-  var d = '', N = 1400;
-  for (var i = 0; i <= N; i++) { var t = 10 * i / N, xx = xAt(t), yy = yAt(sig(t)); d += (i ? 'L' : 'M') + xx.toFixed(1) + ',' + yy.toFixed(1); }
-  line.setAttribute('d', d);
-
-  function tick(x) { return el('line', { x1: x, y1: by - 2, x2: x, y2: by + 6, stroke: mag, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' }); }
-  var markEls = [];
- 
-  peaks.forEach(function (p) {
-    var g = el('g', { 'class': 'chroma-mark' });
-    g.appendChild(tick(xAt(p.rt - 2.6 * p.w))); g.appendChild(tick(xAt(p.rt + 2.6 * p.w)));
-    var axp = xAt(p.rt), ayp = yAt(sig(p.rt));
-    var lb = el('text', { x: axp, y: ayp - 12, fill: '#222', 'font-family': ff, 'font-size': 13, 'text-anchor': 'start', transform: 'rotate(-90 ' + axp + ' ' + (ayp - 12) + ')' });
-    lb.textContent = p.rt.toFixed(3); g.appendChild(lb);
-    marksG.appendChild(g); markEls.push({ el: g, x: xAt(p.rt + 2.6 * p.w) });
-  });
-
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    wipe.setAttribute('width', W);
-    axesG.style.opacity = 1;
-    markEls.forEach(function (mk) { mk.el.style.opacity = 1; });
-    return;
-  }
-
-  // Sin pin ni contenedor extra -> CERO espacio muerto arriba/abajo. La hoja
-  // scrollea normal; el cromatograma se dibuja SOLO (animacion por tiempo)
-  // cuando entra en el viewport. DURACION controla la velocidad del trazo.
-  var DURACION = 900; // ms
-  function applyP(p) {
-    var px = p * W;
-    wipe.setAttribute('width', px.toFixed(1));
-    if (px > L && px < R) {
-      var t = (px - L) / (R - L) * 10;
-      pen.setAttribute('cx', px.toFixed(1)); pen.setAttribute('cy', yAt(sig(t)).toFixed(1));
-      pen.style.opacity = (p > 0.002 && p < 0.998) ? 1 : 0;
-    } else { pen.style.opacity = 0; }
-    markEls.forEach(function (mk) { mk.el.style.opacity = (px >= mk.x) ? 1 : 0; });
-  }
-  var started = false;
-  function animate() {
-    if (started) return; started = true;
-    var t0 = null;
-    function step(ts) {
-      if (t0 === null) t0 = ts;
-      var k = Math.min(1, (ts - t0) / DURACION);
-      var e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // easeInOutQuad
-      applyP(e);
-      if (k < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  applyP(0);
-  if ('IntersectionObserver' in window) {
-    // Umbral alto: se dibuja recien cuando el cromatograma entra ENTERO en el
-    // viewport (no cuando asoma cortado en el borde), asi no arranca a medias
-    // en pantallas bajas (notebook).
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.intersectionRatio >= 0.9) { animate(); io.disconnect(); } });
-    }, { threshold: [0.9, 1] });
-    io.observe(wrap);
-  } else { animate(); }
-})();
-</script>
-<script>
+  <script>
 (function () {
   var hero  = document.querySelector('.hero');
   var media = document.querySelector('.hero-media');
@@ -862,6 +797,101 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll, { passive: true });
   draw();
+})();
+</script>
+<script>
+(function () {
+  // Previews animadas de las cards de herramienta. Nunca mas de un video a la
+  // vez; en reposo cada card queda en su poster (imagen). Los data-video son
+  // "loop" (presion, forma de picos: arranca y para igual, se puede repetir
+  // en bucle sin que se note el corte) o "once" (usp467, como-funciona-gc:
+  // terminan en un estado -- el resultado, el diagrama -- que hay que dejar
+  // leer, asi que no se reinician solos mientras siguen activas).
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card-tool[data-video]'));
+  if (!cards.length) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // solo poster
+
+  function getVideo(card) { return card.querySelector('video.card-media'); }
+
+  function ensureLoaded(video) {
+    if (video && !video.src && video.dataset.src) {
+      video.preload = 'metadata';
+      video.src = video.dataset.src;
+    }
+  }
+
+  var current = null; // <video> actualmente reproduciendose (a lo sumo uno)
+
+  function stop(card) {
+    var video = getVideo(card);
+    if (!video || !video.src) return;
+    video.pause();
+    video.currentTime = 0;
+    if (current === video) current = null;
+  }
+
+  function start(card) {
+    var video = getVideo(card);
+    if (!video) return;
+    ensureLoaded(video);
+    if (current && current !== video) { current.pause(); current.currentTime = 0; }
+    video.loop = (card.getAttribute('data-video') === 'loop');
+    var p = video.play();
+    if (p && p.catch) p.catch(function () {}); // autoplay bloqueado u otro error: se queda en el poster
+    current = video;
+  }
+
+  // Cargar el <video> (asignar src) recien cuando la card esta por entrar en
+  // viewport -- no hace falta bajar los 4 clips si el visitante no llega a
+  // scrollear hasta ahi.
+  if ('IntersectionObserver' in window) {
+    var loadIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { ensureLoaded(getVideo(e.target)); loadIo.unobserve(e.target); }
+      });
+    }, { rootMargin: '200px 0px' });
+    cards.forEach(function (c) { loadIo.observe(c); });
+  } else {
+    cards.forEach(function (c) { ensureLoaded(getVideo(c)); });
+  }
+
+  var esDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (esDesktop) {
+    // Escritorio: reproduce con hover o foco de teclado; al salir, pausa y
+    // vuelve al inicio (silencioso: el primer frame es parecido al poster).
+    cards.forEach(function (card) {
+      card.addEventListener('mouseenter', function () { start(card); });
+      card.addEventListener('mouseleave', function () { stop(card); });
+      card.addEventListener('focus', function () { start(card); });
+      card.addEventListener('blur', function () { stop(card); });
+    });
+  } else {
+    // Tactil: solo la card mas cercana al centro del viewport reproduce; el
+    // resto queda pausada. Se recalcula en cada scroll (throttleado a rAF).
+    var active = null;
+    function pickClosest() {
+      var vh = window.innerHeight, centro = vh / 2, mejor = null, mejorDist = Infinity;
+      cards.forEach(function (card) {
+        var r = card.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        var dist = Math.abs((r.top + r.height / 2) - centro);
+        if (dist < mejorDist) { mejorDist = dist; mejor = card; }
+      });
+      if (mejor !== active) {
+        if (active) stop(active);
+        active = mejor;
+        if (active) start(active);
+      }
+    }
+    var ticking = false;
+    function onScrollTouch() {
+      if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; pickClosest(); }); }
+    }
+    window.addEventListener('scroll', onScrollTouch, { passive: true });
+    window.addEventListener('resize', onScrollTouch, { passive: true });
+    pickClosest();
+  }
 })();
 </script>
 </body>
