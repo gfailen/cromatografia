@@ -298,7 +298,7 @@
             </div>
             <div class="vel-slider-row">
               <div class="vel-slider-wrap">
-                <input type="range" id="velSlider" min="2" max="120" step="1" value="35">
+                <input type="range" id="velSlider" min="2" max="120" step="1" value="100">
                 <div class="vel-zone-ticks">
                   <span class="vel-tick" id="velTickL"></span>
                   <span class="vel-tick" id="velTickR"></span>
@@ -308,7 +308,7 @@
               <div class="vel-readout">
                 <div class="vel-readout-item">
                   <span class="vel-readout-label">Velocidad lineal promedio</span>
-                  <span><b id="velVal">35</b> cm/s</span>
+                  <span><b id="velVal">100</b> cm/s</span>
                 </div>
                 <div class="vel-readout-item">
                   <span class="vel-readout-label">Flujo de carrier</span>
@@ -626,7 +626,7 @@
   }
 
   /* ===== 5. Render ===== */
-  var state = { gas:'he', u:35, ramp:'r20' };
+  var state = { gas:'he', u:100, ramp:'r20' };
   var RAMP_RATE = { r20:'20', r15:'15', r10:'10' };
   var VD_GEOM = null;   // geometria del eje X del grafico, para poder invertirlo
   var GAS_COLOR = { he:'#ea580c', h2:'#dc2626', n2:'#16a34a' };
