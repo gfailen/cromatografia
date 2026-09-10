@@ -307,14 +307,48 @@
 
     .divider { margin: 2.5rem 0 2rem; border: none; border-top: 1px solid var(--border); }
 
-    /* ── Respaldo (confianza técnica) ─────────────── */
-    .trust-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+    /* ── Preguntas frecuentes (acordeon nativo <details>, sin JS) ──── */
+    .faq { max-width: 760px; display: flex; flex-direction: column; gap: .55rem; }
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid #d8dfe8;
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(15,23,42,.05);
     }
-    .trust-num { font-size: 1.15rem; font-weight: 800; color: var(--primary); letter-spacing: -.01em; margin-bottom: .3rem; }
-    .trust-label { font-size: .82rem; color: var(--muted); line-height: 1.5; }
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      padding: .9rem 1.1rem;
+      font-size: .92rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after {
+      content: "";
+      width: 8px; height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      transition: transform .18s ease;
+      flex-shrink: 0;
+    }
+    .faq-item[open] summary::after { transform: rotate(225deg); }
+    .faq-item summary:hover { color: var(--primary); }
+    .faq-answer {
+      padding: 0 1.1rem 1rem;
+      font-size: .86rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .faq-answer p + p { margin-top: .55rem; }
+    .faq-answer a { color: var(--primary); text-decoration: none; }
+    .faq-answer a:hover { text-decoration: underline; }
+    @media (prefers-reduced-motion: reduce) { .faq-item summary::after { transition: none; } }
 
     /* ── Franja "Un proyecto de AGS Analítica" ────── */
     .ags-strip { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
@@ -696,24 +730,6 @@
 
       <hr class="divider" />
 
-      <p class="section-title">Respaldo</p>
-      <div class="trust-grid">
-        <div class="trust-item">
-          <div class="trust-num">22 años</div>
-          <div class="trust-label">AGS Analítica trabaja en cromatografía desde hace 22 años.</div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-num">+30 años</div>
-          <div class="trust-label">de experiencia práctica de los fundadores en GC, HPLC, GC-MS y LC-MS.</div>
-        </div>
-        <div class="trust-item">
-          <div class="trust-num">Problemas reales</div>
-          <div class="trust-label">Las herramientas nacen de situaciones que aparecen habitualmente en el laboratorio, no de un ejercicio teórico.</div>
-        </div>
-      </div>
-
-      <hr class="divider" />
-
       <p class="section-title">Links útiles</p>
       <div class="cards-grid">
 
@@ -748,6 +764,56 @@
           <div class="card-desc">Viales, tapas, insertos y consumibles para cromatografía. Envío a todo el país.</div>
           <span class="card-cta-btn">Comprar consumibles →</span>
         </a>
+
+      </div>
+
+      <hr class="divider" />
+
+      <p class="section-title">Preguntas frecuentes</p>
+      <div class="faq">
+
+        <details class="faq-item">
+          <summary>¿Las herramientas tienen costo? ¿Hay que registrarse?</summary>
+          <div class="faq-answer">
+            <p>No. Todas las herramientas son de acceso libre y pueden utilizarse sin registro ni ingreso de datos personales.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Puedo usar los resultados para liberar un lote o tomar una decisión regulatoria?</summary>
+          <div class="faq-answer">
+            <p>No por sí solos. Las herramientas tienen carácter informativo y de referencia. Antes de utilizar los resultados para una decisión técnica, de calidad o regulatoria, deben verificarse contra las fuentes oficiales vigentes, como USP, ICH, ANMAT u otras farmacopeas y normativas aplicables.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Quién desarrolla cromatografia.com.ar?</summary>
+          <div class="faq-answer">
+            <p>cromatografia.com.ar es un proyecto de AGS Analítica S.A., empresa argentina especializada en instrumentación analítica y soporte técnico, con amplia experiencia en cromatografía líquida y gaseosa.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Los datos que ingreso se guardan o se envían a algún servidor?</summary>
+          <div class="faq-answer">
+            <p>No. Los cálculos y simulaciones se realizan localmente en tu navegador y los datos ingresados en las herramientas no se envían a nuestros servidores.</p>
+            <p>Si utilizás un formulario de contacto o comentarios, únicamente se envían los datos que decidas completar en ese formulario.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Funcionan desde el celular?</summary>
+          <div class="faq-answer">
+            <p>Sí. Las herramientas están diseñadas para funcionar tanto en computadoras como en celulares y tablets.</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>¿Cómo reporto un error o sugiero una herramienta?</summary>
+          <div class="faq-answer">
+            <p>Podés escribirnos desde el formulario disponible debajo de cada herramienta o directamente a <a href="mailto:soporte@agsanalitica.com">soporte@agsanalitica.com</a>. Los comentarios, correcciones y sugerencias son bienvenidos.</p>
+          </div>
+        </details>
 
       </div>
 
