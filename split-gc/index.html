@@ -311,7 +311,7 @@
               </div>
 
               <div class="general-head">Vista general &middot; mezcla de 16 compuestos</div>
-              <svg id="chromGeneral" viewBox="0 0 560 230"></svg>
+              <svg id="chromGeneral" viewBox="0 0 560 268"></svg>
 
               <div class="zoom-connector">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16.5 5 8h14z" fill="currentColor"/></svg>
@@ -570,12 +570,15 @@
     return v.toFixed(2).replace(/\.?0+$/,'').replace('.',',');
   }
 
-  /* Vista general: los 12 compuestos, sin etiquetar (para eso esta el zoom).
-     Solo marca -- con una banda -- donde cae el par que se ve en detalle abajo. */
+  /* Vista general: los 16 compuestos, cada uno con su nombre (rotado, para
+     que entren todos sin pisarse demasiado -- los 3 pares casi coeluidos
+     igual se superponen un poco entre si, porque en el grafico tambien lo
+     hacen). Una banda punteada marca donde cae el par que se ve en detalle
+     abajo. */
   function renderGeneralChrom(){
     var svg = document.getElementById('chromGeneral');
     svg.innerHTML = '';
-    var W=560,H=230, padL=52,padR=14,padT=14,padB=34;
+    var W=560,H=268, padL=52,padR=14,padT=50,padB=34;
     var plotW=W-padL-padR, plotH=H-padT-padB;
     var baseY = padT+plotH;
 
@@ -625,8 +628,8 @@
     var xlab = svgEl('text',{x:padL+plotW/2,y:H-3,'text-anchor':'middle',class:'axis-label'});
     xlab.textContent = 'Tiempo (min)'; svg.appendChild(xlab);
 
-    // --- traza: offset + 12 gaussianas (mismo sigma para todas) + ruido ---
-    var allPeaks = PEAKS_MORE.concat([{tR:TR1,h1:H_AT_1},{tR:TR2,h1:H_AT_1_ETOH}]);
+    // --- traza: offset + 16 gaussianas (mismo sigma para todas) + ruido ---
+    var allPeaks = PEAKS_MORE.concat([{tR:TR1,h1:H_AT_1,name:AN1},{tR:TR2,h1:H_AT_1_ETOH,name:AN2}]);
     var steps = 900, d = '';
     for(var i=0;i<=steps;i++){
       var tt = xMin + i*(xMax-xMin)/steps;
@@ -640,6 +643,26 @@
     }
     svg.appendChild(svgEl('path',{d:d, fill:'none', stroke:'#0ea5e9', 'stroke-width':1.3,
       'stroke-linejoin':'round','vector-effect':'non-scaling-stroke'}));
+
+    // --- nombre de cada compuesto, rotado arriba de su pico. Los pares casi
+    // coeluidos (tR muy cerca del anterior) arrancan mas arriba para que las
+    // dos diagonales no se pisen de entrada. */
+    var labeled = allPeaks.slice().sort(function(a,b){ return a.tR-b.tR; });
+    var prevTR = null;
+    labeled.forEach(function(pk){
+      var apexPA = OFFSET + pk.h1/sr;
+      var tight = prevTR!==null && (pk.tR-prevTR) < 0.2;
+      var lx = xPix(pk.tR);
+      var ly = Math.max(12, yPix(apexPA) - (tight?20:6));
+      var isCrit = (pk.name===AN1 || pk.name===AN2);
+      var lb = svgEl('text',{x:lx, y:ly, 'text-anchor':'start',
+        transform:'rotate(-60 '+lx+' '+ly+')',
+        'font-size':8, 'font-weight':isCrit?700:600,
+        fill:isCrit?'#0284c7':'#64748b'});
+      lb.textContent = pk.name;
+      svg.appendChild(lb);
+      prevTR = pk.tR;
+    });
   }
 
   function renderChrom(){
